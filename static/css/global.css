@@ -9,6 +9,7 @@ main {
     padding-top: 62px;
     flex: 1;
     display: flex;
+    justify-content: center;
 }
 
 .btn-custom {
@@ -19,6 +20,10 @@ main {
 .btn-custom:hover {
     background-color: #a62521;
     color: #ffffff;
+}
+
+.container-narrow {
+    max-width: 400px;
 }
 
 /* Navbar */
