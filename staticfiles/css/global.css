@@ -1,0 +1,16 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    padding-top: 62px;
+    flex: 1;
+}
+
+/* Navbar */
+#nav-logo {
+    height: 35px;
+}
