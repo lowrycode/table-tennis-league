@@ -8,6 +8,17 @@ html, body {
 main {
     padding-top: 62px;
     flex: 1;
+    display: flex;
+}
+
+.btn-custom {
+    background-color: #cd2f29;
+    color: #f0f0f0;
+}
+
+.btn-custom:hover {
+    background-color: #a62521;
+    color: #ffffff;
 }
 
 /* Navbar */
