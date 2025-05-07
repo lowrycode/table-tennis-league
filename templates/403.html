@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-narrow d-flex justify-content-center align-items-center flex-grow-1">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="visually-hidden">403 - Forbidden</h1>
+            <img src="{% static 'images/error-403.png' %}" alt="403 Access Forbidden" class="img-fluid">
+            <p>Looks like you don't have permission to view this page.</p>
+            <p>If you think this is a mistake, please contact the league administrator.</p>
+            <a href="{% url "home" %}" class="btn btn-custom mb-5">Go to Homepage</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
