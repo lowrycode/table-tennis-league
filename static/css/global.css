@@ -1,3 +1,13 @@
+/* Common Page Elements */
+:root {
+    /* Accounting for navbar */
+    --navbar-height: 49px;
+    scroll-padding-top: var(--navbar-height);
+    /* Colours */
+    --light-background-1: #ffffff;
+    --light-background-2: #f0f0f0;
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -6,13 +16,25 @@ html, body {
 }
 
 main {
-    padding-top: 50px;
+    padding-top: var(--navbar-height);
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+/* Containers */
+.container-narrow {
+    max-width: 400px;
+    margin: 0 2rem;
+}
+
+.container-slim {
+    max-width: 800px;
+    margin: 0 2rem;
+}
+
+/* Buttons */
 .btn-custom {
     background-color: #cd2f29;
     color: #f0f0f0;
@@ -23,10 +45,6 @@ main {
     color: #ffffff;
 }
 
-.container-narrow {
-    max-width: 400px;
-}
-
 /* Navbar */
 .navbar {
     padding: 2px 0;
@@ -34,4 +52,40 @@ main {
 
 #nav-logo {
     height: 35px;
+}
+
+/* Homepage */
+#hero {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+}
+
+#hero-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70%;
+    /* object-position: top center; */
+}
+
+#hero-overlay {
+    position: absolute;
+    bottom: 5%;
+    left: 5%;
+    width: 300px;
+}
+
+#about {
+    background-color: var(--light-background-2);
+}
+
+/* Media Queries */
+@media (min-width: 900px) { 
+
+    #hero-overlay {
+        top: 10%; /* Reduce image width for better spacing */
+        width: 35%;
+    }
 }

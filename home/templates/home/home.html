@@ -1,12 +1,43 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% load static %} {% block content %}
+<h1 class="visually-hidden">City and District Table Tennis League</h1>
+<!-- Hero Section -->
+<section id="hero">
+  <picture>
+    <source srcset="{% static 'images/hero.webp' %}" type="image/webp" />
+    <source srcset="{% static 'images/hero.jpg' %}" type="image/jpeg" />
+    <img
+      id="hero-img"
+      src="{% static 'images/hero.jpg' %}"
+      alt="Action shot of table tennis player in an arena"
+    />
+  </picture>
+  <img
+    id="hero-overlay"
+    src="{% static 'images/hero-overlay.png' %}"
+    alt="City and District Table Tennis League Logo Overlay"
+  />
+</section>
 
-{% block content %}
-<div class="container-lg">
+<!-- About Section -->
+<section id="about" class="py-4 w-100 d-flex justify-content-center">
+  <div class="container-slim">
     <div class="row">
-        <div class="col-12 text-center">
-            <p>Welcome to the homepage!</p>
-            <p>Does this look right now?</p>            
-        </div>
+      <div class="col-12 text-center">
+        <h2 class="my-3">Welcome to the City and District Table Tennis League!</h2>
+        <p>
+          Founded in 2015, our league brings together players of all skill levels
+          from across York and surrounding regions. What started as a small group
+          of passionate enthusiasts has grown into one of Yorkshire's most vibrant
+          and competitive table tennis scenes. With a focus on sportsmanship,
+          skill development, and friendly competition, we offer seasonal leagues
+          and social events for everyone from beginners to seasoned pros. Whether
+          you're looking to sharpen your skills or just have fun, this is the
+          perfect place to connect, compete, and enjoy the fast-paced excitement
+          of table tennis.
+        </p>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
 {% endblock content %}
