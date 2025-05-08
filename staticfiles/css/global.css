@@ -9,7 +9,8 @@ main {
     padding-top: 62px;
     flex: 1;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .btn-custom {
@@ -27,6 +28,10 @@ main {
 }
 
 /* Navbar */
+.navbar {
+    padding: 2px 0;
+}
+
 #nav-logo {
     height: 35px;
 }
