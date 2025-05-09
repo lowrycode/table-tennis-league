@@ -89,6 +89,10 @@ main {
     width: 100%;
 }
 
+.sponsor-img {
+    height: 60px;
+}
+
 /* Override bootstrap's active accordion button style */
 .accordion {
     --bs-accordion-btn-focus-box-shadow: 0 0 0 1px #bf2622;
