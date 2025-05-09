@@ -51,73 +51,73 @@ class NewsItemTests(TestCase):
 
     def test_is_active_property_for_currently_active_items(self):
         now = timezone.now()
-        item1 = NewsItem.objects.create(
+        active_news = NewsItem.objects.create(
             title="Is active",
             content="Currently active news item with specified expiry date",
             active_from=now - timezone.timedelta(days=1),
             active_to=now + timezone.timedelta(days=1)
         )
-        self.assertEqual(item1.is_active, True)
-        item2 = NewsItem.objects.create(
+        self.assertEqual(active_news.is_active, True)
+        unending_news = NewsItem.objects.create(
             title="Is active indefinitely",
             content="Currently active news item without any expiry date",
             active_from=now - timezone.timedelta(days=1)
         )
-        self.assertEqual(item2.is_active, True)
+        self.assertEqual(unending_news.is_active, True)
 
     def test_is_active_property_for_currently_inactive_items(self):
         now = timezone.now()
-        item1 = NewsItem.objects.create(
+        future_news_with_expiry = NewsItem.objects.create(
             title="Is not yet active",
             content="And an end date is specified",
             active_from=now + timezone.timedelta(days=1),
             active_to=now + timezone.timedelta(days=2)
         )
-        self.assertEqual(item1.is_active, False)
-        item2 = NewsItem.objects.create(
+        self.assertEqual(future_news_with_expiry.is_active, False)
+        future_news_unending = NewsItem.objects.create(
             title="Is not yet active",
             content="and no expiry date set",
             active_from=now + timezone.timedelta(days=1),
         )
-        self.assertEqual(item2.is_active, False)
+        self.assertEqual(future_news_unending.is_active, False)
         # Note: this test works without triggering a validation error because
         # although the create method saves the object to the database it does
         # not run the clean method
-        item3 = NewsItem.objects.create(
+        expired_news = NewsItem.objects.create(
             title="Has expired",
             content="News item expired in the past",
             active_from=now - timezone.timedelta(days=2),
             active_to=now - timezone.timedelta(days=1)
         )
-        self.assertEqual(item3.is_active, False)
+        self.assertEqual(expired_news.is_active, False)
 
     def test_active_to_datetime_being_earlier_than_active_from_datetime(self):
         now = timezone.now()
-        item1 = NewsItem.objects.create(
+        days_before_start = NewsItem.objects.create(
             title="End date days before start date",
             content="...",
             active_from=now + timezone.timedelta(days=1),
             active_to=now - timezone.timedelta(days=1)
         )
         with self.assertRaises(ValidationError):
-            item1.full_clean()
+            days_before_start.full_clean()
 
-        item2 = NewsItem.objects.create(
+        seconds_before_start = NewsItem.objects.create(
             title="End date seconds before start date",
             content="...",
             active_from=now + timezone.timedelta(seconds=1),
             active_to=now - timezone.timedelta(seconds=1)
         )
         with self.assertRaises(ValidationError):
-            item2.full_clean()
+            seconds_before_start.full_clean()
 
     def test_active_to_datetime_is_in_future(self):
         now = timezone.now()
-        item = NewsItem.objects.create(
+        end_in_past = NewsItem.objects.create(
             title="End date in the past",
             content="...",
             active_from=now - timezone.timedelta(days=2),
             active_to=now - timezone.timedelta(days=1)
         )
         with self.assertRaises(ValidationError):
-            item.full_clean()
+            end_in_past.full_clean()
