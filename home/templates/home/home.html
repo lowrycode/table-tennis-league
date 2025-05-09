@@ -45,34 +45,31 @@
 <!-- News Section -->
 <section id="news" class="py-4 w-100 d-flex flex-column align-items-center">
   <h2 class="visually-hidden">Latest News</h2>
+  {% if active_news_items %}
   <div class="container-slim w-100 text-center">
-    <div id="news-carousel" class="carousel slide my-3" data-bs-ride="carousel">
+    <div id="news-carousel" class="carousel slide my-3"
+      data-bs-ride="carousel" data-bs-interval="6000">
       <div class="carousel-indicators">
-        <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        {% for item in active_news_items %}
+          <button type="button" data-bs-target="#news-carousel" 
+            data-bs-slide-to="{{ forloop.counter0 }}" 
+            {% if forloop.first %}
+            class="active" aria-current="true" aria-label="Slide {{ forloop.counter }}"
+            {% else %}
+            aria-label="Slide {{ forloop.counter }}"
+            {% endif %}
+          ></button>
+        {% endfor %}
       </div>
       <div class="carousel-inner">
-        <div class="carousel-item active">
-          <h3 class="mb-3">League Registration Now Open for 25-26 Season</h3>
-          <p>
-            Please speak to your club administrator to register a tem.
-            Registration closes on June 15th.
-          </p>
+        {% for item in active_news_items %}
+        <div class="carousel-item{% if forloop.first %} active{% endif %}">
+          <h3 class="mb-3">{{ item.title }}</h3>
+          <p>{{ item.content }}</p>
         </div>
-        <div class="carousel-item">
-          <h3>News Item 2</h3>
-          <p>
-            This is the description for news item 2 This is the description for
-            news item 2 This is the description for news item 2 This is the
-            description for news item 2 This is the description for news item 2
-          </p>
-        </div>
-        <div class="carousel-item">
-          <h3>News Item 3</h3>
-          <p>This is the description for news item 3</p>
-        </div>
+        {% endfor %}
       </div>
+      {% if active_news_items|length > 1 %}
       <button
         class="carousel-control-prev"
         type="button"
@@ -91,8 +88,13 @@
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>
+      {% endif %}
     </div>
   </div>
+  {% else %}
+  <p class="m-1"><em>No news items to show at the moment.</em></p>
+  <p class="m-1">Watch this space!</p>
+  {% endif %}
 </section>
 
 <!-- FAQs Section -->
