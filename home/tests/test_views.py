@@ -48,6 +48,12 @@ class HomePageTests(TestCase):
         )
         self.assertContains(response, "Founded in 2015")
 
+    # News Section
+    def test_homepage_contains_news_section(self):
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, '<section id="news"')
+        self.assertContains(response, "Latest News")
+
     # FAQ Section
     def test_homepage_contains_faq_section(self):
         response = self.client.get(reverse("home"))

@@ -8,7 +8,7 @@
     --light-background-2: #f0f0f0;
     --primary-1: #0b2151;
     --primary-2: #a62521;
-    --secondary-1: #143c93;
+    --secondary-1: #1e4989;
     --secondary-2: #cd2f29;
 }
 
@@ -30,12 +30,12 @@ main {
 /* Containers */
 .container-narrow {
     max-width: 400px;
-    margin: 0 2rem;
+    margin: 0 1rem;
 }
 
 .container-slim {
     max-width: 800px;
-    margin: 0 2rem;
+    margin: 0 1rem;
 }
 
 /* Buttons */
@@ -58,7 +58,8 @@ main {
     height: 35px;
 }
 
-/* Homepage */
+/* HOMEPAGE */
+/* Hero section */
 #hero {
     position: relative;
     width: 100%;
@@ -81,19 +82,36 @@ main {
     width: 300px;
 }
 
-#about {
-    background-color: var(--light-background-2);
+/* News section */
+#news {
+    background-color: var(--secondary-1);
+    color: #f0f0f0;
+}
+
+.carousel-item {
+    padding: 0 3rem;
+}
+
+.carousel-item h3 {
+    color: #FFEE00;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: auto; /* or something like 2rem, 40px, etc. */
+  padding: 0.5rem; /* optional: reduce clickable area */
+}
+
+.carousel-indicators {
+    position: static;
 }
 
 #faq {
     width: 100%;
+    background-color: var(--light-background-2);
 }
 
-.sponsor-img {
-    height: 60px;
-}
-
-/* Override bootstrap's active accordion button style */
+/* Override bootstrap accordion styles */
 .accordion {
     --bs-accordion-btn-focus-box-shadow: 0 0 0 1px #bf2622;
 }
@@ -105,6 +123,10 @@ main {
 
 .accordion-button:not(.collapsed)::after {
     filter: brightness(0) invert(1); /* makes the arrow white */
+}
+
+.sponsor-img {
+    height: 60px;
 }
 
 /* Media Queries */
