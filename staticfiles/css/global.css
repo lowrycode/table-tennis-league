@@ -4,8 +4,12 @@
     --navbar-height: 49px;
     scroll-padding-top: var(--navbar-height);
     /* Colours */
-    --light-background-1: #ffffff;
+    --light-background-1: #fff;
     --light-background-2: #f0f0f0;
+    --primary-1: #0b2151;
+    --primary-2: #a62521;
+    --secondary-1: #143c93;
+    --secondary-2: #cd2f29;
 }
 
 html, body {
@@ -79,6 +83,24 @@ main {
 
 #about {
     background-color: var(--light-background-2);
+}
+
+#faq {
+    width: 100%;
+}
+
+/* Override bootstrap's active accordion button style */
+.accordion {
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 1px #bf2622;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #bf2622;
+    color: #fff;
+}    
+
+.accordion-button:not(.collapsed)::after {
+    filter: brightness(0) invert(1); /* makes the arrow white */
 }
 
 /* Media Queries */
