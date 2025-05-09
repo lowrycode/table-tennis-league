@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
+from home.models import NewsItem
 
 
-class HomePageTests(TestCase):
+class HomePageStaticTests(TestCase):
     def test_homepage_returns_correct_status_code(self):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
@@ -70,6 +72,77 @@ class HomePageTests(TestCase):
     def test_homepage_contains_sponsors_section(self):
         response = self.client.get(reverse("home"))
         self.assertContains(response, '<section id="sponsors"')
-        self.assertContains(response, 'League Sponsors')
+        self.assertContains(response, "League Sponsors")
         self.assertContains(response, 'class="sponsor-img"')
         self.assertContains(response, 'rel="noopener noreferrer"')
+
+
+class HomePageDynamicNewsTests(TestCase):
+    def test_homepage_displays_placeholder_when_no_news_items(self):
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "No news items to show at the moment.")
+        self.assertNotContains(response, 'id="news-carousel"')
+
+    def test_homepage_displays_only_active_news_items(self):
+        # Add news items
+        now = timezone.now()
+        active_news = NewsItem.objects.create(
+            title="Active News",
+            content="This is active",
+            active_from=now - timezone.timedelta(days=1),
+            active_to=now + timezone.timedelta(days=1),
+        )
+        future_news = NewsItem.objects.create(
+            title="Future News",
+            content="Not yet active",
+            active_from=now + timezone.timedelta(days=1),
+            active_to=now + timezone.timedelta(days=2),
+        )
+        expired_news = NewsItem.objects.create(
+            title="Expired News",
+            content="Was active, now expired",
+            active_from=now - timezone.timedelta(days=3),
+            active_to=now - timezone.timedelta(days=1),
+        )
+        unending_news = NewsItem.objects.create(
+            title="Always Active News",
+            content="No end date",
+            active_from=now - timezone.timedelta(days=5),
+            active_to=None,
+        )
+
+        # Request home page
+        response = self.client.get(reverse("home"))
+
+        # Active items should be shown
+        self.assertContains(response, active_news.title)
+        self.assertContains(response, unending_news.title)
+
+        # Inactive items should not be shown
+        self.assertNotContains(response, future_news.title)
+        self.assertNotContains(response, expired_news.title)
+
+    def test_news_carousel_navigation_button_visibility(self):
+        now = timezone.now()
+
+        # Carousel navigation buttons should not show with one item
+        NewsItem.objects.create(
+            title="First News Item",
+            content="First active news item",
+            active_from=now - timezone.timedelta(days=1),
+            active_to=now + timezone.timedelta(days=1),
+        )
+        response = self.client.get(reverse("home"))
+        self.assertNotContains(response, "carousel-control-prev")
+        self.assertNotContains(response, "carousel-control-next")
+
+        # Carousel navigation buttons should show with two items
+        NewsItem.objects.create(
+            title="Second News Item",
+            content="Second active news item",
+            active_from=now - timezone.timedelta(days=1),
+            active_to=now + timezone.timedelta(days=1),
+        )
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "carousel-control-prev")
+        self.assertContains(response, "carousel-control-next")
