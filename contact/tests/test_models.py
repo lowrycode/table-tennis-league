@@ -1,12 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from contact.models import Enquiry
+
+User = get_user_model()
 
 
 class EnquiryTests(TestCase):
     def setUp(self):
-        self.enquiry = Enquiry(
+        self.enquiry = Enquiry.objects.create(
             name="John",
             email="example@example.com",
             phone="01233 455677",
@@ -65,3 +68,46 @@ class EnquiryTests(TestCase):
         self.enquiry.phone = "4155552671"  # US phone number
         with self.assertRaises(ValidationError):
             self.enquiry.full_clean()
+
+    def test_enquiry_user_relationship(self):
+        user = User.objects.create_user(
+            username="testuser",
+            email="example@example.com",
+            password="password123"
+            )
+        self.enquiry.user = user
+        self.enquiry.full_clean()
+        self.enquiry.save()
+
+        self.assertEqual(self.enquiry.user, user)
+        self.assertIn(self.enquiry, user.enquiries.all())
+
+    def test_enquiries_are_ordered_desc_by_submitted_at(self):
+        # Create older enquiry
+        older = Enquiry.objects.create(
+            name="Older",
+            email="older@example.com",
+            phone="01233 455677",
+            subject="Older Enquiry",
+            message="Older message"
+        )
+        # Override submitted_at
+        older.submitted_at = timezone.now() - timezone.timedelta(days=1)
+        older.save()
+
+        # Create newer enquiry
+        newer = Enquiry.objects.create(
+            name="newer",
+            email="newer@example.com",
+            phone="01233 455677",
+            subject="Newer Enquiry",
+            message="Newer message"
+        )
+        # Override submitted_at
+        newer.submitted_at = timezone.now() + timezone.timedelta(days=1)
+        newer.save()
+
+        enquiries = list(Enquiry.objects.all())
+        self.assertEqual(enquiries[0], newer)
+        self.assertEqual(enquiries[1], self.enquiry)
+        self.assertEqual(enquiries[2], older)
