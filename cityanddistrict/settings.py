@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cloudinary_storage',
     'cloudinary',
+    'phonenumber_field',
     'home',
     'clubs',
     'contact',
@@ -122,3 +123,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Set default for django-phonenumber-field
+PHONENUMBER_DEFAULT_REGION = "GB"

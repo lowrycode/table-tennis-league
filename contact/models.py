@@ -1,10 +1,11 @@
 from django.db import models
-from django.utils import timezone
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Enquiry(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
+    phone = PhoneNumberField(null=True, blank=True)
     subject = models.CharField(max_length=150)
     message = models.TextField()
     submitted_at = models.DateTimeField(auto_now_add=True)

@@ -9,6 +9,7 @@ class EnquiryTests(TestCase):
         self.enquiry = Enquiry(
             name="John",
             email="example@example.com",
+            phone="01233 455677",
             subject="My Sample Title",
             message="Just a test",
         )
@@ -45,5 +46,22 @@ class EnquiryTests(TestCase):
 
     def test_email_is_required_field(self):
         self.enquiry.email = None
+        with self.assertRaises(ValidationError):
+            self.enquiry.full_clean()
+
+    def test_phone_is_optional_field(self):
+        self.enquiry.phone = None
+        self.enquiry.full_clean()  # Should pass because phone is optional
+        self.enquiry.save()
+        self.assertIsNone(self.enquiry.phone)
+
+    def test_invalid_phone_number(self):
+        # Test not a number
+        self.enquiry.phone = "Invalid"
+        with self.assertRaises(ValidationError):
+            self.enquiry.full_clean()
+
+        # Test invalid region
+        self.enquiry.phone = "4155552671"  # US phone number
         with self.assertRaises(ValidationError):
             self.enquiry.full_clean()
