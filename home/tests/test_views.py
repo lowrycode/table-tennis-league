@@ -76,6 +76,17 @@ class HomePageStaticTests(TestCase):
         self.assertContains(response, 'class="sponsor-img"')
         self.assertContains(response, 'rel="noopener noreferrer"')
 
+    # Footer Section
+    def test_homepage_contains_footer(self):
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "<footer")
+        self.assertContains(response, '<section id="contact"')
+        self.assertContains(response, 'class="social-media"')
+        self.assertContains(response, "fa-brands fa-instagram")
+        self.assertContains(response, "fa-brands fa-square-facebook")
+        self.assertContains(response, "fa-brands fa-x-twitter")
+        self.assertContains(response, "© 2025 Peter Lowry")
+
 
 class HomePageDynamicNewsTests(TestCase):
     def test_homepage_displays_placeholder_when_no_news_items(self):
