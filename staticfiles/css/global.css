@@ -7,6 +7,7 @@
     --light-1: #fff;
     --light-2: #f0f0f0;
     --light-3: #cfcfcf;
+    --dark-1: #0f0f0f;
     --primary-1: #0b2151;
     --primary-2: #a62521;
     --secondary-1: #1e4989;
@@ -50,6 +51,11 @@ main {
     color: #ffffff;
 }
 
+/* Links */
+a {
+    text-decoration: none;
+}
+
 /* Navbar */
 .navbar {
     padding: 2px 0;
@@ -61,7 +67,7 @@ main {
 
 /* Footer */
 footer a {
-    text-decoration: none;
+    /* text-decoration: none; */
     color: var(--light-3);
 }
 
@@ -144,6 +150,25 @@ footer a:hover {
 
 .sponsor-img {
     height: 60px;
+}
+
+/* CONTACT PAGE */
+#contact-info-box {
+    border: 1px solid black;
+    padding: 0 3rem;
+}
+
+#phone-and-email {
+    column-gap: 1.5rem;
+    row-gap: 0.3rem;
+}
+
+#phone-and-email a {
+    color: var(--primary-1);
+}
+
+#phone-and-email a:hover {
+    color: var(--secondary-1);
 }
 
 /* Media Queries */
