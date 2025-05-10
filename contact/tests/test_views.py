@@ -22,3 +22,10 @@ class ContactPageTests(TestCase):
         self.assertContains(response, "League and Website Administrator:")
         self.assertContains(response, 'href="mailto:')
         self.assertContains(response, 'href="tel:')
+
+    def test_contact_page_has_contact_info_section(self):
+        response = self.client.get(reverse("contact"))
+        self.assertContains(response, '<section id="enquiries"')
+        self.assertContains(response, "Club Enquiries")
+        self.assertContains(response, "League Enquiries")
+        self.assertContains(response, "Other Enquiries")

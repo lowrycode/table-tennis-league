@@ -171,6 +171,10 @@ footer a:hover {
     color: var(--secondary-1);
 }
 
+#enquiries {
+    background-color: var(--light-2);
+}
+
 /* Media Queries */
 @media (min-width: 900px) { 
 
