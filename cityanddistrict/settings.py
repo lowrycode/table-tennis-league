@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'home',
     'clubs',
     'contact',
+    'useraccounts'
 ]
 
 SITE_ID = 1
