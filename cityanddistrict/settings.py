@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'phonenumber_field',
+    'crispy_forms',
+    'crispy_bootstrap5',
     'home',
     'clubs',
     'contact',
@@ -126,3 +128,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Set default for django-phonenumber-field
 PHONENUMBER_DEFAULT_REGION = "GB"
+
+# Crispy Forms
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
