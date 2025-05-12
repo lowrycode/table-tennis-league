@@ -22,6 +22,7 @@ class Enquiry(models.Model):
     is_actioned = models.BooleanField(default=False)
 
     class Meta:
+        verbose_name_plural = "Enquiries"
         ordering = ["-submitted_at"]
 
     def __str__(self):
