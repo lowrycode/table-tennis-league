@@ -67,10 +67,16 @@ class SignUpPageTests(TestCase):
         # Check form errors are raised
         response = self.client.post(reverse("account_signup"), data=form_data)
         self.assertFormError(
-            response, "form", "email", "A user is already registered with this email address."
+            response,
+            "form",
+            "email",
+            "A user is already registered with this email address.",
         )
         self.assertFormError(
-            response, "form", "username", "A user with that username already exists."
+            response,
+            "form",
+            "username",
+            "A user with that username already exists.",
         )
 
     # Test valid form submission
@@ -83,7 +89,7 @@ class SignUpPageTests(TestCase):
                 "password1": "complex!2PassValidation",
                 "password2": "complex!2PassValidation",
             },
-            follow=True
+            follow=True,
         )
         # Check redirect
         self.assertRedirects(response, reverse("home"))
@@ -93,3 +99,26 @@ class SignUpPageTests(TestCase):
         self.assertEqual(User.objects.count(), 2)
         user = User.objects.get(username="seconduser")
         self.assertEqual(user.email, "second@example.com")
+
+    def test_authenticated_user_cannot_create_new_user(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("account_signup"),
+            {
+                "email": "iamloggedin@example.com",
+                "username": "trytomakewhileloggedin",
+                "password1": "newsecurepassword!1",
+                "password2": "newsecurepassword!1",
+            },
+            follow=True,
+        )
+
+        # Check redirect
+        self.assertRedirects(response, reverse("home"))
+
+        # Check user not created
+        users = User.objects.all()
+        self.assertEqual(users.count(), 1)
+        self.assertFalse(
+            User.objects.filter(username="trytomakewhileloggedin").exists()
+        )
