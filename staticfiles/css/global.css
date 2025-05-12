@@ -42,8 +42,11 @@ main {
 
 /* Buttons */
 .btn-custom {
-    background-color: #cd2f29;
+    background-color: var(--secondary-2);
+    border: 2px solid var(--primary-2);
     color: #f0f0f0;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
 }
 
 .btn-custom:hover {
@@ -173,6 +176,11 @@ footer a:hover {
 
 #enquiries {
     background-color: var(--light-2);
+}
+
+#enquiry-form {
+    max-width: 700px;
+    
 }
 
 /* Media Queries */
