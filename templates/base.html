@@ -1,6 +1,7 @@
 {% load static %}
 {% url 'home' as home_url %}
 {% url 'clubs' as clubs_url %}
+{% url 'contact' as contact_url %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -101,6 +102,16 @@
                   href="{% url 'clubs' %}"
                 >
                   Clubs
+                </a>
+              </li>
+              <!-- Contact -->
+              <li class="nav-item">
+                <a
+                  class="nav-link{% if request.path == contact_url %} active{% endif %}"
+                  {% if request.path == contact_url %}aria-current="page"{% endif %}
+                  href="{% url 'contact' %}"
+                >
+                  Contact
                 </a>
               </li>
               <!-- User Dropdown -->
