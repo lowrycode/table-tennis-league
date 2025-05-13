@@ -150,9 +150,22 @@
 
     <!-- Main -->
     <main>
+      <!-- Show logged in user-->
+      {% if user.is_authenticated %}
+      <div class="user-banner fixed-top">
+        <div class="container-lg">
+          <div class="row">
+            <div class="col-12 fst-italic text-end">
+              Logged in as {{ user.username }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
       <!-- Messages -->
       {% if messages %}
-      <div class="container-lg">
+      <div class="container-lg bring-to-front">
         <div class="row">
           <div class="col-12">
             <div class="alert-container">

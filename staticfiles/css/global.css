@@ -8,6 +8,7 @@
     --light-2: #f0f0f0;
     --light-3: #cfcfcf;
     --dark-1: #0f0f0f;
+    --dark-2: #202020;
     --primary-1: #0b2151;
     --primary-2: #a62521;
     --secondary-1: #1e4989;
@@ -27,6 +28,10 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.bring-to-front {
+    z-index: 1000;
 }
 
 /* Containers */
@@ -68,6 +73,18 @@ a {
     height: 35px;
 }
 
+/* User banner */
+.user-banner {
+    top: var(--navbar-height);
+    width: 100%;
+    /* background-color: #4c555e; */
+    background-color: #cbdae8;
+    /* color: var(--light-2); */
+    color: var(--dark-2);
+    padding: 0.2rem 0;
+    z-index: 1;
+}
+
 /* Footer */
 footer a {
     /* text-decoration: none; */
@@ -98,7 +115,7 @@ footer a:hover {
     height: 100%;
     object-fit: cover;
     object-position: 70%;
-    /* object-position: top center; */
+    z-index: -2;
 }
 
 #hero-overlay {
@@ -106,6 +123,7 @@ footer a:hover {
     bottom: 5%;
     left: 5%;
     width: 300px;
+    z-index: -1;
 }
 
 /* News section */
