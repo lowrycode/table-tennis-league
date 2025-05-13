@@ -55,6 +55,10 @@ class ContactPageTests(TestCase):
         self.assertIn("form", response.context)
         self.assertIsInstance(response.context["form"], EnquiryForm)
 
+    def test_page_contains_csrf(self):
+        response = self.client.get(reverse("contact"))
+        self.assertContains(response, 'csrfmiddlewaretoken')
+
     def test_enquiry_form_prefills_email_for_authenticated_user(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("contact"))
@@ -79,9 +83,15 @@ class ContactPageTests(TestCase):
         }
         response = self.client.post(reverse("contact"), form_data, follow=True)
         self.assertRedirects(response, reverse("contact"))
-        self.assertContains(
-            response, "Your enquiry has been submitted successfully."
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Your enquiry has been submitted successfully.",
+            msgs[0].message,
         )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
 
         # Check database entry
         self.assertEqual(Enquiry.objects.count(), 1)
@@ -103,9 +113,15 @@ class ContactPageTests(TestCase):
         }
         response = self.client.post(reverse("contact"), form_data, follow=True)
         self.assertRedirects(response, reverse("contact"))
-        self.assertContains(
-            response, "Your enquiry has been submitted successfully."
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Your enquiry has been submitted successfully.",
+            msgs[0].message,
         )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
 
         # Check database entry
         self.assertEqual(Enquiry.objects.count(), 1)
