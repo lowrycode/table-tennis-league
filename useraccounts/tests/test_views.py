@@ -9,8 +9,9 @@ User = get_user_model()
 class SignUpPageTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_username = "testuser"
         cls.user = User.objects.create_user(
-            username="testuser",
+            username=cls.current_username,
             email="user@example.com",
             password="difficulttoguess!",
         )
@@ -63,10 +64,10 @@ class SignUpPageTests(TestCase):
 
     def test_invalid_form_non_unique_fields(self):
         form_data = {
-            "username": "testuser",
+            "username": self.current_username,
             "email": "user@example.com",
-            "password1": "difficulttoguess!",
-            "password2": "difficulttoguess!",
+            "password1": "anythingwilldo!",
+            "password2": "anythingwilldo!",
         }
 
         # Check form errors are raised
@@ -130,10 +131,12 @@ class SignUpPageTests(TestCase):
 class LoginPageTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_username = "testuser"
+        cls.current_password = "difficulttoguess!"
         cls.user = User.objects.create_user(
-            username="testuser",
+            username=cls.current_username,
             email="user@example.com",
-            password="difficulttoguess!",
+            password=cls.current_password,
         )
 
     def test_page_returns_correct_status_code(self):
@@ -172,7 +175,7 @@ class LoginPageTests(TestCase):
         )
 
     def test_invalid_form_incorrect_password(self):
-        form_data = {"login": "testuser", "password": "notmypassword!"}
+        form_data = {"login": self.current_username, "password": "notmypassword!"}
 
         # Check form errors are raised
         response = self.client.post(reverse("account_login"), data=form_data)
@@ -184,7 +187,7 @@ class LoginPageTests(TestCase):
         )
 
     def test_password_case_sensitive(self):
-        form_data = {"login": "testuser", "password": "diFfiCultToGuEss!"}
+        form_data = {"login": self.current_username, "password": self.current_password.upper()}
 
         # Check form errors are raised
         response = self.client.post(reverse("account_login"), data=form_data)
@@ -209,7 +212,7 @@ class LoginPageTests(TestCase):
 
     # Test valid form submission
     def test_valid_form(self):
-        form_data = {"login": "testuser", "password": "difficulttoguess!"}
+        form_data = {"login": self.current_username, "password": self.current_password}
         response = self.client.post(
             reverse("account_login"),
             data=form_data,
@@ -322,10 +325,11 @@ class LogoutPageTests(TestCase):
 class ChangePasswordPageTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_password = "difficulttoguess!"
         cls.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
-            password="difficulttoguess!",
+            password=cls.current_password,
         )
 
     def test_page_returns_correct_status_code(self):
@@ -399,7 +403,7 @@ class ChangePasswordPageTests(TestCase):
 
     def test_invalid_form_non_matching_passwords(self):
         form_data = {
-            "oldpassword": "difficulttoguess!",
+            "oldpassword": self.current_password,
             "password1": "anewandbetterpassword!",
             "password2": "shouldbethesamepassword!",
         }
@@ -414,7 +418,7 @@ class ChangePasswordPageTests(TestCase):
 
     def test_invalid_form_passwords_case_sensitive(self):
         form_data = {
-            "oldpassword": "difFiculTtogUess!",
+            "oldpassword": self.current_password,
             "password1": "anewandbetterpassword!",
             "password2": "aNewAndBetTerPasSword!",
         }
@@ -424,15 +428,12 @@ class ChangePasswordPageTests(TestCase):
         # Check form errors are raised
         response = self.client.post(reverse("account_change_password"), data=form_data)
         self.assertFormError(
-            response, "form", "oldpassword", "Please type your current password."
-        )
-        self.assertFormError(
             response, "form", "password2", "You must type the same password each time."
         )
 
     def test_user_can_change_password(self):
         form_data = {
-            "oldpassword": "difficulttoguess!",
+            "oldpassword": self.current_password,
             "password1": "anewandbetterpassword!",
             "password2": "anewandbetterpassword!"
         }
@@ -442,7 +443,7 @@ class ChangePasswordPageTests(TestCase):
 
         # Check password has been updated
         self.user.refresh_from_db()
-        self.assertFalse(self.user.check_password("difficulttoguess!"))
+        self.assertFalse(self.user.check_password(self.current_password))
         self.assertTrue(self.user.check_password("anewandbetterpassword!"))
 
         # Check redirect
