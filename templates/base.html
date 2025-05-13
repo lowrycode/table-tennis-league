@@ -133,7 +133,7 @@
                   {% if user.is_authenticated %}
                   <li><a class="dropdown-item" href="{{ logout_url }}">Logout</a></li>
                   <li><hr class="dropdown-divider" /></li>
-                  <li><a class="dropdown-item" href="{{ change_password_url }}">Change Password</a></li>
+                  <li><a class="dropdown-item" href="{{ change_password_url }}?next={{ request.path }}">Change Password</a></li>
                   <li><a class="dropdown-item" href="#">Account Settings</a></li>
                   {% else %}
                   <li><a class="dropdown-item" href="{{ login_url }}">Login</a></li>
