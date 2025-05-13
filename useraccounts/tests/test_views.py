@@ -254,3 +254,66 @@ class LoginPageTests(TestCase):
         self.assertTrue(user.is_authenticated)
         self.assertEqual(user.username, self.user.username)
         self.assertNotEqual(user.username, user2.username)
+
+
+class LogoutPageTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="difficulttoguess!",
+        )
+
+    def test_page_returns_correct_status_code(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_logout"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_returns_correct_template(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_logout"))
+        self.assertTemplateUsed(response, "account/logout.html")
+
+    def test_page_redirects_unauthenticated_user(self):
+        response = self.client.get(reverse("account_logout"))
+        self.assertRedirects(response, reverse("home"))
+
+    def test_page_has_title(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_logout"))
+        self.assertContains(response, "<h1")
+        self.assertContains(response, "Log Out")
+
+    def test_page_contains_csrf(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_logout"))
+        self.assertContains(response, 'csrfmiddlewaretoken')
+
+    def test_page_contains_go_back_button(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_logout"))
+        self.assertContains(response, '<a')
+        self.assertContains(response, 'href')
+        self.assertContains(response, 'Go Back')
+        self.assertContains(response, 'javascript:history.back()')
+
+    def test_user_can_logout(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("account_logout"), follow=True)
+
+        # Check logged out
+        user = response.context["user"]
+        self.assertFalse(user.is_authenticated)
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "You have signed out.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+        # Check redirect
+        self.assertRedirects(response, reverse("home"))
