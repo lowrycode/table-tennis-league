@@ -317,3 +317,142 @@ class LogoutPageTests(TestCase):
 
         # Check redirect
         self.assertRedirects(response, reverse("home"))
+
+
+class ChangePasswordPageTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="difficulttoguess!",
+        )
+
+    def test_page_returns_correct_status_code(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_change_password"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_returns_correct_template(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_change_password"))
+        self.assertTemplateUsed(response, "account/password_change.html")
+
+    def test_page_redirects_unauthenticated_user(self):
+        response = self.client.get(reverse("account_change_password"))
+        self.assertRedirects(response, f"{reverse("account_login")}?next={reverse("account_change_password")}")
+
+    def test_page_has_title(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_change_password"))
+        self.assertContains(response, "<h1")
+        self.assertContains(response, "Change Password")
+
+    def test_page_contains_csrf(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_change_password"))
+        self.assertContains(response, 'csrfmiddlewaretoken')
+
+    def test_page_contains_go_back_button(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_change_password"))
+        self.assertContains(response, '<a')
+        self.assertContains(response, 'href')
+        self.assertContains(response, 'Go Back')
+        self.assertContains(response, 'javascript:history.back()')
+
+    def test_invalid_form_missing_required_fields(self):
+        form_data = {
+            "oldpassword": "",
+            "password1": "",
+            "password2": "",
+        }
+
+        self.client.force_login(self.user)
+
+        # Check form errors are raised
+        response = self.client.post(reverse("account_change_password"), data=form_data)
+        self.assertFormError(
+            response, "form", "oldpassword", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "password1", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "password2", "This field is required."
+        )
+
+    def test_invalid_form_incorrect_old_password(self):
+        form_data = {
+            "oldpassword": "notmyoldpassword!",
+            "password1": "anewandbetterpassword!",
+            "password2": "anewandbetterpassword!",
+        }
+
+        self.client.force_login(self.user)
+
+        # Check form errors are raised
+        response = self.client.post(reverse("account_change_password"), data=form_data)
+        self.assertFormError(
+            response, "form", "oldpassword", "Please type your current password."
+        )
+
+    def test_invalid_form_non_matching_passwords(self):
+        form_data = {
+            "oldpassword": "difficulttoguess!",
+            "password1": "anewandbetterpassword!",
+            "password2": "shouldbethesamepassword!",
+        }
+
+        self.client.force_login(self.user)
+
+        # Check form errors are raised
+        response = self.client.post(reverse("account_change_password"), data=form_data)
+        self.assertFormError(
+            response, "form", "password2", "You must type the same password each time."
+        )
+
+    def test_invalid_form_passwords_case_sensitive(self):
+        form_data = {
+            "oldpassword": "difFiculTtogUess!",
+            "password1": "anewandbetterpassword!",
+            "password2": "aNewAndBetTerPasSword!",
+        }
+
+        self.client.force_login(self.user)
+
+        # Check form errors are raised
+        response = self.client.post(reverse("account_change_password"), data=form_data)
+        self.assertFormError(
+            response, "form", "oldpassword", "Please type your current password."
+        )
+        self.assertFormError(
+            response, "form", "password2", "You must type the same password each time."
+        )
+
+    def test_user_can_change_password(self):
+        form_data = {
+            "oldpassword": "difficulttoguess!",
+            "password1": "anewandbetterpassword!",
+            "password2": "anewandbetterpassword!"
+        }
+
+        self.client.force_login(self.user)
+        response = self.client.post(f"{reverse("account_change_password")}?next={reverse("contact")}", data=form_data, follow=True)
+
+        # Check password has been updated
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.check_password("difficulttoguess!"))
+        self.assertTrue(self.user.check_password("anewandbetterpassword!"))
+
+        # Check redirect
+        self.assertRedirects(response, reverse("contact"))
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Password successfully changed.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
