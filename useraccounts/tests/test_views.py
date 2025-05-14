@@ -540,6 +540,12 @@ class AccountSettingsPageTests(TestCase):
         self.assertContains(response, self.user.email)
         self.assertContains(response, "Change</a>")
 
+    def test_page_has_delete_account_section(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+        self.assertContains(response, "Delete Account")
+        self.assertContains(response, "WARNING: This action cannot be undone.")
+
 
 class ChangeEmailPageTests(TestCase):
     @classmethod
@@ -623,3 +629,109 @@ class ChangeEmailPageTests(TestCase):
         self.assertFormError(
             response, "form", "email", "Enter a valid email address."
         )
+
+
+class ConfirmAccountDeletePageTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="difficulttoguess!",
+        )
+
+    def test_page_returns_correct_status_code(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_account"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_returns_correct_template(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_account"))
+        self.assertTemplateUsed(
+            response, "useraccounts/confirm_account_delete.html"
+        )
+
+    def test_page_redirects_unauthenticated_user(self):
+        response = self.client.get(reverse("delete_account"))
+        self.assertRedirects(
+            response,
+            f"{reverse("account_login")}?next={reverse("delete_account")}",
+        )
+
+    def test_page_contains_expected_title_and_warnings(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_account"))
+        self.assertContains(response, "<h1")
+        self.assertContains(response, "Delete Account?</h1>")
+        self.assertContains(
+            response,
+            (
+                "This will permanently delete your login credentials "
+                "for this website."
+            ),
+        )
+        self.assertContains(response, "action cannot be undone")
+
+    def test_page_contains_csrf(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_account"))
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    def test_page_contains_cancel_button(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_account"))
+        self.assertContains(response, "<a")
+        self.assertContains(response, "href")
+        self.assertContains(response, "Cancel")
+        self.assertContains(response, "javascript:history.back()")
+
+    def test_page_contains_confirm_delete_checkbox(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_account"))
+        self.assertContains(response, "input")
+        self.assertContains(response, 'type="checkbox"')
+        self.assertContains(response, 'id="confirm-delete"')
+
+    def test_view_requires_confirm_delete_checkbox(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("delete_account"), {})
+
+        # Check user still exists
+        self.assertTrue(
+            User.objects.filter(username=self.user.username).exists()
+        )
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "You must confirm before deleting your account.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.WARNING)
+
+    def test_user_can_delete_account(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("delete_account"),
+            {"confirm_delete": "on"},
+            follow=True,
+        )
+
+        # Check user is no longer in database
+        self.assertFalse(
+            User.objects.filter(username=self.user.username).exists()
+        )
+
+        # Check redirect
+        self.assertRedirects(response, reverse("home"))
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Your account has been deleted.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
