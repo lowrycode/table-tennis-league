@@ -29,7 +29,7 @@ class SignUpPageTests(TestCase):
         response = self.client.get(reverse("account_signup"))
         self.assertRedirects(response, reverse("home"))
 
-    def test_page_has_title(self):
+    def test_page_contains_expected_title(self):
         response = self.client.get(reverse("account_signup"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Sign Up")
@@ -152,7 +152,7 @@ class LoginPageTests(TestCase):
         response = self.client.get(reverse("account_login"))
         self.assertRedirects(response, reverse("home"))
 
-    def test_page_has_title(self):
+    def test_page_contains_expected_title(self):
         response = self.client.get(reverse("account_login"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Log in")
@@ -297,7 +297,7 @@ class LogoutPageTests(TestCase):
         response = self.client.get(reverse("account_logout"))
         self.assertRedirects(response, reverse("home"))
 
-    def test_page_has_title(self):
+    def test_page_contains_expected_title(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
         self.assertContains(response, "<h1")
@@ -361,10 +361,13 @@ class ChangePasswordPageTests(TestCase):
         response = self.client.get(reverse("account_change_password"))
         self.assertRedirects(
             response,
-            f"{reverse("account_login")}?next={reverse("account_change_password")}",
+            (
+                f"{reverse("account_login")}"
+                f"?next={reverse("account_change_password")}"
+            ),
         )
 
-    def test_page_has_title(self):
+    def test_page_contains_expected_title(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
         self.assertContains(response, "<h1")
@@ -524,8 +527,99 @@ class AccountSettingsPageTests(TestCase):
             f"{reverse("account_login")}?next={reverse("account_settings")}",
         )
 
-    def test_page_has_title(self):
+    def test_page_contains_expected_title(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Account Settings")
+
+    def test_page_has_email_address_section(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+        self.assertContains(response, 'id="user-email"')
+        self.assertContains(response, self.user.email)
+        self.assertContains(response, "Change</a>")
+
+
+class ChangeEmailPageTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="difficulttoguess!",
+        )
+
+    def test_page_returns_correct_status_code(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("change_email"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_returns_correct_template(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("change_email"))
+        self.assertTemplateUsed(response, "useraccounts/change_email.html")
+
+    def test_page_redirects_unauthenticated_user(self):
+        response = self.client.get(reverse("change_email"))
+        self.assertRedirects(
+            response,
+            f"{reverse("account_login")}?next={reverse("change_email")}",
+        )
+
+    def test_page_contains_expected_title(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("change_email"))
+        self.assertContains(response, "<h1")
+        self.assertContains(response, "Change Email")
+
+    def test_page_contains_csrf(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("change_email"))
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    def test_page_contains_go_back_button(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("change_email"))
+        self.assertContains(response, "<a")
+        self.assertContains(response, "href")
+        self.assertContains(response, "Go Back")
+        self.assertContains(response, "javascript:history.back()")
+
+    def test_user_can_update_email(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("change_email"),
+            {"email": "myupdatedemail@example.com"},
+            follow=True,
+        )
+
+        # Check email has been updated
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "myupdatedemail@example.com")
+
+        # Check redirect
+        self.assertRedirects(response, reverse("account_settings"))
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Your email has been updated.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+    def test_invalid_email_does_not_update_user(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("change_email"),
+            {"email": "not_an_email"},
+        )
+
+        self.user.refresh_from_db()
+        self.assertNotEqual(self.user.email, "not_an_email")
+        self.assertEqual(self.user.email, "user@example.com")
+        self.assertFormError(
+            response, "form", "email", "Enter a valid email address."
+        )
