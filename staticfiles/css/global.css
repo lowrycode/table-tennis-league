@@ -36,6 +36,14 @@ main {
     z-index: 1000;
 }
 
+.row-gap-3 {
+    row-gap: 1rem;
+}
+
+.col-gap-4 {
+    column-gap: 1.5rem;
+}
+
 /* Containers */
 .container-max-4 {
     max-width: 400px;
