@@ -37,12 +37,12 @@ main {
 }
 
 /* Containers */
-.container-narrow {
+.container-max-4 {
     max-width: 400px;
     margin: 0 1rem;
 }
 
-.container-slim {
+.container-max-8 {
     max-width: 800px;
     margin: 0 1rem;
 }
