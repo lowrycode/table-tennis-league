@@ -42,6 +42,11 @@ main {
     margin: 0 1rem;
 }
 
+.container-max-6 {
+    max-width: 600px;
+    margin: 0 1rem;
+}
+
 .container-max-8 {
     max-width: 800px;
     margin: 0 1rem;
