@@ -36,7 +36,7 @@ class SignUpPageTests(TestCase):
 
     def test_page_contains_csrf(self):
         response = self.client.get(reverse("account_signup"))
-        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, "csrfmiddlewaretoken")
 
     # Test invalid form submissions
     def test_invalid_form_missing_required_fields(self):
@@ -94,7 +94,7 @@ class SignUpPageTests(TestCase):
                 "username": "seconduser",
                 "password1": "complex!2PassValidation",
                 "password2": "complex!2PassValidation",
-            }
+            },
         )
         # Check redirect
         self.assertRedirects(response, reverse("home"))
@@ -114,7 +114,7 @@ class SignUpPageTests(TestCase):
                 "username": "trytomakewhileloggedin",
                 "password1": "newsecurepassword!1",
                 "password2": "newsecurepassword!1",
-            }
+            },
         )
 
         # Check redirect
@@ -159,7 +159,7 @@ class LoginPageTests(TestCase):
 
     def test_page_contains_csrf(self):
         response = self.client.get(reverse("account_login"))
-        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, "csrfmiddlewaretoken")
 
     # Test invalid form submissions
     def test_invalid_form_missing_required_fields(self):
@@ -175,7 +175,10 @@ class LoginPageTests(TestCase):
         )
 
     def test_invalid_form_incorrect_password(self):
-        form_data = {"login": self.current_username, "password": "notmypassword!"}
+        form_data = {
+            "login": self.current_username,
+            "password": "notmypassword!",
+        }
 
         # Check form errors are raised
         response = self.client.post(reverse("account_login"), data=form_data)
@@ -183,11 +186,14 @@ class LoginPageTests(TestCase):
             response,
             "form",
             None,
-            ["The username and/or password you specified are not correct."]
+            ["The username and/or password you specified are not correct."],
         )
 
     def test_password_case_sensitive(self):
-        form_data = {"login": self.current_username, "password": self.current_password.upper()}
+        form_data = {
+            "login": self.current_username,
+            "password": self.current_password.upper(),
+        }
 
         # Check form errors are raised
         response = self.client.post(reverse("account_login"), data=form_data)
@@ -195,11 +201,14 @@ class LoginPageTests(TestCase):
             response,
             "form",
             None,
-            ["The username and/or password you specified are not correct."]
+            ["The username and/or password you specified are not correct."],
         )
 
     def test_invalid_form_incorrect_username(self):
-        form_data = {"login": "notaknownuser", "password": "wonthaveappasword!"}
+        form_data = {
+            "login": "notaknownuser",
+            "password": "wonthaveappasword!",
+        }
 
         # Check form errors are raised
         response = self.client.post(reverse("account_login"), data=form_data)
@@ -207,12 +216,15 @@ class LoginPageTests(TestCase):
             response,
             "form",
             None,
-            ["The username and/or password you specified are not correct."]
+            ["The username and/or password you specified are not correct."],
         )
 
     # Test valid form submission
     def test_valid_form(self):
-        form_data = {"login": self.current_username, "password": self.current_password}
+        form_data = {
+            "login": self.current_username,
+            "password": self.current_password,
+        }
         response = self.client.post(
             reverse("account_login"),
             data=form_data,
@@ -240,7 +252,10 @@ class LoginPageTests(TestCase):
             email="user2@example.com",
             password="alsodifficulttotguess!",
         )
-        form_data = {"login": "seconduser", "password": "alsodifficulttotguess!"}
+        form_data = {
+            "login": "seconduser",
+            "password": "alsodifficulttotguess!",
+        }
 
         self.client.force_login(self.user)
         response = self.client.post(
@@ -291,15 +306,15 @@ class LogoutPageTests(TestCase):
     def test_page_contains_csrf(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
-        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_page_contains_go_back_button(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
-        self.assertContains(response, '<a')
-        self.assertContains(response, 'href')
-        self.assertContains(response, 'Go Back')
-        self.assertContains(response, 'javascript:history.back()')
+        self.assertContains(response, "<a")
+        self.assertContains(response, "href")
+        self.assertContains(response, "Go Back")
+        self.assertContains(response, "javascript:history.back()")
 
     def test_user_can_logout(self):
         self.client.force_login(self.user)
@@ -344,7 +359,10 @@ class ChangePasswordPageTests(TestCase):
 
     def test_page_redirects_unauthenticated_user(self):
         response = self.client.get(reverse("account_change_password"))
-        self.assertRedirects(response, f"{reverse("account_login")}?next={reverse("account_change_password")}")
+        self.assertRedirects(
+            response,
+            f"{reverse("account_login")}?next={reverse("account_change_password")}",
+        )
 
     def test_page_has_title(self):
         self.client.force_login(self.user)
@@ -355,15 +373,15 @@ class ChangePasswordPageTests(TestCase):
     def test_page_contains_csrf(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
-        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_page_contains_go_back_button(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
-        self.assertContains(response, '<a')
-        self.assertContains(response, 'href')
-        self.assertContains(response, 'Go Back')
-        self.assertContains(response, 'javascript:history.back()')
+        self.assertContains(response, "<a")
+        self.assertContains(response, "href")
+        self.assertContains(response, "Go Back")
+        self.assertContains(response, "javascript:history.back()")
 
     def test_invalid_form_missing_required_fields(self):
         form_data = {
@@ -375,7 +393,9 @@ class ChangePasswordPageTests(TestCase):
         self.client.force_login(self.user)
 
         # Check form errors are raised
-        response = self.client.post(reverse("account_change_password"), data=form_data)
+        response = self.client.post(
+            reverse("account_change_password"), data=form_data
+        )
         self.assertFormError(
             response, "form", "oldpassword", "This field is required."
         )
@@ -396,9 +416,14 @@ class ChangePasswordPageTests(TestCase):
         self.client.force_login(self.user)
 
         # Check form errors are raised
-        response = self.client.post(reverse("account_change_password"), data=form_data)
+        response = self.client.post(
+            reverse("account_change_password"), data=form_data
+        )
         self.assertFormError(
-            response, "form", "oldpassword", "Please type your current password."
+            response,
+            "form",
+            "oldpassword",
+            "Please type your current password.",
         )
 
     def test_invalid_form_non_matching_passwords(self):
@@ -411,9 +436,14 @@ class ChangePasswordPageTests(TestCase):
         self.client.force_login(self.user)
 
         # Check form errors are raised
-        response = self.client.post(reverse("account_change_password"), data=form_data)
+        response = self.client.post(
+            reverse("account_change_password"), data=form_data
+        )
         self.assertFormError(
-            response, "form", "password2", "You must type the same password each time."
+            response,
+            "form",
+            "password2",
+            "You must type the same password each time.",
         )
 
     def test_invalid_form_passwords_case_sensitive(self):
@@ -426,20 +456,29 @@ class ChangePasswordPageTests(TestCase):
         self.client.force_login(self.user)
 
         # Check form errors are raised
-        response = self.client.post(reverse("account_change_password"), data=form_data)
+        response = self.client.post(
+            reverse("account_change_password"), data=form_data
+        )
         self.assertFormError(
-            response, "form", "password2", "You must type the same password each time."
+            response,
+            "form",
+            "password2",
+            "You must type the same password each time.",
         )
 
     def test_user_can_change_password(self):
         form_data = {
             "oldpassword": self.current_password,
             "password1": "anewandbetterpassword!",
-            "password2": "anewandbetterpassword!"
+            "password2": "anewandbetterpassword!",
         }
 
         self.client.force_login(self.user)
-        response = self.client.post(f"{reverse("account_change_password")}?next={reverse("contact")}", data=form_data, follow=True)
+        response = self.client.post(
+            f"{reverse("account_change_password")}?next={reverse("contact")}",
+            data=form_data,
+            follow=True,
+        )
 
         # Check password has been updated
         self.user.refresh_from_db()
@@ -457,3 +496,36 @@ class ChangePasswordPageTests(TestCase):
             msgs[0].message,
         )
         self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+
+class AccountSettingsPageTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="difficulttoguess!",
+        )
+
+    def test_page_returns_correct_status_code(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_returns_correct_template(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+        self.assertTemplateUsed(response, "useraccounts/account_settings.html")
+
+    def test_page_redirects_unauthenticated_user(self):
+        response = self.client.get(reverse("account_settings"))
+        self.assertRedirects(
+            response,
+            f"{reverse("account_login")}?next={reverse("account_settings")}",
+        )
+
+    def test_page_has_title(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+        self.assertContains(response, "<h1")
+        self.assertContains(response, "Account Settings")
