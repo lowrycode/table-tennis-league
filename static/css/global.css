@@ -88,16 +88,21 @@ a {
     height: 35px;
 }
 
+.nav-user-highlight {
+    color: var(--primary-3);
+}
+
 /* User banner */
 .user-banner {
+    position: absolute;
     top: var(--navbar-height);
-    width: 100%;
-    /* background-color: #4c555e; */
-    background-color: #cbdae8;
-    /* color: var(--light-2); */
-    color: var(--dark-2);
-    padding: 0.2rem 0;
     z-index: 1;
+}
+
+.user-logged-in {
+    padding: 0.2rem 1rem;
+    background-color: var(--primary-3);
+    color: var(--dark-2);
 }
 
 /* Footer */
