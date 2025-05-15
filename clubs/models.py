@@ -10,4 +10,13 @@ class Club(models.Model):
 
 
 class ClubInfo(models.Model):
-    image = CloudinaryField('image', default='placeholder')
+    club = models.OneToOneField(
+        Club, on_delete=models.CASCADE, related_name="info"
+    )
+    website = models.URLField(null=True, blank=True)
+    image = CloudinaryField("image", default="placeholder")
+    contact_name = models.CharField(max_length=100)
+    contact_email = models.EmailField()
+
+    def __str__(self):
+        return self.club.name
