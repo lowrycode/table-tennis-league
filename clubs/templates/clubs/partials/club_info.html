@@ -1,0 +1,42 @@
+{% with club as info %}
+<article class="border my-4 p-3">
+    <!-- Club Name and Website -->
+    <div class="d-flex justify-content-between">
+      <h3>{{club.name}}</h3>
+      {% if club.website %}
+      <a
+        href="{{club.website}}"
+        target="_blank"
+        rel="noopener noreferrer"
+        alt="Link to club website (opens on an another tab)"
+        >Visit Website</a
+      >
+      {% endif %}
+    </div>
+    <!-- Contact Details -->
+    <div class="d-flex justify-content-between flex-wrap gap-3 border p-3 mt-3 mx-1">
+      <div>
+        <strong>Contact: </strong>
+        <span>{{ club.contact_name }}</span>
+      </div>
+      {% if club.contact_phone %}
+        <a
+          href="tel:{{ club.contact_phone }}"
+          class="d-flex align-items-center"
+          aria-label="Call {{ club.contact_name }} on {{ club.contact_phone }}"
+        >
+          <i class="fa-solid fa-phone me-2" aria-hidden="true"></i>
+          <span>{{ club.contact_phone }}</span>
+        </a>
+      {% endif %}
+      <a
+        href="mailto:{{ club.contact_email }}"
+        class="d-flex align-items-center"
+        aria-label="Email {{ club.contact_email }}"
+      >
+        <i class="fa-solid fa-envelope me-2" aria-hidden="true"></i>
+        <span>{{ club.contact_email }}</span>
+      </a>
+  
+  </article>
+  {% endwith %}

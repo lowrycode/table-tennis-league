@@ -1,14 +1,23 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<p>Welcome to the clubs page!</p>
-{% if "placeholder" in club_info.image.url %}
-<p>No image uploaded</p>
-{% else %}
-<p>Here is your image</p>
-<img
-  src=" {{ club_info.image.url }}"
-  alt="A test image"
-/>
-{% endif %}
-{% endblock content %}
+<h1 class="visually-hidden">Clubs Page</h1>
+<!-- Club Info Section -->
+<section id="club-info" class="w-100 mt-4 px-2">
+  <div class="container-lg">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-9">
+        <h2 class="text-center my-5">Clubs</h2>
+        <!-- All Clubs -->
+        {% for club in clubs %}
+          {% include 'clubs/partials/club_info.html' %}
+        {% empty %}
+          <p class="text-center m-1">No clubs are currently listed.</p>
+          <p class="text-center m-1">Please check back soon.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
