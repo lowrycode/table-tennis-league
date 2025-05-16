@@ -7,13 +7,16 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Club(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self):
         return self.name
 
 
 class ClubInfo(models.Model):
-    club = models.OneToOneField(
-        Club, on_delete=models.CASCADE, related_name="info"
+    club = models.ForeignKey(
+        Club, on_delete=models.CASCADE, related_name="infos"
     )
     website = models.URLField(null=True, blank=True)
     image = CloudinaryField("image", default="placeholder")
@@ -32,22 +35,28 @@ class ClubInfo(models.Model):
     equipment_provided = models.BooleanField(default=False)
     membership_required = models.BooleanField(default=False)
     free_taster = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)
 
+    class Meta:
+        verbose_name_plural = "Club Information"
+        ordering = ["club", "-created_on"]
+
     def __str__(self):
-        return self.club.name
+        created_on_str = (
+            self.created_on.strftime("%d/%m/%y at %I:%M %p")
+            if self.created_on
+            else "No date"
+        )
+        return f"{self.club.name} ({created_on_str})"
 
     def clean(self):
         super().clean()
         if len(self.description) > 500:
             raise ValidationError(
-                {
-                    "description": "Cannot be more than 500 characters."
-                }
+                {"description": "Cannot be more than 500 characters."}
             )
         if len(self.session_info) > 500:
             raise ValidationError(
-                {
-                    "session_info": "Cannot be more than 500 characters."
-                }
+                {"session_info": "Cannot be more than 500 characters."}
             )

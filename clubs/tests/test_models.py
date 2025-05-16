@@ -49,7 +49,7 @@ class ClubInfoTests(TestCase):
         self.club_info.save()
 
     def test_string_representation(self):
-        self.assertEqual(str(self.club_info), self.club_info.club.name)
+        self.assertIn(self.club_info.club.name, str(self.club_info))
 
     # Multi-field tests
     def test_required_fields(self):
@@ -72,6 +72,7 @@ class ClubInfoTests(TestCase):
             "equipment_provided": False,
             "membership_required": False,
             "free_taster": False,
+            "created_on": False,
             "approved": False,
         }
 
@@ -101,10 +102,16 @@ class ClubInfoTests(TestCase):
             )
 
     # Tests for club field
-    def test_club_field_one_to_one(self):
+    def test_club_field_many_to_one(self):
         club_info2 = ClubInfo(**self.info_data)  # linking to same club again
-        with self.assertRaises(ValidationError):
-            club_info2.full_clean()
+
+        # These should not raise an error
+        club_info2.full_clean()
+        club_info2.save()
+
+        # Check that both ClubInfos exist for the same club
+        infos = ClubInfo.objects.filter(club=self.info_data["club"])
+        self.assertEqual(infos.count(), 2)
 
     def test_club_field_cascade_delete(self):
         # Test correct behaviour
@@ -126,7 +133,7 @@ class ClubInfoTests(TestCase):
 
     def test_club_field_related_name(self):
         self.assertEqual(self.club_info.club, self.club)
-        self.assertEqual(self.club.info, self.club_info)
+        self.assertIn(self.club_info, self.club.infos.all())
 
     # Tests for contact_name field
     def test_contact_name_max_length(self):
@@ -188,6 +195,10 @@ class ClubInfoTests(TestCase):
 
         # Check placeholder is recorded as default
         self.assertEqual(club_info.image, "placeholder")
+
+    # Tests for created_on field
+    def test_created_on_field_is_not_none(self):
+        self.assertIsNotNone(self.club_info.created_on)
 
 
 # Helper functions
