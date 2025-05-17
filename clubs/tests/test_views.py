@@ -82,6 +82,59 @@ class ClubsPageDynamicTests(TestCase):
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, self.club_info_1.contact_phone)
 
+    def test_page_displays_club_description(self):
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, self.club_info_1.description)
+
+    def test_page_displays_placeholder_image_for_missing_image(self):
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, '<picture>')
+        self.assertContains(response, 'alt="No club image provided"')
+        self.assertContains(response, "placeholder.webp")
+        self.assertContains(response, "placeholder.jpg")
+
+    def test_page_displays_image_when_provided(self):
+        # simulate non-placeholder
+        self.club_info_1.image = "custom-image.jpg"
+        self.club_info_1.save()
+
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, 'custom-image.jpg')
+        self.assertContains(response, f'alt="{self.club_1.name} image"')
+
+    def test_page_displays_club_session_info(self):
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, "Sessions</h4>")
+        self.assertContains(response, self.club_info_1.session_info)
+
+    def test_page_displays_checkboxes(self):
+        # Ensure all checkboxes should appear
+        self.club_info_1.beginners = True
+        self.club_info_1.intermediates = True
+        self.club_info_1.advanced = True
+        self.club_info_1.kids = True
+        self.club_info_1.adults = True
+        self.club_info_1.coaching = True
+        self.club_info_1.league = True
+        self.club_info_1.equipment_provided = True
+        self.club_info_1.membership_required = True
+        self.club_info_1.free_taster = True
+        self.club_info_1.save()
+
+        # Check they do appear
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, "fa-solid fa-square-check")
+        self.assertContains(response, "Beginners")
+        self.assertContains(response, "Intermediates")
+        self.assertContains(response, "Advanced")
+        self.assertContains(response, "Kids")
+        self.assertContains(response, "Adults")
+        self.assertContains(response, "Coaching")
+        self.assertContains(response, "Participate in league")
+        self.assertContains(response, "Equipment provided")
+        self.assertContains(response, "Membership required")
+        self.assertContains(response, "Free taster sessions")
+
     def test_page_displays_only_approved_club_info(self):
         response = self.client.get(reverse("clubs"))
 
@@ -115,12 +168,16 @@ class ClubsPageDynamicTests(TestCase):
         self.info_data_1_newer = self.base_data.copy()
         self.info_data_1_newer["club"] = self.club_1
         self.info_data_1_newer["contact_name"] = "Club 1 New Contact"
-        self.info_data_1_newer["created_on"] = (
-            timezone.now() + timezone.timedelta(minutes=1)
-        )
+
         self.club_info_1_newer = ClubInfo.objects.create(
             **self.info_data_1_newer
         )
+
+        # Override created_on AFTER save for reliability
+        self.club_info_1_newer.created_on = (
+            timezone.now() + timezone.timedelta(minutes=1)
+        )
+        self.club_info_1_newer.save()
 
         response = self.client.get(reverse("clubs"))
 

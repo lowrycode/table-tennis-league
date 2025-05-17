@@ -1,42 +1,138 @@
+{% load static %}
+
 {% with club as info %}
 <article class="border my-4 p-3">
-    <!-- Club Name and Website -->
-    <div class="d-flex justify-content-between">
-      <h3>{{club.name}}</h3>
-      {% if club.website %}
+  <!-- Club Name and Website -->
+  <div class="d-flex justify-content-between flex-wrap">
+    <h3>{{club.name}}</h3>
+    {% if club.website %}
+    <a
+      href="{{club.website}}"
+      target="_blank"
+      rel="noopener noreferrer"
+      alt="Link to club website (opens on an another tab)"
+      >Visit Website</a
+    >
+    {% endif %}
+  </div>
+  <!-- Contact Details -->
+  <div class="d-flex justify-content-between flex-wrap col-gap-4 row-gap-2 border p-3 my-3 mx-1">
+    <div>
+      <strong>Contact: </strong>
+      <span>{{ club.contact_name }}</span>
+    </div>
+    {% if club.contact_phone %}
       <a
-        href="{{club.website}}"
-        target="_blank"
-        rel="noopener noreferrer"
-        alt="Link to club website (opens on an another tab)"
-        >Visit Website</a
+        href="tel:{{ club.contact_phone }}"
+        class="d-flex align-items-center"
+        aria-label="Call {{ club.contact_name }} on {{ club.contact_phone }}"
       >
+        <i class="fa-solid fa-phone me-2" aria-hidden="true"></i>
+        <span>{{ club.contact_phone }}</span>
+      </a>
+    {% endif %}
+    <a
+      href="mailto:{{ club.contact_email }}"
+      class="d-flex align-items-center"
+      aria-label="Email {{ club.contact_email }}"
+    >
+      <i class="fa-solid fa-envelope me-2" aria-hidden="true"></i>
+      <span>{{ club.contact_email }}</span>
+    </a>
+  </div>
+  <!-- Description -->
+  <div class="container">
+    <p class="my-3">{{ club.description }}</p>
+  </div>
+  <!-- Image and Session Info -->
+  <div class="container my-4">
+    <div class="row g-4">
+      <div class="d-flex justify-content-center col-12 col-md-5">
+        {% if "placeholder" in club.image.url %}
+        <picture>
+          <source srcset="{% static 'images/placeholder.webp' %}" type="image/webp" />
+          <source srcset="{% static 'images/placeholder.jpg' %}" type="image/jpeg" />
+          <img
+            class="img-fluid"
+            src="{% static 'images/placeholder.jpg' %}"
+            alt="No club image provided"
+          />
+        </picture>
+        {% else %}
+        <img class="img-fluid" src="{{ club.image.url }}" alt="{{ club.name }} image">
+        {% endif %}
+      </div>
+      <div class="col-12 col-md-7">
+        <h4 class="fs-5">Sessions</h4>
+        {{ club.session_info|linebreaksbr }}
+      </div>
+    </div>
+  </div>
+  <!-- Checkboxes -->
+  <div class="container d-flex justify-content-center my-3">
+    <div class="d-flex flex-wrap justify-content-start col-gap-5 row-gap-2">
+      {% if club.beginners %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Beginners
+        </div>
+      {% endif %}
+      {% if club.intermediates %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Intermediates
+        </div>
+      {% endif %}
+      {% if club.advanced %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Advanced
+        </div>
+      {% endif %}
+      {% if club.kids %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Kids
+        </div>
+      {% endif %}
+      {% if club.adults %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Adults
+        </div>
+      {% endif %}
+      {% if club.coaching %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Coaching
+        </div>
+      {% endif %}
+      {% if club.league %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Participate in league
+        </div>
+      {% endif %}
+      {% if club.equipment_provided %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Equipment provided
+        </div>
+      {% endif %}
+      {% if club.membership_required %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Membership required
+        </div>
+      {% endif %}
+      {% if club.free_taster %}
+        <div>
+          <i class="fa-solid fa-square-check" aria-hidden="true"></i>
+          Free taster sessions
+        </div>
       {% endif %}
     </div>
-    <!-- Contact Details -->
-    <div class="d-flex justify-content-between flex-wrap gap-3 border p-3 mt-3 mx-1">
-      <div>
-        <strong>Contact: </strong>
-        <span>{{ club.contact_name }}</span>
-      </div>
-      {% if club.contact_phone %}
-        <a
-          href="tel:{{ club.contact_phone }}"
-          class="d-flex align-items-center"
-          aria-label="Call {{ club.contact_name }} on {{ club.contact_phone }}"
-        >
-          <i class="fa-solid fa-phone me-2" aria-hidden="true"></i>
-          <span>{{ club.contact_phone }}</span>
-        </a>
-      {% endif %}
-      <a
-        href="mailto:{{ club.contact_email }}"
-        class="d-flex align-items-center"
-        aria-label="Email {{ club.contact_email }}"
-      >
-        <i class="fa-solid fa-envelope me-2" aria-hidden="true"></i>
-        <span>{{ club.contact_email }}</span>
-      </a>
-  
-  </article>
-  {% endwith %}
+  </div>
+
+</article>
+{% endwith %}
