@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from clubs.models import Club, ClubInfo, Venue
+from clubs.models import Club, ClubInfo, Venue, VenueInfo
 
 
 class ClubTests(TestCase):
@@ -22,10 +22,16 @@ class ClubTests(TestCase):
             club.full_clean()
 
     def test_club_name_max_length(self):
+        # Valid length should pass without error
+        name = "A" * 100
+        club1 = Club(name=name)
+        club1.full_clean()
+
+        # Invalid length (too long) should raise an error
         long_name = "A" * 101
-        club = Club(name=long_name)
+        club2 = Club(name=long_name)
         with self.assertRaises(ValidationError):
-            club.full_clean()
+            club2.full_clean()
 
 
 class ClubInfoTests(TestCase):
@@ -208,8 +214,40 @@ class ClubInfoTests(TestCase):
 
 class VenueTests(TestCase):
     def setUp(self):
+        self.venue_name = "My Test Venue"
+        self.venue = Venue.objects.create(name=self.venue_name)
+
+    def test_string_representation(self):
+        self.assertEqual(str(self.venue), self.venue_name)
+
+    def test_venue_name_must_be_unique(self):
+        duplicate_venue = Venue(name=self.venue_name)
+        with self.assertRaises(ValidationError):
+            duplicate_venue.full_clean()
+
+    def test_venue_name_required(self):
+        venue = Venue(name="")
+        with self.assertRaises(ValidationError):
+            venue.full_clean()
+
+    def test_venue_name_max_length(self):
+        # Valid length should pass without error
+        name = "A" * 100
+        venue1 = Venue(name=name)
+        venue1.full_clean()
+
+        # Invalid length (too long) should raise an error
+        long_name = "A" * 101
+        venue2 = Venue(name=long_name)
+        with self.assertRaises(ValidationError):
+            venue2.full_clean()
+
+
+class VenueInfoTests(TestCase):
+    def setUp(self):
+        self.venue = Venue.objects.create(name="My Test Venue")
         self.info_data = {
-            "name": "Test Venue",
+            "venue": self.venue,
             "street_address": "5 Main Street",
             "city": "York",
             "county": "Yorkshire",
@@ -217,20 +255,20 @@ class VenueTests(TestCase):
             "num_tables": 5,
             "parking_info": "We have a car park outside the venue",
         }
-        self.venue = Venue.objects.create(**self.info_data)
+        self.venue_info = VenueInfo.objects.create(**self.info_data)
 
     def test_valid_setup_info_data(self):
         # These should pass without raising errors
-        self.venue.full_clean()
-        self.venue.save()
+        self.venue_info.full_clean()
+        self.venue_info.save()
 
     def test_string_representation(self):
-        self.assertIn(self.venue.name, str(self.venue))
+        self.assertIn(self.venue_info.venue.name, str(self.venue_info))
 
     # Multi-field tests
     def test_required_fields(self):
         required_fields = {
-            "name": True,
+            "venue": True,
             "street_address": True,
             "address_line_2": False,
             "city": True,
@@ -241,13 +279,12 @@ class VenueTests(TestCase):
         }
 
         # Check each field
-        test_object = Venue()
+        test_object = VenueInfo()
         for field, is_required in required_fields.items():
             helper_test_required_fields(self, test_object, field, is_required)
 
     def test_max_lengths(self):
         fields = {
-            "name": 100,
             "street_address": 100,
             "address_line_2": 100,
             "city": 100,
@@ -259,7 +296,7 @@ class VenueTests(TestCase):
         # Check each field
         for field, max_length in fields.items():
             helper_test_max_length(
-                self, Venue, self.info_data.copy(), field, max_length
+                self, VenueInfo, self.info_data.copy(), field, max_length
             )
 
     def test_boolean_field_defaults(self):
@@ -271,7 +308,7 @@ class VenueTests(TestCase):
         # Check each field
         for field, default_value in boolean_fields.items():
             result = helper_test_boolean_default_generic(
-                field, default_value, Venue, self.info_data.copy()
+                field, default_value, VenueInfo, self.info_data.copy()
             )
             self.assertTrue(
                 result, f"Default for {field} should be {default_value}"
@@ -279,30 +316,66 @@ class VenueTests(TestCase):
 
     def test_num_fields_range(self):
         # Check lower limit is valid
-        self.venue.num_tables = 1
-        self.venue.full_clean()
+        self.venue_info.num_tables = 1
+        self.venue_info.full_clean()
 
         # Check upper limit is valid
-        self.venue.num_tables = 100
-        self.venue.full_clean()
+        self.venue_info.num_tables = 100
+        self.venue_info.full_clean()
 
         # Check invalid numbers below range
-        self.venue.num_tables = 0
+        self.venue_info.num_tables = 0
         with self.assertRaises(ValidationError):
-            self.venue.full_clean()
+            self.venue_info.full_clean()
 
-        self.venue.num_tables = -1
+        self.venue_info.num_tables = -1
         with self.assertRaises(ValidationError):
-            self.venue.full_clean()
+            self.venue_info.full_clean()
 
         # Check invalid numbers above range
-        self.venue.num_tables = 101
+        self.venue_info.num_tables = 101
         with self.assertRaises(ValidationError):
-            self.venue.full_clean()
+            self.venue_info.full_clean()
+
+    # Tests for venue field
+    def test_venue_field_many_to_one(self):
+        venue_info2 = VenueInfo(
+            **self.info_data
+        )  # linking to same venue again
+
+        # These should not raise an error
+        venue_info2.full_clean()
+        venue_info2.save()
+
+        # Check that both VenueInfos exist for the same venue
+        infos = VenueInfo.objects.filter(venue=self.info_data["venue"])
+        self.assertEqual(infos.count(), 2)
+
+    def test_venue_field_cascade_delete(self):
+        # Test correct behaviour
+        self.venue.delete()
+        self.assertFalse(
+            VenueInfo.objects.filter(id=self.venue_info.id).exists()
+        )
+
+        # Set up new venue and venue info to test opposite behaviour
+        venue2 = Venue.objects.create(name="My Second Venue")
+        info_data2 = self.info_data.copy()
+        info_data2["venue"] = venue2
+        venue_info2 = VenueInfo.objects.create(**info_data2)
+        self.assertTrue(VenueInfo.objects.filter(id=venue_info2.id).exists())
+
+        # Test opposite behaviour
+        venue_info2.delete()
+        self.assertTrue(Venue.objects.filter(id=venue2.id).exists())
+
+    def test_venue_field_related_name(self):
+        self.assertEqual(self.venue_info.venue, self.venue)
+        self.assertIn(self.venue_info, self.venue.venue_infos.all())
 
     # Tests for created_on field
     def test_created_on_field_is_not_none(self):
-        self.assertIsNotNone(self.venue.created_on)
+        self.assertIsNotNone(self.venue_info.created_on)
 
 
 # Helper functions

@@ -64,7 +64,19 @@ class ClubInfo(models.Model):
 
 
 class Venue(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class VenueInfo(models.Model):
+    venue = models.ForeignKey(
+        Venue, on_delete=models.CASCADE, related_name="venue_infos"
+    )
     street_address = models.CharField(max_length=100)
     address_line_2 = models.CharField(max_length=100, blank=True, null=True)
     city = models.CharField(max_length=100)
@@ -84,7 +96,7 @@ class Venue(models.Model):
             if self.created_on
             else "No date"
         )
-        return f"{self.name} ({created_on_str})"
+        return f"{self.venue} ({created_on_str})"
 
     def clean(self):
         super().clean()
