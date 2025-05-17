@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from clubs.models import Club, ClubInfo, Venue, VenueInfo
+from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
 
 
 class ClubTests(TestCase):
@@ -376,6 +376,85 @@ class VenueInfoTests(TestCase):
     # Tests for created_on field
     def test_created_on_field_is_not_none(self):
         self.assertIsNotNone(self.venue_info.created_on)
+
+
+class ClubVenueTests(TestCase):
+    def setUp(self):
+        self.club = Club.objects.create(name="My Test Club")
+        self.venue = Venue.objects.create(name="My Test Venue")
+        self.data = {
+            "club": self.club,
+            "venue": self.venue,
+        }
+        self.club_venue = ClubVenue.objects.create(**self.data)
+
+    def test_valid_setup_info_data(self):
+        # These should pass without raising errors
+        self.club_venue.full_clean()
+        self.club_venue.save()
+
+    def test_string_representation(self):
+        self.assertIn(self.club_venue.club.name, str(self.club_venue))
+        self.assertIn(self.club_venue.venue.name, str(self.club_venue))
+
+    # Multi-field tests
+    def test_required_fields(self):
+        required_fields = {
+            "club": True,
+            "venue": True,
+        }
+
+        test_object = ClubVenue()
+
+        # Check each field
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    # Tests for club field
+    def test_club_venue_combination_must_be_unique(self):
+        # link to same club and venue again
+        duplicate = ClubVenue(**self.data)
+
+        # These should raise an error
+        with self.assertRaises(ValidationError):
+            duplicate.full_clean()
+
+    def test_club_field_cascade_delete(self):
+        # Test correct behaviour
+        self.club.delete()
+        self.assertFalse(
+            ClubVenue.objects.filter(id=self.club_venue.id).exists()
+        )
+
+    def test_venue_field_cascade_delete(self):
+        # Test correct behaviour
+        self.venue.delete()
+        self.assertFalse(
+            ClubVenue.objects.filter(id=self.club_venue.id).exists()
+        )
+
+    def test_club_and_venue_not_deleted_when_clubvenue_deleted(self):
+        # Create new club, venue and club_venue
+        club_2 = Club.objects.create(name="My Second Club")
+        venue_2 = Venue.objects.create(name="My Second Venue")
+        data_2 = self.data.copy()
+        data_2["club"] = club_2
+        data_2["venue"] = venue_2
+        club_venue_2 = ClubVenue.objects.create(**data_2)
+        self.assertTrue(ClubVenue.objects.filter(id=club_venue_2.id).exists())
+
+        # Check club and venue not deleted
+        club_venue_2.delete()
+        self.assertTrue(Club.objects.filter(id=club_2.id).exists())
+        self.assertTrue(Venue.objects.filter(id=venue_2.id).exists())
+
+    def test_club_field_related_name(self):
+        self.assertEqual(self.club_venue.club, self.club)
+        self.assertIn(self.club_venue, self.club.club_venues.all())
+
+    def test_venue_field_related_name(self):
+        self.assertEqual(self.club_venue.venue, self.venue)
+        self.assertIn(self.club_venue, self.venue.venue_clubs.all())
 
 
 # Helper functions

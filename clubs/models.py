@@ -104,3 +104,19 @@ class VenueInfo(models.Model):
             raise ValidationError(
                 {"description": "Cannot be more than 500 characters."}
             )
+
+
+class ClubVenue(models.Model):
+    club = models.ForeignKey(
+        Club, on_delete=models.CASCADE, related_name="club_venues"
+    )
+    venue = models.ForeignKey(
+        Venue, on_delete=models.CASCADE, related_name="venue_clubs"
+    )
+
+    class Meta:
+        unique_together = ("club", "venue")
+        ordering = ["club", "venue"]
+
+    def __str__(self):
+        return f"{self.club.name} at {self.venue.name}"
