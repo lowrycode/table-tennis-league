@@ -36,12 +36,20 @@ main {
     z-index: 1000;
 }
 
+.row-gap-2 {
+    row-gap: 0.5rem;
+}
+
 .row-gap-3 {
     row-gap: 1rem;
 }
 
 .col-gap-4 {
     column-gap: 1.5rem;
+}
+
+.col-gap-5 {
+    column-gap: 3rem;
 }
 
 /* Containers */
