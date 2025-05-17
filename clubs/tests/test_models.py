@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from clubs.models import Club, ClubInfo
+from clubs.models import Club, ClubInfo, Venue
 
 
 class ClubTests(TestCase):
@@ -99,8 +99,11 @@ class ClubInfoTests(TestCase):
 
         # Check each field
         for field, default_value in boolean_fields.items():
-            helper_test_boolean_default(
+            result = helper_test_boolean_default_on_club_info(
                 field, default_value, self.info_data.copy()
+            )
+            self.assertTrue(
+                result, f"Default for {field} should be {default_value}"
             )
 
     # Tests for club field
@@ -203,8 +206,109 @@ class ClubInfoTests(TestCase):
         self.assertIsNotNone(self.club_info.created_on)
 
 
+class VenueTests(TestCase):
+    def setUp(self):
+        self.info_data = {
+            "name": "Test Venue",
+            "street_address": "5 Main Street",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 9NX",
+            "num_tables": 5,
+            "parking_info": "We have a car park outside the venue",
+        }
+        self.venue = Venue.objects.create(**self.info_data)
+
+    def test_valid_setup_info_data(self):
+        # These should pass without raising errors
+        self.venue.full_clean()
+        self.venue.save()
+
+    def test_string_representation(self):
+        self.assertIn(self.venue.name, str(self.venue))
+
+    # Multi-field tests
+    def test_required_fields(self):
+        required_fields = {
+            "name": True,
+            "street_address": True,
+            "address_line_2": False,
+            "city": True,
+            "county": True,
+            "postcode": True,
+            "num_tables": True,
+            "parking_info": True,
+        }
+
+        # Check each field
+        test_object = Venue()
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    def test_max_lengths(self):
+        fields = {
+            "name": 100,
+            "street_address": 100,
+            "address_line_2": 100,
+            "city": 100,
+            "county": 100,
+            "postcode": 8,
+            "parking_info": 500,
+        }
+
+        # Check each field
+        for field, max_length in fields.items():
+            helper_test_max_length(
+                self, Venue, self.info_data.copy(), field, max_length
+            )
+
+    def test_boolean_field_defaults(self):
+        boolean_fields = {
+            "meets_league_standards": False,
+            "approved": False,
+        }
+
+        # Check each field
+        for field, default_value in boolean_fields.items():
+            result = helper_test_boolean_default_generic(
+                field, default_value, Venue, self.info_data.copy()
+            )
+            self.assertTrue(
+                result, f"Default for {field} should be {default_value}"
+            )
+
+    def test_num_fields_range(self):
+        # Check lower limit is valid
+        self.venue.num_tables = 1
+        self.venue.full_clean()
+
+        # Check upper limit is valid
+        self.venue.num_tables = 100
+        self.venue.full_clean()
+
+        # Check invalid numbers below range
+        self.venue.num_tables = 0
+        with self.assertRaises(ValidationError):
+            self.venue.full_clean()
+
+        self.venue.num_tables = -1
+        with self.assertRaises(ValidationError):
+            self.venue.full_clean()
+
+        # Check invalid numbers above range
+        self.venue.num_tables = 101
+        with self.assertRaises(ValidationError):
+            self.venue.full_clean()
+
+    # Tests for created_on field
+    def test_created_on_field_is_not_none(self):
+        self.assertIsNotNone(self.venue.created_on)
+
+
 # Helper functions
-def helper_test_boolean_default(field_name, default_value, info_data):
+def helper_test_boolean_default_on_club_info(
+    field_name, default_value, info_data
+):
     # Create a new club for this test instance
     club = Club.objects.create(name="A Different Club Name")
 
@@ -220,6 +324,22 @@ def helper_test_boolean_default(field_name, default_value, info_data):
 
     # Tidy up and return result
     club.delete()
+    return result
+
+
+def helper_test_boolean_default_generic(
+    field_name, default_value, model, info_data
+):
+    # Amend info_data
+    info_data.pop(field_name, None)
+
+    # Create ClubInfo object from info_data
+    test_object = model.objects.create(**info_data)
+
+    # Check placeholder is recorded as default
+    result = getattr(test_object, field_name) == default_value
+
+    # Return result
     return result
 
 
@@ -244,3 +364,19 @@ def helper_test_required_fields(
             errors,
             msg=f"{field_name} should not be required in {model_name}",
         )
+
+
+def helper_test_max_length(
+    test_case, model, info_data, field_name, max_length
+):
+    # Create object
+    test_object = model.objects.create(**info_data)
+
+    # Check valid at threshold
+    setattr(test_object, field_name, "a" * max_length)
+    test_object.full_clean()
+
+    # Check invalid above threshold
+    setattr(test_object, field_name, "a" * (max_length + 1))
+    with test_case.assertRaises(ValidationError):
+        test_object.full_clean()

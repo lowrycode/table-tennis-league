@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from cloudinary.models import CloudinaryField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -59,4 +60,35 @@ class ClubInfo(models.Model):
         if len(self.session_info) > 500:
             raise ValidationError(
                 {"session_info": "Cannot be more than 500 characters."}
+            )
+
+
+class Venue(models.Model):
+    name = models.CharField(max_length=100)
+    street_address = models.CharField(max_length=100)
+    address_line_2 = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100)
+    county = models.CharField(max_length=100)
+    postcode = models.CharField(max_length=8)
+    num_tables = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(100)]
+    )
+    parking_info = models.TextField(max_length=500)
+    meets_league_standards = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        created_on_str = (
+            self.created_on.strftime("%d/%m/%y at %I:%M %p")
+            if self.created_on
+            else "No date"
+        )
+        return f"{self.name} ({created_on_str})"
+
+    def clean(self):
+        super().clean()
+        if len(self.parking_info) > 500:
+            raise ValidationError(
+                {"description": "Cannot be more than 500 characters."}
             )
