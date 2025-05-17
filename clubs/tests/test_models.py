@@ -116,8 +116,8 @@ class ClubInfoTests(TestCase):
 
         # Check each field
         for field, default_value in boolean_fields.items():
-            result = helper_test_boolean_default_on_club_info(
-                field, default_value, self.info_data.copy()
+            result = helper_test_boolean_default(
+                field, default_value, ClubInfo, self.info_data.copy()
             )
             self.assertTrue(
                 result, f"Default for {field} should be {default_value}"
@@ -307,7 +307,7 @@ class VenueInfoTests(TestCase):
 
         # Check each field
         for field, default_value in boolean_fields.items():
-            result = helper_test_boolean_default_generic(
+            result = helper_test_boolean_default(
                 field, default_value, VenueInfo, self.info_data.copy()
             )
             self.assertTrue(
@@ -379,34 +379,13 @@ class VenueInfoTests(TestCase):
 
 
 # Helper functions
-def helper_test_boolean_default_on_club_info(
-    field_name, default_value, info_data
-):
-    # Create a new club for this test instance
-    club = Club.objects.create(name="A Different Club Name")
-
-    # Amend info_data
-    info_data["club"] = club
-    info_data.pop(field_name, None)
-
-    # Create ClubInfo object from info_data
-    club_info = ClubInfo.objects.create(**info_data)
-
-    # Check placeholder is recorded as default
-    result = getattr(club_info, field_name) == default_value
-
-    # Tidy up and return result
-    club.delete()
-    return result
-
-
-def helper_test_boolean_default_generic(
+def helper_test_boolean_default(
     field_name, default_value, model, info_data
 ):
     # Amend info_data
     info_data.pop(field_name, None)
 
-    # Create ClubInfo object from info_data
+    # Create test_object from info_data
     test_object = model.objects.create(**info_data)
 
     # Check placeholder is recorded as default
