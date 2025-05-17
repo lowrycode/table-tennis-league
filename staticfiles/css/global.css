@@ -98,6 +98,12 @@ main {
 /* Links */
 a {
     text-decoration: none;
+    color: var(--primary-1);
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--primary-2);
 }
 
 /* Navbar */
@@ -223,14 +229,6 @@ footer a:hover {
 #phone-and-email {
     column-gap: 1.5rem;
     row-gap: 0.3rem;
-}
-
-#phone-and-email a {
-    color: var(--primary-1);
-}
-
-#phone-and-email a:hover {
-    color: var(--primary-2);
 }
 
 #enquiries {
