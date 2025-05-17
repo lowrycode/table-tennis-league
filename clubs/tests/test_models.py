@@ -76,9 +76,11 @@ class ClubInfoTests(TestCase):
             "approved": False,
         }
 
+        test_object = ClubInfo()
+
         # Check each field
         for field, is_required in required_fields.items():
-            helper_test_required_fields(self, field, is_required)
+            helper_test_required_fields(self, test_object, field, is_required)
 
     def test_boolean_field_defaults(self):
         boolean_fields = {
@@ -221,17 +223,24 @@ def helper_test_boolean_default(field_name, default_value, info_data):
     return result
 
 
-def helper_test_required_fields(test_case, field_name, is_required):
-    club_info = ClubInfo()
+def helper_test_required_fields(
+    test_case, test_object, field_name, is_required
+):
     with test_case.assertRaises(ValidationError) as cm:
-        club_info.full_clean()
+        test_object.full_clean()
     errors = cm.exception.message_dict
+
+    model_name = test_object.__class__.__name__
 
     if is_required:
         test_case.assertIn(
-            field_name, errors, msg=f"{field_name} should be required"
+            field_name,
+            errors,
+            msg=f"{field_name} should be required in {model_name}",
         )
     else:
         test_case.assertNotIn(
-            field_name, errors, msg=f"{field_name} should not be required"
+            field_name,
+            errors,
+            msg=f"{field_name} should not be required in {model_name}",
         )
