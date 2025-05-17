@@ -82,6 +82,17 @@ class ClubInfoTests(TestCase):
         for field, is_required in required_fields.items():
             helper_test_required_fields(self, test_object, field, is_required)
 
+    def test_max_lengths(self):
+        fields = {
+            "contact_name": 100,
+        }
+
+        # Check each field
+        for field, max_length in fields.items():
+            helper_test_max_length(
+                self, ClubInfo, self.info_data.copy(), field, max_length
+            )
+
     def test_boolean_field_defaults(self):
         boolean_fields = {
             "beginners": False,
@@ -139,17 +150,6 @@ class ClubInfoTests(TestCase):
     def test_club_field_related_name(self):
         self.assertEqual(self.club_info.club, self.club)
         self.assertIn(self.club_info, self.club.infos.all())
-
-    # Tests for contact_name field
-    def test_contact_name_max_length(self):
-        # Check valid at threshold
-        self.club_info.contact_name = "a" * 100
-        self.club_info.full_clean()
-
-        # Check invalid above threshold
-        self.club_info.contact_name = "a" * 101
-        with self.assertRaises(ValidationError):
-            self.club_info.full_clean()
 
     # Tests for contact_phone field
     def test_invalid_phone_number(self):
