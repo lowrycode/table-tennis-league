@@ -17,7 +17,7 @@ class Club(models.Model):
 
 class ClubInfo(models.Model):
     club = models.ForeignKey(
-        Club, on_delete=models.CASCADE, related_name="infos"
+        Club, on_delete=models.CASCADE, related_name="club_infos"
     )
     website = models.URLField(null=True, blank=True)
     image = CloudinaryField("image", default="placeholder")

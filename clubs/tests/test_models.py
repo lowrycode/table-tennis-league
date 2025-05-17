@@ -155,7 +155,7 @@ class ClubInfoTests(TestCase):
 
     def test_club_field_related_name(self):
         self.assertEqual(self.club_info.club, self.club)
-        self.assertIn(self.club_info, self.club.infos.all())
+        self.assertIn(self.club_info, self.club.club_infos.all())
 
     # Tests for contact_phone field
     def test_invalid_phone_number(self):

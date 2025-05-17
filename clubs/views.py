@@ -6,17 +6,17 @@ from .models import Club, ClubInfo
 def clubs(request):
     all_clubs = Club.objects.prefetch_related(
         Prefetch(
-            "infos",
+            "club_infos",
             queryset=ClubInfo.objects.filter(approved=True).order_by(
                 "-created_on"
             ),
-            to_attr="approved_infos",
+            to_attr="approved_club_infos",
         )
     )
     clubs = []
     for club in all_clubs:
-        if club.approved_infos:
-            data = club.approved_infos[0]
+        if club.approved_club_infos:
+            data = club.approved_club_infos[0]
             data.name = club.name
             clubs.append(data)
     return render(request, "clubs/clubs.html", {"clubs": clubs})
