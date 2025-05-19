@@ -240,6 +240,19 @@ footer a:hover {
     
 }
 
+/* CLUBS PAGE */
+.club {
+    background-color: var(--light-1);
+}
+
+.club-contacts {
+    background-color: var(--light-2);
+}
+
+.venue {
+    background-color: var(--light-2);
+}
+
 /* Media Queries */
 @media (min-width: 900px) { 
 
