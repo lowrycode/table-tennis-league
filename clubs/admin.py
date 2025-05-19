@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Club, ClubInfo, Venue, VenueInfo
+from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
 
 # Register your models here.
 admin.site.register(Club)
 admin.site.register(Venue)
+admin.site.register(ClubVenue)
 
 
 @admin.register(ClubInfo)
