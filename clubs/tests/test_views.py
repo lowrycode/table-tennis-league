@@ -1,7 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
+from django.contrib.auth import get_user_model
+from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
+
+User = get_user_model()
 
 
 class ClubsPageStaticTests(TestCase):
@@ -77,7 +80,7 @@ class ClubsPageDynamicTests(TestCase):
             "city": "York",
             "county": "Yorkshire",
             "postcode": "YO1 1HA",
-            "num_tables": "5",
+            "num_tables": 5,
             "parking_info": "There is a free carpark at the venue",
             "meets_league_standards": True,
             "approved": True,
@@ -377,4 +380,88 @@ class ClubsPageDynamicTests(TestCase):
             response,
             self.venue_1.name,
             msg_prefix="Venue with no approved venue_info should not be shown",
+        )
+
+
+class ClubAdminDashboardTests(TestCase):
+    def setUp(self):
+        # Create user
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+
+        # Base ClubInfo data
+        self.base_club_info_data = {
+            "club": None,
+            "image": "",
+            "website": "https://www.example.com",
+            "contact_name": "Joe Bloggs",
+            "contact_email": "example@example.com",
+            "contact_phone": "01234556778",
+            "description": "This club is the best!",
+            "session_info": "We do every night of the week.",
+            "approved": True,
+        }
+
+        # Create ClubInfo object
+        self.club_info_data_1 = self.base_club_info_data.copy()
+        self.club_info_data_1["club"] = self.club
+        self.club_info_1 = ClubInfo.objects.create(**self.club_info_data_1)
+
+        # Create Venue objects
+        self.venue = Venue.objects.create(name="Test Venue Name")
+
+        # Base VenueInfo data
+        self.base_venue_info_data = {
+            "venue": None,
+            "street_address": "1 Main Street",
+            "address_line_2": "",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1HA",
+            "num_tables": 5,
+            "parking_info": "There is a free carpark at the venue",
+            "meets_league_standards": True,
+            "approved": True,
+        }
+
+        # Create VenueInfo object
+        self.venue_info_data = self.base_venue_info_data.copy()
+        self.venue_info_data["venue"] = self.venue
+        self.venue_info_1 = VenueInfo.objects.create(**self.venue_info_data)
+
+        # Create ClubVenue object
+        self.club_venue = ClubVenue.objects.create(
+            club=self.club, venue=self.venue
+        )
+
+        # Assign ClubAdmin status
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+    # Club Info
+    def test_page_displays_for_authenticated_user(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/admin_dashboard.html")
+        self.assertContains(response, "Club Admin Dashboard")
+
+    def test_page_redirects_unauthenticated_user_to_login_page(self):
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_page_redirects_authenticated_user_without_club_admin_status(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(
+            response,
+            "Looks like you don't have permission to view this page.",
+            status_code=403,
         )

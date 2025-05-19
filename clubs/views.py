@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 from django.shortcuts import render
 from .models import Club, ClubInfo, VenueInfo, ClubVenue
+from .decorators import club_admin_required
 
 
 def clubs(request):
@@ -65,3 +66,8 @@ def clubs(request):
             clubs.append(club_info)
 
     return render(request, "clubs/clubs.html", {"clubs": clubs})
+
+
+@club_admin_required
+def club_admin_dashboard(request):
+    return render(request, "clubs/admin_dashboard.html")
