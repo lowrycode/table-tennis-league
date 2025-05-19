@@ -7,6 +7,7 @@
 {% url 'account_logout' as logout_url %}
 {% url 'account_change_password' as change_password_url %}
 {% url 'account_settings' as account_settings_url %}
+{% url 'club_admin_dashboard' as club_admin_dashboard_url %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -132,6 +133,10 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end mb-2">
                   {% if user.is_authenticated %}
+                    {% if request.user.club_admin %}
+                    <li><a class="dropdown-item" href="{{ club_admin_dashboard_url }}">Club Admin</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    {% endif %}
                   <li><a class="dropdown-item" href="{{ logout_url }}">Logout</a></li>
                   <li><hr class="dropdown-divider" /></li>
                   <li><a class="dropdown-item" href="{{ change_password_url }}?next={{ request.path }}">Change Password</a></li>
