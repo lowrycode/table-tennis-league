@@ -1,0 +1,28 @@
+<article class="venue border mt-3 p-3">
+  <!-- Venue Name and Number of Tables -->
+  <div class="d-flex justify-content-between flex-wrap">
+    <h4>{{ venue.name }}</h4>
+    <div>{{ venue.num_tables }} table{{ venue.num_tables|pluralize }}</div>
+  </div>
+  <!-- Address and Parking Info -->
+  <div class="row">
+    <!-- Address -->
+    <div class="col-12 col-md-6 col-lg-5 mt-3" aria-label="Venue address">
+      <h5>Address</h5>
+      <p class="mb-0">
+        {{ venue.street_address }}<br>
+        {% if venue.address_line_2%} {{ venue.address_line_2 }}<br> {% endif %}
+        {{ venue.city }}<br>
+        {{ venue.county }}<br>
+        {{ venue.postcode }}
+      </p>
+    </div>
+    <!-- Parking Info -->
+    <div class="col-12 col-md-6 col-lg-7 mt-3">
+      <h5>Parking Info</h5>
+      <p class="mb-0">
+        {{ venue.parking_info }}
+      </p>
+    </div>
+  </div>
+</article>
