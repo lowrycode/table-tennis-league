@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from clubs.models import Club, ClubInfo
+from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
 
 
 class ClubsPageStaticTests(TestCase):
@@ -32,7 +32,7 @@ class ClubsPageDynamicTests(TestCase):
         self.club_3 = Club.objects.create(name="Newcastle Club")
 
         # Base ClubInfo data
-        self.base_data = {
+        self.base_club_info_data = {
             "club": None,
             "image": "",
             "website": "https://www.example.com",
@@ -45,30 +45,81 @@ class ClubsPageDynamicTests(TestCase):
         }
 
         # Create ClubInfo objects
-        self.info_data_1 = self.base_data.copy()
-        self.info_data_1["club"] = self.club_1
-        self.info_data_1["contact_name"] = "Club 1 contact"
-        self.info_data_1["description"] = "Club 1 is approved"
-        self.club_info_1 = ClubInfo.objects.create(**self.info_data_1)
+        self.club_info_data_1 = self.base_club_info_data.copy()
+        self.club_info_data_1["club"] = self.club_1
+        self.club_info_data_1["contact_name"] = "Club 1 contact"
+        self.club_info_data_1["description"] = "Club 1 is approved"
+        self.club_info_1 = ClubInfo.objects.create(**self.club_info_data_1)
 
-        self.info_data_2 = self.base_data.copy()
-        self.info_data_2["club"] = self.club_2
-        self.info_data_2["contact_name"] = "Club 2 contact"
-        self.info_data_2["description"] = "Club 2 is NOT approved"
-        self.info_data_2["approved"] = False
-        self.club_info_2 = ClubInfo.objects.create(**self.info_data_2)
+        self.club_info_data_2 = self.base_club_info_data.copy()
+        self.club_info_data_2["club"] = self.club_2
+        self.club_info_data_2["contact_name"] = "Club 2 contact"
+        self.club_info_data_2["description"] = "Club 2 is NOT approved"
+        self.club_info_data_2["approved"] = False
+        self.club_info_2 = ClubInfo.objects.create(**self.club_info_data_2)
 
-        self.info_data_3 = self.base_data.copy()
-        self.info_data_3["club"] = self.club_3
-        self.info_data_3["contact_name"] = "Club 3 contact"
-        self.info_data_3["description"] = "Club 3 is approved"
-        self.club_info_3 = ClubInfo.objects.create(**self.info_data_3)
+        self.club_info_data_3 = self.base_club_info_data.copy()
+        self.club_info_data_3["club"] = self.club_3
+        self.club_info_data_3["contact_name"] = "Club 3 contact"
+        self.club_info_data_3["description"] = "Club 3 is approved"
+        self.club_info_3 = ClubInfo.objects.create(**self.club_info_data_3)
 
-    def test_page_displays_placeholder_when_no_active_clubs(self):
+        # Create Venue objects
+        self.venue_1 = Venue.objects.create(name="York Venue 1")
+        self.venue_2 = Venue.objects.create(name="Durham Venue 1")
+        self.venue_3 = Venue.objects.create(name="Newcastle Venue 1")
+
+        # Base VenueInfo data
+        self.base_venue_info_data = {
+            "venue": None,
+            "street_address": "1 Main Street",
+            "address_line_2": "",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1HA",
+            "num_tables": "5",
+            "parking_info": "There is a free carpark at the venue",
+            "meets_league_standards": True,
+            "approved": True,
+        }
+
+        # Create VenueInfo objects
+        self.venue_info_data_1 = self.base_venue_info_data.copy()
+        self.venue_info_data_1["venue"] = self.venue_1
+        self.venue_info_1 = VenueInfo.objects.create(**self.venue_info_data_1)
+
+        self.venue_info_data_2 = self.base_venue_info_data.copy()
+        self.venue_info_data_2["venue"] = self.venue_2
+        self.venue_info_data_2["city"] = "Durham"
+        self.venue_info_data_2["county"] = "County Durham"
+        self.venue_info_data_2["postcode"] = "DH1 3SE"
+        self.venue_info_data_2["approved"] = True
+        self.venue_info_2 = VenueInfo.objects.create(**self.venue_info_data_2)
+
+        self.venue_info_data_3 = self.base_venue_info_data.copy()
+        self.venue_info_data_3["venue"] = self.venue_3
+        self.venue_info_data_3["city"] = "Newcastle"
+        self.venue_info_data_3["county"] = "Tyne and Wear"
+        self.venue_info_data_3["postcode"] = "NE1 7RU"
+        self.venue_info_3 = VenueInfo.objects.create(**self.venue_info_data_3)
+
+        # Create ClubVenue objects
+        self.club_venue_1 = ClubVenue.objects.create(
+            club=self.club_1, venue=self.venue_1
+        )
+        self.club_venue_2 = ClubVenue.objects.create(
+            club=self.club_2, venue=self.venue_2
+        )
+        self.club_venue_3 = ClubVenue.objects.create(
+            club=self.club_3, venue=self.venue_3
+        )
+
+    # Club Info
+    def test_page_displays_placeholder_when_no_approved_clubs(self):
         ClubInfo.objects.all().delete()
         Club.objects.all().delete()
         response = self.client.get(reverse("clubs"))
-        self.assertContains(response, "No clubs are currently listed.")
+        self.assertContains(response, "No clubs found.")
 
     def test_page_displays_contact_names(self):
         response = self.client.get(reverse("clubs"))
@@ -88,7 +139,7 @@ class ClubsPageDynamicTests(TestCase):
 
     def test_page_displays_placeholder_image_for_missing_image(self):
         response = self.client.get(reverse("clubs"))
-        self.assertContains(response, '<picture>')
+        self.assertContains(response, "<picture>")
         self.assertContains(response, 'alt="No club image provided"')
         self.assertContains(response, "placeholder.webp")
         self.assertContains(response, "placeholder.jpg")
@@ -99,7 +150,7 @@ class ClubsPageDynamicTests(TestCase):
         self.club_info_1.save()
 
         response = self.client.get(reverse("clubs"))
-        self.assertContains(response, 'custom-image.jpg')
+        self.assertContains(response, "custom-image.jpg")
         self.assertContains(response, f'alt="{self.club_1.name} image"')
 
     def test_page_displays_club_session_info(self):
@@ -138,11 +189,11 @@ class ClubsPageDynamicTests(TestCase):
     def test_page_displays_only_approved_club_info(self):
         response = self.client.get(reverse("clubs"))
 
-        # Active clubs should be shown
+        # Approved clubs should be shown
         self.assertContains(response, self.club_1.name)
         self.assertContains(response, self.club_3.name)
 
-        # Inactive clubs should not be shown
+        # Unapproved clubs should not be shown
         self.assertNotContains(response, self.club_2.name)
 
     def test_page_displays_clubs_alphabetically(self):
@@ -153,7 +204,7 @@ class ClubsPageDynamicTests(TestCase):
         self.assertContains(response, self.club_1.name)
         self.assertContains(response, self.club_3.name)
 
-        # Find positions of active clubs
+        # Find positions of approved clubs
         pos_club_1 = content.find(self.club_1.name)  # York Club
         pos_club_3 = content.find(self.club_3.name)  # Newcastle Club
         self.assertTrue(
@@ -165,19 +216,19 @@ class ClubsPageDynamicTests(TestCase):
         )
 
     def test_page_displays_latest_club_info_version(self):
-        self.info_data_1_newer = self.base_data.copy()
-        self.info_data_1_newer["club"] = self.club_1
-        self.info_data_1_newer["contact_name"] = "Club 1 New Contact"
+        self.club_info_data_1_newer = self.base_club_info_data.copy()
+        self.club_info_data_1_newer["club"] = self.club_1
+        self.club_info_data_1_newer["contact_name"] = "Club 1 New Contact"
 
         self.club_info_1_newer = ClubInfo.objects.create(
-            **self.info_data_1_newer
+            **self.club_info_data_1_newer
         )
 
         # Override created_on AFTER save for reliability
+        self.club_info_1_newer.save()
         self.club_info_1_newer.created_on = (
             timezone.now() + timezone.timedelta(minutes=1)
         )
-        self.club_info_1_newer.save()
 
         response = self.client.get(reverse("clubs"))
 
@@ -195,4 +246,135 @@ class ClubsPageDynamicTests(TestCase):
             response,
             self.club.name,
             msg_prefix="Club with no club_info attached should not show",
+        )
+
+    # Venue Info
+    def test_page_displays_placeholder_when_no_approved_venues(self):
+        self.venue_info_1.approved = False
+        self.venue_info_1.save()
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, "No venues are currently listed.")
+
+    def test_page_displays_venue_names(self):
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, self.venue_1.name)
+        # ClubInfo not approved so this venue should not display
+        self.assertNotContains(response, self.venue_2.name)
+        self.assertContains(response, self.venue_3.name)
+
+    def test_page_displays_number_of_tables(self):
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, f"{self.venue_info_1.num_tables} tables")
+
+    def test_page_displays_venue_address(self):
+        self.venue_info_1.address_line_2 = "Address Line 2"
+        self.venue_info_1.save()
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, self.venue_info_1.street_address)
+        self.assertContains(response, self.venue_info_1.address_line_2)
+        self.assertContains(response, self.venue_info_1.city)
+        self.assertContains(response, self.venue_info_1.county)
+        self.assertContains(response, self.venue_info_1.postcode)
+
+    def test_page_displays_parking_info(self):
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, self.venue_info_1.parking_info)
+
+    def test_page_displays_only_approved_venue_info(self):
+        # Unapprove venue 1
+        self.venue_info_1.approved = False
+        self.venue_info_1.save()
+
+        response = self.client.get(reverse("clubs"))
+
+        # Check approved venues are displayed
+        # note: although venue 2 is approved the club info is not
+        self.assertContains(response, self.venue_3.name)
+
+        # Check unapproved venues are not displayed
+        self.assertNotContains(response, self.venue_1.name)
+
+    def test_page_displays_venues_alphabetically(self):
+        # Create additional venues
+        first_venue = self.venue_1
+        second_venue = Venue.objects.create(name="Another York Venue 2")
+        third_venue = Venue.objects.create(name="Venue 3 for York")
+
+        # Create venue infos (otherwise venue won't be displayed)
+        second_venue_data = self.base_venue_info_data.copy()
+        second_venue_data["venue"] = second_venue
+        second_venue_data["street_address"] = "Second street"
+        second_venue_info = VenueInfo.objects.create(**second_venue_data)
+
+        third_venue_data = self.base_venue_info_data.copy()
+        third_venue_data["venue"] = third_venue
+        third_venue_data["street_address"] = "Third street"
+        third_venue_info = VenueInfo.objects.create(**third_venue_data)
+
+        # Assign venues to club 1 (York)
+        self.second_club_venue = ClubVenue.objects.create(
+            club=self.club_1, venue=second_venue
+        )
+        self.third_club_venue = ClubVenue.objects.create(
+            club=self.club_1, venue=third_venue
+        )
+
+        # Get request
+        response = self.client.get(reverse("clubs"))
+        content = response.content.decode()
+
+        # Check all venues listed for club 1 (York)
+        self.assertContains(response, first_venue.name)
+        self.assertContains(response, second_venue.name)
+        self.assertContains(response, third_venue.name)
+
+        # Find positions of approved clubs
+        pos_first_venue = content.find(first_venue.name)  # York Venue 1
+        pos_second_venue = content.find(second_venue.name)  # Another ...
+        pos_third_venue = content.find(third_venue.name)  # Venue 3 for York
+        self.assertTrue(
+            pos_second_venue < pos_third_venue < pos_first_venue,
+            msg=(
+                "Venues should be listed in alphabetical order:"
+                f"{second_venue.name} then {third_venue.name} then {first_venue.name}"
+            ),
+        )
+
+    def test_page_displays_latest_venue_info_version(self):
+        self.venue_info_1.street_address = "Old Street Address"
+        self.venue_info_1.save()
+
+        self.venue_info_data_1_newer = self.base_venue_info_data.copy()
+        self.venue_info_data_1_newer["venue"] = self.venue_1
+        self.venue_info_data_1_newer["street_address"] = "New Street Address"
+
+        self.venue_info_1_newer = VenueInfo.objects.create(
+            **self.venue_info_data_1_newer
+        )
+
+        # Override created_on AFTER save for reliability
+        self.venue_info_1_newer.save()
+        self.venue_info_1_newer.created_on = (
+            timezone.now() + timezone.timedelta(minutes=1)
+        )
+
+        response = self.client.get(reverse("clubs"))
+
+        # Most recent (approved) venue info should be shown
+        self.assertContains(response, self.venue_info_1_newer.street_address)
+
+        # Less recent (approved) venue info should not be shown
+        self.assertNotContains(response, self.venue_info_1.street_address)
+
+    def test_venue_with_no_approved_venue_info(self):
+        # Delete all VenueInfos for venue_1
+        VenueInfo.objects.filter(venue=self.venue_1).delete()
+
+        response = self.client.get(reverse("clubs"))
+
+        # Assert venue name is not in the response
+        self.assertNotContains(
+            response,
+            self.venue_1.name,
+            msg_prefix="Venue with no approved venue_info should not be shown",
         )
