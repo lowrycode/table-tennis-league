@@ -1,8 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.contrib.auth import get_user_model
 from cloudinary.models import CloudinaryField
 from phonenumber_field.modelfields import PhoneNumberField
+
+User = get_user_model()
 
 
 class Club(models.Model):
@@ -120,3 +123,18 @@ class ClubVenue(models.Model):
 
     def __str__(self):
         return f"{self.club.name} at {self.venue.name}"
+
+
+class ClubAdmin(models.Model):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="club_admin"
+    )
+    club = models.ForeignKey(
+        Club, on_delete=models.CASCADE, related_name="admins"
+    )
+
+    class Meta:
+        ordering = ["user", "club"]
+
+    def __str__(self):
+        return f"{self.user.username} for {self.club.name}"

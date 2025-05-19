@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
+from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
 
 # Register your models here.
 admin.site.register(Club)
@@ -17,3 +17,9 @@ class ClubInfoAdmin(admin.ModelAdmin):
 class VenueInfoAdmin(admin.ModelAdmin):
     list_display = ("venue", "created_on", "approved")
     list_filter = ("approved",)
+
+
+@admin.register(ClubAdmin)
+class ClubAdminAdmin(admin.ModelAdmin):
+    list_display = ("user", "club")
+    list_filter = ("club",)

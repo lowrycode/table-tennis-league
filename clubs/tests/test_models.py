@@ -1,6 +1,10 @@
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.test import TestCase
-from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
+from django.contrib.auth import get_user_model
+from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
+
+User = get_user_model()
 
 
 class ClubTests(TestCase):
@@ -457,10 +461,67 @@ class ClubVenueTests(TestCase):
         self.assertIn(self.club_venue, self.venue.venue_clubs.all())
 
 
+class ClubAdminTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="example@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="My Test Club")
+        self.admin = ClubAdmin.objects.create(user=self.user, club=self.club)
+
+    def test_valid_setup_info_data(self):
+        # These should pass without raising errors
+        self.admin.full_clean()
+        self.admin.save()
+
+    def test_string_representation(self):
+        self.assertEqual(
+            str(self.admin), f"{self.user.username} for {self.club.name}"
+        )
+
+    # Multi-field tests
+    def test_required_fields(self):
+        required_fields = {
+            "user": True,
+            "club": True,
+        }
+
+        test_object = ClubAdmin()
+
+        # Check each field
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    # Tests for relationships
+    def test_user_cannot_have_multiple_club_admins(self):
+        self.club_2 = Club.objects.create(name="Second Test Club")
+        with self.assertRaises(IntegrityError):
+            ClubAdmin.objects.create(user=self.user, club=self.club_2)
+
+    def test_club_can_have_multiple_admins(self):
+        user_2 = User.objects.create_user(
+            username="seconduser",
+            email="user2@example.com",
+            password="test123",
+        )
+        ClubAdmin.objects.create(user=user_2, club=self.club)
+        self.assertEqual(self.club.admins.count(), 2)
+
+    def test_deleting_user_deletes_club_admin(self):
+        self.assertTrue(ClubAdmin.objects.filter(pk=self.admin.pk).exists())
+        self.user.delete()
+        self.assertFalse(ClubAdmin.objects.filter(pk=self.admin.pk).exists())
+
+    def test_deleting_club_deletes_club_admin(self):
+        self.assertTrue(ClubAdmin.objects.filter(pk=self.admin.pk).exists())
+        self.club.delete()
+        self.assertFalse(ClubAdmin.objects.filter(pk=self.admin.pk).exists())
+
+
 # Helper functions
-def helper_test_boolean_default(
-    field_name, default_value, model, info_data
-):
+def helper_test_boolean_default(field_name, default_value, model, info_data):
     # Amend info_data
     info_data.pop(field_name, None)
 
