@@ -465,3 +465,99 @@ class ClubAdminDashboardTests(TestCase):
             "Looks like you don't have permission to view this page.",
             status_code=403,
         )
+
+    # Club Info
+    def test_page_elements_for_missing_club_info(self):
+        self.client.force_login(self.user)
+        ClubInfo.objects.all().delete()
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, "Club Information REQUIRED")
+        self.assertNotContains(response, "Toggle Preview")
+
+    def test_page_elements_for_unapproved_club_info(self):
+        self.client.force_login(self.user)
+        self.club_info_1.approved = False
+        self.club_info_1.save()
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, "Club Information (PENDING APPROVAL)")
+        self.assertContains(response, "Toggle Preview")
+        self.assertContains(response, self.club_info_1.contact_name)
+
+    def test_page_elements_for_approved_club_info(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, "Club Information</span>")
+        self.assertContains(response, "Toggle Preview")
+        self.assertContains(response, self.club_info_1.contact_name)
+
+    def test_club_info_preview_shows_latest_unapproved_info(self):
+        self.client.force_login(self.user)
+
+        # Create new unapproved ClubInfo object
+        self.club_info_data_2 = self.base_club_info_data.copy()
+        self.club_info_data_2["club"] = self.club
+        self.club_info_data_2["contact_name"] = "New Club Contact"
+        self.club_info_data_2["approved"] = False
+        self.club_info_2 = ClubInfo.objects.create(**self.club_info_data_2)
+        self.club_info_2.created_on = (
+            timezone.now() + timezone.timedelta(minutes=1)
+        )
+
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_1.contact_name)
+
+    # Venue Info
+    def test_page_elements_for_no_assigned_venues(self):
+        self.client.force_login(self.user)
+        ClubVenue.objects.all().delete()
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, "Venue Information REQUIRED")
+
+    def test_page_elements_for_one_assigned_venue(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, self.venue_info_1.venue.name)
+
+    def test_page_elements_for_multiple_assigned_venues(self):
+        self.client.force_login(self.user)
+
+        # Create Second Venue
+        self.venue_2 = Venue.objects.create(name="Second Venue Name")
+
+        # Create VenueInfo object
+        self.venue_info_data_2 = self.base_venue_info_data.copy()
+        self.venue_info_data_2["venue"] = self.venue_2
+        self.venue_info_2 = VenueInfo.objects.create(**self.venue_info_data_2)
+
+        # Create ClubVenue object
+        self.club_venue = ClubVenue.objects.create(
+            club=self.club, venue=self.venue_2
+        )
+
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, self.venue_info_1.venue.name)
+        self.assertContains(response, self.venue_info_2.venue.name)
+
+    def test_page_displays_unapproved_venue(self):
+        self.client.force_login(self.user)
+
+        # Unapprove venue
+        self.venue_info_1.approved = False
+        self.venue_info_1.save()
+
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, self.venue_info_1.venue.name)
+
+    def test_page_displays_venue_with_missing_venue_info(self):
+        self.client.force_login(self.user)
+
+        # Create Venue objects
+        self.venue_without_info = Venue.objects.create(name="Missing Info")
+
+        # Create ClubVenue object
+        self.club_venue = ClubVenue.objects.create(
+            club=self.club, venue=self.venue_without_info
+        )
+        response = self.client.get(reverse("club_admin_dashboard"))
+        self.assertContains(response, self.venue_without_info.name)

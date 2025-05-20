@@ -52,6 +52,18 @@ main {
     column-gap: 3rem;
 }
 
+.green {
+    color: green;
+}
+
+.amber {
+    color: orange;
+}
+
+.red {
+    color: red;
+}
+
 /* Containers */
 .container-max-4 {
     max-width: 400px;
@@ -252,6 +264,23 @@ footer a:hover {
 .venue {
     background-color: var(--light-2);
 }
+
+#club-info-preview {
+    background-color: var(--primary-1);
+}
+
+/* CLUB ADMIN PAGE */
+#club-info-admin {
+    background-color: var(--light-1);
+}
+
+#club-info-admin ul {
+    background-color: var(--light-2);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 
 /* Media Queries */
 @media (min-width: 900px) { 
