@@ -68,8 +68,8 @@ def clubs(request):
                     venue_dict["name"] = venue.name
                     club_dict["venues"].append(venue_dict)
 
-        # Append club data
-        clubs_dict.append(club_dict)
+            # Append club data
+            clubs_dict.append(club_dict)
 
     return render(request, "clubs/clubs.html", {"clubs": clubs_dict})
 
