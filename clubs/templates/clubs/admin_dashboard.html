@@ -50,7 +50,7 @@
                   <span aria-hidden="true">Club Information</span>
                 </div>
                 <div class="flex-shrink-0 d-flex gap-1">
-                  <a href="#" class="btn" aria-label="Edit details" title="Edit details">
+                  <a href="{% url "update_club_info" %}" class="btn" aria-label="Edit details" title="Edit details">
                     <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                   </a>
                   <a href="#" class="btn"  aria-label="Delete details" title="Delete details">
@@ -63,7 +63,7 @@
                   <span aria-hidden="true">Club Information (PENDING APPROVAL)</span>
                 </div>
                 <div class="flex-shrink-0 d-flex gap-1">
-                  <a href="#" class="btn" aria-label="Edit details" title="Edit details">
+                  <a href="{% url "update_club_info" %}" class="btn" aria-label="Edit details" title="Edit details">
                     <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                   </a>
                   <a href="#" class="btn"  aria-label="Delete details" title="Delete details">
@@ -76,8 +76,8 @@
                 <i class="fa-solid fa-circle-exclamation red me-2"></i>
                 <span class="fw-semibold">Club Information REQUIRED</span>
               </div>
-              <a href="{% url "update_club_info" %}" aria-label="Add club details" title="Add club details">
-                <i class="fa-solid fa-circle-plus"></i>
+              <a href="{% url "update_club_info" %}" class="btn flex-shrink-0" aria-label="Add club details" title="Add club details">
+                Add<i class="fa-solid fa-circle-plus ms-2"></i>
               </a>
               {% endif %}
             </li>
@@ -88,7 +88,7 @@
                 <i class="fa-solid fa-circle green me-2"></i>
                 {{ venue.name }}
               </div>
-              <div>
+              <div class="flex-shrink-0 d-flex gap-1">
                 <a href="#" class="btn" aria-label="Unassign" title="Unassign">
                   <i class="fa-solid fa-link-slash"></i>
                 </a>
@@ -104,7 +104,7 @@
                 <i class="fa-solid fa-circle amber me-2"></i>
                 {{ venue.name }}
               </div>
-              <div>
+              <div class="flex-shrink-0 d-flex gap-1">
                 <a href="#" class="btn" aria-label="Unassign" title="Unassign">
                   <i class="fa-solid fa-link-slash"></i>
                 </a>
