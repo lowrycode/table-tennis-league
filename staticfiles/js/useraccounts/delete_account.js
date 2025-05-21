@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const checkbox = document.getElementById("confirm-delete");
+  const checkbox = document.getElementById("confirm-account-delete");
   const button = document.getElementById("btn-delete-account");
 
   if (checkbox && button) {
