@@ -1,0 +1,39 @@
+from django import forms
+from .models import ClubInfo
+
+
+class UpdateClubInfoForm(forms.ModelForm):
+    class Meta:
+        model = ClubInfo
+        fields = [
+            "contact_name",
+            "contact_email",
+            "contact_phone",
+            "website",
+            "description",
+            "session_info",
+            "image",
+            "beginners",
+            "intermediates",
+            "advanced",
+            "kids",
+            "adults",
+            "coaching",
+            "league",
+            "equipment_provided",
+            "membership_required",
+            "free_taster",
+        ]
+        labels = {
+            "website": "Club website (optional)",
+            "beginners": "Suitable for beginners",
+            "intermediates": "Suitable for intermediate level players",
+            "advanced": "Suitable for advanced level players",
+            "kids": "Kids are welcome",
+            "adults": "Adults are welcome",
+            "coaching": "Coaching is available",
+            "league": "Club participates in the league",
+            "equipment_provided": "Equipment is provided",
+            "membership_required": "Membership is required",
+            "free_taster": "Free taster sessions available",
+        }

@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
+from clubs.forms import UpdateClubInfoForm
 
 User = get_user_model()
 
@@ -227,11 +229,11 @@ class ClubsPageDynamicTests(TestCase):
             **self.club_info_data_1_newer
         )
 
-        # Override created_on AFTER save for reliability
-        self.club_info_1_newer.save()
+        # Override created_on AFTER creation for reliability
         self.club_info_1_newer.created_on = (
             timezone.now() + timezone.timedelta(minutes=1)
         )
+        self.club_info_1_newer.save()
 
         response = self.client.get(reverse("clubs"))
 
@@ -355,11 +357,11 @@ class ClubsPageDynamicTests(TestCase):
             **self.venue_info_data_1_newer
         )
 
-        # Override created_on AFTER save for reliability
-        self.venue_info_1_newer.save()
+        # Override created_on AFTER creation for reliability
         self.venue_info_1_newer.created_on = (
             timezone.now() + timezone.timedelta(minutes=1)
         )
+        self.venue_info_1_newer.save()
 
         response = self.client.get(reverse("clubs"))
 
@@ -499,9 +501,10 @@ class ClubAdminDashboardTests(TestCase):
         self.club_info_data_2["contact_name"] = "New Club Contact"
         self.club_info_data_2["approved"] = False
         self.club_info_2 = ClubInfo.objects.create(**self.club_info_data_2)
-        self.club_info_2.created_on = (
-            timezone.now() + timezone.timedelta(minutes=1)
+        self.club_info_2.created_on = timezone.now() + timezone.timedelta(
+            minutes=1
         )
+        self.club_info_2.save()
 
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertContains(response, self.club_info_2.contact_name)
@@ -561,3 +564,343 @@ class ClubAdminDashboardTests(TestCase):
         )
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertContains(response, self.venue_without_info.name)
+
+
+class UpdateClubInfoTests(TestCase):
+    def setUp(self):
+        # Create user
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+
+        # Base ClubInfo data
+        self.base_club_info_data = {
+            "club": None,
+            "image": "",
+            "website": "https://www.example.com",
+            "contact_name": "Joe Bloggs",
+            "contact_email": "example@example.com",
+            "contact_phone": "01234556778",
+            "description": "This club is the best!",
+            "session_info": "We do every night of the week.",
+            "approved": True,
+        }
+
+        # Create ClubInfo object
+        self.club_info_data_1 = self.base_club_info_data.copy()
+        self.club_info_data_1["club"] = self.club
+        self.club_info_1 = ClubInfo.objects.create(**self.club_info_data_1)
+
+        # Create Venue objects
+        self.venue = Venue.objects.create(name="Test Venue Name")
+
+        # Base VenueInfo data
+        self.base_venue_info_data = {
+            "venue": None,
+            "street_address": "1 Main Street",
+            "address_line_2": "",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1HA",
+            "num_tables": 5,
+            "parking_info": "There is a free carpark at the venue",
+            "meets_league_standards": True,
+            "approved": True,
+        }
+
+        # Create VenueInfo object
+        self.venue_info_data = self.base_venue_info_data.copy()
+        self.venue_info_data["venue"] = self.venue
+        self.venue_info_1 = VenueInfo.objects.create(**self.venue_info_data)
+
+        # Create ClubVenue object
+        self.club_venue = ClubVenue.objects.create(
+            club=self.club, venue=self.venue
+        )
+
+        # Assign ClubAdmin status
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+    # Access Restrictions
+    def test_update_club_info_page_displays_for_authenticated_user(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("update_club_info"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/update_club_info.html")
+        self.assertContains(response, "Update Club Information</h1>")
+
+    def test_page_redirects_unauthenticated_user_to_login_page(self):
+        response = self.client.get(reverse("update_club_info"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_page_redirects_authenticated_user_without_club_admin_status(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("update_club_info"))
+        self.assertContains(
+            response,
+            "Looks like you don't have permission to view this page.",
+            status_code=403,
+        )
+
+    # Test form rendering for GET request
+    def test_update_club_info_page_renders_form(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("update_club_info"))
+        self.assertContains(response, '<input type="text"')
+        self.assertContains(response, "<label")
+        self.assertContains(response, "Club website (optional)")  # A label
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], UpdateClubInfoForm)
+
+    def test_page_contains_csrf(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("update_club_info"))
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    def test_update_club_info_form_prefills_latest_club_info_data(self):
+        self.client.force_login(self.user)
+
+        # Create Newer ClubInfo object
+        self.new_club_info_data = {
+            "club": self.club,
+            "image": "",
+            "website": "https://www.newexample.com",
+            "contact_name": "New Contact Name",
+            "contact_email": "newexample@newexample.com",
+            "contact_phone": "01234566666",
+            "description": "This club is new!",
+            "session_info": "We start soon.",
+            "beginners": True,
+            "approved": False,
+        }
+        self.new_club_info = ClubInfo.objects.create(**self.new_club_info_data)
+        self.new_club_info.created_on = timezone.now() + timezone.timedelta(
+            minutes=1
+        )
+        self.new_club_info.save()
+
+        # Check most recent data is prefilled
+        response = self.client.get(reverse("update_club_info"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["form"].initial["website"],
+            self.new_club_info.website,
+        )
+        self.assertEqual(
+            response.context["form"].initial["contact_name"],
+            self.new_club_info.contact_name,
+        )
+        self.assertEqual(
+            response.context["form"].initial["contact_email"],
+            self.new_club_info.contact_email,
+        )
+        self.assertEqual(
+            response.context["form"].initial["contact_phone"],
+            self.new_club_info.contact_phone,
+        )
+        self.assertEqual(
+            response.context["form"].initial["description"],
+            self.new_club_info.description,
+        )
+        self.assertEqual(
+            response.context["form"].initial["session_info"],
+            self.new_club_info.session_info,
+        )
+        self.assertEqual(
+            response.context["form"].initial["beginners"],
+            self.new_club_info.beginners,
+        )
+
+    def test_update_club_info_form_renders_when_no_previous_club_info_data(
+        self,
+    ):
+        self.client.force_login(self.user)
+
+        # Delete ClubInfo records
+        ClubInfo.objects.all().delete()
+
+        # Check form renders without prefilled data
+        response = self.client.get(reverse("update_club_info"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("club", response.context["form"].initial)
+        self.assertNotIn("contact_name", response.context["form"].initial)
+
+    # Test form submissions with POST request
+    def test_authenticated_user_can_submit_valid_update_club_info_form(self):
+        self.client.force_login(self.user)
+        form_data = {
+            "image": "",
+            "website": "https://www.newexample.com",
+            "contact_name": "New Contact Name",
+            "contact_email": "newexample@example.com",
+            "contact_phone": "01234555555",
+            "description": "This club info is new!",
+            "session_info": "We will do many nights.",
+        }
+        response = self.client.post(
+            reverse("update_club_info"), form_data, follow=True
+        )
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Club info has been updated.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+        # Check database entry
+        club_info = ClubInfo.objects.get(
+            contact_name=form_data["contact_name"]
+        )
+        self.assertEqual(club_info.club, self.club)
+        self.assertEqual(club_info.website, form_data["website"])
+        self.assertEqual(club_info.contact_name, form_data["contact_name"])
+        self.assertEqual(club_info.contact_email, form_data["contact_email"])
+        self.assertEqual(club_info.contact_phone, form_data["contact_phone"])
+        self.assertEqual(club_info.description, form_data["description"])
+        self.assertEqual(club_info.session_info, form_data["session_info"])
+
+    def test_unauthenticated_user_cannot_submit_form(self):
+        form_data = {
+            "image": "",
+            "website": "https://www.newexample.com",
+            "contact_name": "New Contact Name",
+            "contact_email": "newexample@example.com",
+            "contact_phone": "01234555555",
+            "description": "This club info is new!",
+            "session_info": "We will do many nights.",
+        }
+        response = self.client.post(
+            reverse("update_club_info"), form_data, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            any(
+                "/accounts/login/" in url for url, _ in response.redirect_chain
+            )
+        )
+
+        # Check database entry
+        self.assertEqual(ClubInfo.objects.count(), 1)
+        self.assertEqual(
+            ClubInfo.objects.filter(
+                contact_name=form_data["contact_name"]
+            ).count(),
+            0,
+        )
+
+    def test_club_info_record_cleanup_after_valid_form_submission(self):
+        self.client.force_login(self.user)
+
+        # Create Another approved ClubInfo object
+        self.club_info_data_2 = self.base_club_info_data.copy()
+        self.club_info_data_2["club"] = self.club
+        self.club_info_data_2["contact_name"] = "Approved Contact 2"
+        self.club_info_2 = ClubInfo.objects.create(**self.club_info_data_2)
+        self.club_info_2.created_on = timezone.now() + timezone.timedelta(
+            minutes=1
+        )
+        self.club_info_2.save()
+
+        # Create unapproved ClubInfo object
+        self.club_info_data_3 = self.base_club_info_data.copy()
+        self.club_info_data_3["club"] = self.club
+        self.club_info_data_3["contact_name"] = "Unapproved Contact 3"
+        self.club_info_data_3["approved"] = False
+        self.club_info_3 = ClubInfo.objects.create(**self.club_info_data_3)
+        self.club_info_3.created_on = timezone.now() + timezone.timedelta(
+            minutes=2
+        )
+        self.club_info_3.save()
+
+        form_data = {
+            "image": "",
+            "website": "https://www.newexample.com",
+            "contact_name": "New Contact Name",
+            "contact_email": "newexample@example.com",
+            "contact_phone": "01234555555",
+            "description": "This club info is new!",
+            "session_info": "We will do many nights.",
+        }
+        response = self.client.post(
+            reverse("update_club_info"), form_data, follow=True
+        )
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Club info has been updated.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+        # Check database entry
+        # It should contain latest approved and newly submitted records only
+        self.assertEqual(ClubInfo.objects.count(), 2)
+        self.assertEqual(
+            ClubInfo.objects.filter(
+                contact_name=form_data["contact_name"]
+            ).count(),
+            1,
+            msg="ClubInfo record for new form submission should exist",
+        )
+        self.assertEqual(
+            ClubInfo.objects.filter(id=self.club_info_2.id).count(),
+            1,
+            msg="Latest approved ClubInfo record should exist",
+        )
+        self.assertEqual(
+            ClubInfo.objects.filter(id=self.club_info_1.id).count(),
+            0,
+            msg="Early approved ClubInfo record should no longer exist",
+        )
+        self.assertEqual(
+            ClubInfo.objects.filter(id=self.club_info_3.id).count(),
+            0,
+            msg="Early unapproved ClubInfo record should no longer exist",
+        )
+
+    # Test Invalid form submissions
+    def test_invalid_form_submission_shows_warning(self):
+        self.client.force_login(self.user)
+        form_data = {
+            "image": "",
+            "website": "",
+            "contact_name": "",
+            "contact_email": "not.an.email",
+            "contact_phone": "123",
+            "description": "",
+            "session_info": "",
+        }
+        response = self.client.post(
+            reverse("update_club_info"), form_data, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "form", "contact_name", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "contact_email", "Enter a valid email address."
+        )
+        self.assertContains(response, "Form data was invalid")
+
+        # Check if the message is in the message queue
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Form data was invalid - please check the error message(s)",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.WARNING)

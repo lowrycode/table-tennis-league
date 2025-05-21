@@ -1,7 +1,9 @@
 from django.db.models import Prefetch
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
+from django.contrib import messages
 from .models import Club, ClubInfo, VenueInfo, ClubVenue
+from .forms import UpdateClubInfoForm
 from .decorators import club_admin_required
 
 
@@ -144,7 +146,54 @@ def club_admin_dashboard(request):
 
 @club_admin_required
 def update_club_info(request):
+    club = request.user.club_admin.club
+
+    if request.method == "POST":
+        form = UpdateClubInfoForm(request.POST)
+        if form.is_valid():
+            club_info = form.save(commit=False)
+            club_info.club = club
+            club_info.save()
+
+            # Cleanup records no longer needed
+            latest_approved = (
+                ClubInfo.objects.filter(club=club, approved=True)
+                .exclude(pk=club_info.pk)
+                .order_by("-created_on")
+                .first()
+            )
+            ClubInfo.objects.filter(club=club).exclude(
+                pk__in=[club_info.pk]
+                + ([latest_approved.pk] if latest_approved else [])
+            ).delete()
+
+            # Success message and redirect
+            messages.success(
+                request, "Club info has been updated."
+            )
+            return redirect("club_admin_dashboard")
+        else:
+            messages.warning(
+                request,
+                (
+                    "Form data was invalid - please check the error message(s)"
+                    " in the form and try again"
+                ),
+            )
+    else:
+        # Get the latest ClubInfo (or None)
+        latest_club_info = (
+            ClubInfo.objects.filter(club=club).order_by("-created_on").first()
+        )
+        if latest_club_info:
+            initial_data = model_to_dict(latest_club_info)
+        else:
+            initial_data = {}
+            initial_data["club"] = club
+        form = UpdateClubInfoForm(initial=initial_data)
+
     return render(
         request,
         "clubs/update_club_info.html",
+        {"form": form, "club": club},
     )

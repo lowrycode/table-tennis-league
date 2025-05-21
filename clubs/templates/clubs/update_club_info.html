@@ -2,10 +2,33 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-max-8">
+<div class="container-max-6 my-5">
     <div class="row">
         <div class="col-12 mt-5">
-            <h1 class="my-4 text-center">Update Club Information</h1>
+            <h1 class="text-center">Update Club Information</h1>
+            <p class="mb-5 text-center fs-4">{{ club.name }}</p>
+            <div class="form-info border p-3 mb-5">
+                <p class="fst-italic">
+                    <strong>NOTE: </strong>The name of the club can only be changed
+                    by the league administrator. This is to avoid potential confusion
+                    by league players in other clubs.
+                </p>
+                <p class="fst-italic m-0">
+                    If you do wish to change the name of the club,
+                    please contact the league administrator.
+                </p>
+            </div>
+            <form method="POST" action="{% url "update_club_info" %}">
+                {% csrf_token %}
+                {{ form|crispy }}
+                {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                    <button class="btn btn-custom" type="submit">Update Club Info</button>
+                    <a href="javascript:history.back()" class="btn btn-custom2">Go Back</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

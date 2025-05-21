@@ -118,6 +118,11 @@ a:hover {
     color: var(--primary-2);
 }
 
+/* Form Info */
+.form-info {
+    background-color: var(--light-2);
+}
+
 /* Navbar */
 .navbar {
     padding: 2px 0;
