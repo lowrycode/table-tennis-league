@@ -488,7 +488,7 @@ class ClubAdminDashboardTests(TestCase):
     def test_page_elements_for_approved_club_info(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("club_admin_dashboard"))
-        self.assertContains(response, "Club Information</span>")
+        self.assertContains(response, "Club and Venue Information</h2>")
         self.assertContains(response, "Toggle Preview")
         self.assertContains(response, self.club_info_1.contact_name)
 
