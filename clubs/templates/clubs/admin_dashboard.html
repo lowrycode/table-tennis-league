@@ -45,15 +45,15 @@
             <li class="border d-flex justify-content-between align-items-center gap-3 px-4 py-2">
               {% if club.info %}
                 {% if club.info.approved %}
-                <div class="m-0" aria-label="Club information has been approved" title="Club information has been approved">
+                <div class="m-0" aria-label="Approved" title="Approved">
                   <i class="fa-solid fa-circle green me-2"></i>
                   <span aria-hidden="true">Club Information</span>
                 </div>
                 <div class="flex-shrink-0 d-flex gap-1">
-                  <a href="{% url "update_club_info" %}" class="btn" aria-label="Edit details" title="Edit details">
+                  <a href="{% url "update_club_info" %}" class="btn" aria-label="Edit club info details" title="Edit club info details">
                     <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                   </a>
-                  <a href="{% url "delete_club_info" %}" class="btn"  aria-label="Delete details" title="Delete details">
+                  <a href="{% url "delete_club_info" %}" class="btn"  aria-label="Delete club info" title="Delete club info">
                     <i class="fa-solid fa-trash"  aria-hidden="true"></i>
                   </a>
                 </div>
@@ -63,10 +63,10 @@
                   <span aria-hidden="true">Club Information (PENDING APPROVAL)</span>
                 </div>
                 <div class="flex-shrink-0 d-flex gap-1">
-                  <a href="{% url "update_club_info" %}" class="btn" aria-label="Edit details" title="Edit details">
+                  <a href="{% url "update_club_info" %}" class="btn" aria-label="Edit club info details" title="Edit club info details">
                     <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                   </a>
-                  <a href="{% url "delete_club_info" %}" class="btn"  aria-label="Delete details" title="Delete details">
+                  <a href="{% url "delete_club_info" %}" class="btn"  aria-label="Delete club info" title="Delete club info">
                     <i class="fa-solid fa-trash"  aria-hidden="true"></i>
                   </a>
                 </div>
@@ -89,13 +89,13 @@
                 {{ venue.name }}
               </div>
               <div class="flex-shrink-0 d-flex gap-1">
-                <a href="#" class="btn" aria-label="Unassign" title="Unassign">
+                <a href="#" class="btn" aria-label="Unassign venue" title="Unassign venue">
                   <i class="fa-solid fa-link-slash"></i>
                 </a>
-                <a href="#" class="btn" aria-label="Edit details" title="Edit details">
+                <a href="#" class="btn" aria-label="Edit venue details" title="Edit venue details">
                   <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                 </a>
-                <a href="#" class="btn"  aria-label="Delete details" title="Delete details">
+                <a href="#" class="btn"  aria-label="Delete venue" title="Delete venue">
                   <i class="fa-solid fa-trash"  aria-hidden="true"></i>
                 </a>
               </div>
@@ -105,13 +105,13 @@
                 {{ venue.name }}
               </div>
               <div class="flex-shrink-0 d-flex gap-1">
-                <a href="#" class="btn" aria-label="Unassign" title="Unassign">
+                <a href="#" class="btn" aria-label="Unassign venue" title="Unassign venue">
                   <i class="fa-solid fa-link-slash"></i>
                 </a>
-                <a href="#" class="btn" aria-label="Edit details" title="Edit details">
+                <a href="#" class="btn" aria-label="Edit venue details" title="Edit venue details">
                   <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                 </a>
-                <a href="#" class="btn"  aria-label="Delete details" title="Delete details">
+                <a href="#" class="btn"  aria-label="Delete venue" title="Delete venue">
                   <i class="fa-solid fa-trash"  aria-hidden="true"></i>
                 </a>
               </div>
