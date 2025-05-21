@@ -691,7 +691,7 @@ class ConfirmAccountDeletePageTests(TestCase):
         response = self.client.get(reverse("delete_account"))
         self.assertContains(response, "input")
         self.assertContains(response, 'type="checkbox"')
-        self.assertContains(response, 'id="confirm-delete"')
+        self.assertContains(response, 'id="confirm-account-delete"')
 
     def test_view_requires_confirm_delete_checkbox(self):
         self.client.force_login(self.user)
