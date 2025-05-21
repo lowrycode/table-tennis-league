@@ -19,4 +19,9 @@ urlpatterns = [
         views.delete_club_info,
         name="delete_club_info",
     ),
+    path(
+        "venue/<int:venue_id>/unassign/",
+        views.unassign_venue,
+        name="unassign_venue",
+    ),
 ]
