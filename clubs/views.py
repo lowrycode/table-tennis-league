@@ -149,7 +149,7 @@ def update_club_info(request):
     club = request.user.club_admin.club
 
     if request.method == "POST":
-        form = UpdateClubInfoForm(request.POST)
+        form = UpdateClubInfoForm(request.POST, request.FILES)
         if form.is_valid():
             club_info = form.save(commit=False)
             club_info.club = club

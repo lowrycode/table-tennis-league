@@ -18,7 +18,7 @@
                     please contact the league administrator.
                 </p>
             </div>
-            <form method="POST" action="{% url "update_club_info" %}">
+            <form method="POST" action="{% url "update_club_info" %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form|crispy }}
                 {% if redirect_field_value %}
