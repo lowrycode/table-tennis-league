@@ -904,3 +904,177 @@ class UpdateClubInfoTests(TestCase):
             msgs[0].message,
         )
         self.assertEqual(msgs[0].level, messages.WARNING)
+
+
+class DeleteClubInfoTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+        self.club_info_approved = ClubInfo.objects.create(
+            club=self.club,
+            website="",
+            contact_name="Approved Contact",
+            contact_email="approved@example.com",
+            contact_phone="01234567888",
+            description="Approved club info",
+            session_info="Approved session info",
+            approved=True,
+        )
+        self.club_info_unapproved = ClubInfo.objects.create(
+            club=self.club,
+            website="",
+            contact_name="Unapproved Contact",
+            contact_email="unapproved@example.com",
+            contact_phone="01234567888",
+            description="Unapproved club info",
+            session_info="Unapproved session info",
+            approved=False,
+        )
+
+    # Access restriction tests
+    def test_page_redirects_unauthenticated_user(self):
+        response = self.client.get(reverse("delete_club_info"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_page_restricts_non_club_admin_user(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_club_info"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_club_info_renders_on_get(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_club_info"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "clubs/confirm_delete_club_info.html"
+        )
+
+    # Check page elements exist
+    def test_delete_club_info_has_heading_and_warning(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_club_info"))
+
+        self.assertContains(response, "Delete Club Information</h1>")
+        self.assertContains(
+            response, "Deleting club information cannot be undone."
+        )
+        self.assertContains(response, "href=")
+
+    def test_delete_club_info_has_form(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_club_info"))
+
+        self.assertContains(response, "<form")
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    def test_delete_club_info_has_radio_buttons(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_club_info"))
+
+        self.assertContains(response, "Choose what to delete:</label>")
+        self.assertContains(response, 'type="radio"')
+        self.assertContains(response, 'name="delete_option"')
+        self.assertContains(response, 'value="all"')
+        self.assertContains(response, 'value="unapproved"')
+
+    def test_delete_club_info_has_confirmation_checkbox(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_club_info"))
+
+        self.assertContains(response, 'type="checkbox"')
+        self.assertContains(
+            response,
+            "I understand that this will cause the club to disappear from the Clubs page",
+        )
+
+    def test_delete_club_info_has_buttons(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("delete_club_info"))
+
+        self.assertContains(response, "Delete Club Info</button>")
+        self.assertContains(response, "Cancel</a>")
+
+    # Test DELETE ALL behaviour
+    def test_delete_all_with_confirmation_checkbox_checked(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("delete_club_info"),
+            {"delete_option": "all", "confirm_delete": "on"},
+            follow=True,
+        )
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+        self.assertEqual(ClubInfo.objects.filter(club=self.club).count(), 0)
+        msgs = list(response.context["messages"])
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+        self.assertIn("Club info has been deleted.", msgs[0].message)
+
+    def test_delete_all_without_confirmation_checkbox_shows_warning(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("delete_club_info"),
+            {"delete_option": "all"},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Please tick the confirmation checkbox")
+        self.assertEqual(ClubInfo.objects.filter(club=self.club).count(), 2)
+
+    # Test DELETE UNAPPROVED behaviour
+    def test_delete_unapproved_only(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("delete_club_info"),
+            {"delete_option": "unapproved"},
+            follow=True,
+        )
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+        self.assertEqual(ClubInfo.objects.filter(club=self.club).count(), 1)
+        self.assertTrue(
+            ClubInfo.objects.filter(id=self.club_info_approved.id).exists()
+        )
+        msgs = list(response.context["messages"])
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+        self.assertIn(
+            "Unapproved club info has been deleted.", msgs[0].message
+        )
+
+    def test_delete_unapproved_when_none_exist_shows_warning(self):
+        self.client.force_login(self.user)
+        self.club_info_unapproved.delete()
+        response = self.client.post(
+            reverse("delete_club_info"),
+            {"delete_option": "unapproved"},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        msgs = list(response.context["messages"])
+        self.assertEqual(msgs[0].level, messages.WARNING)
+        self.assertIn(
+            "There is no unapproved club information", msgs[0].message
+        )
+        self.assertEqual(ClubInfo.objects.filter(club=self.club).count(), 1)
+
+    # Test invalid option
+    def test_invalid_delete_option_shows_warning(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("delete_club_info"),
+            {"delete_option": "invalid_option"},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        msgs = list(response.context["messages"])
+        self.assertEqual(msgs[0].level, messages.WARNING)
+        self.assertIn("An error occurred.", msgs[0].message)
+        self.assertEqual(ClubInfo.objects.filter(club=self.club).count(), 2)

@@ -10,9 +10,13 @@ urlpatterns = [
         name="club_admin_dashboard",
     ),
     path(
-        "info/update",
+        "info/update/",
         views.update_club_info,
         name="update_club_info",
     ),
-
+    path(
+        "info/delete/",
+        views.delete_club_info,
+        name="delete_club_info",
+    ),
 ]

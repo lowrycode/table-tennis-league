@@ -70,6 +70,11 @@ main {
     margin: 0 1rem;
 }
 
+.container-max-5 {
+    max-width: 500px;
+    margin: 0 1rem;
+}
+
 .container-max-6 {
     max-width: 600px;
     margin: 0 1rem;

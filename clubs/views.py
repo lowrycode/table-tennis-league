@@ -168,9 +168,7 @@ def update_club_info(request):
             ).delete()
 
             # Success message and redirect
-            messages.success(
-                request, "Club info has been updated."
-            )
+            messages.success(request, "Club info has been updated.")
             return redirect("club_admin_dashboard")
         else:
             messages.warning(
@@ -197,3 +195,53 @@ def update_club_info(request):
         "clubs/update_club_info.html",
         {"form": form, "club": club},
     )
+
+
+@club_admin_required
+def delete_club_info(request):
+    club = request.user.club_admin.club
+
+    if request.method == "POST":
+        data = request.POST
+        option = data.get("delete_option")
+        if option == "all":
+            if data.get("confirm_delete") != "on":
+                messages.warning(
+                    request,
+                    (
+                        "Please tick the confirmation checkbox to confirm"
+                        " that you understand the implications of this action."
+                    ),
+                )
+
+            else:
+                # Delete all club infos
+                ClubInfo.objects.filter(club=club).delete()
+                messages.success(request, "Club info has been deleted.")
+                return redirect("club_admin_dashboard")
+
+        elif option == "unapproved":
+            # Delete unapproved club infos
+            unapproved_club_infos = ClubInfo.objects.filter(club=club).exclude(
+                approved=True
+            )
+            if unapproved_club_infos.count() == 0:
+                messages.warning(
+                    request,
+                    "There is no unapproved club information to delete.",
+                )
+            else:
+                unapproved_club_infos.delete()
+                messages.success(
+                    request, "Unapproved club info has been deleted."
+                )
+                return redirect("club_admin_dashboard")
+        else:
+            messages.warning(
+                request,
+                (
+                    "An error occurred."
+                    " Please contact the league administrator."
+                ),
+            )
+    return render(request, "clubs/confirm_delete_club_info.html")
