@@ -309,12 +309,12 @@ class ClubsPageDynamicTests(TestCase):
         second_venue_data = self.base_venue_info_data.copy()
         second_venue_data["venue"] = second_venue
         second_venue_data["street_address"] = "Second street"
-        second_venue_info = VenueInfo.objects.create(**second_venue_data)
+        VenueInfo.objects.create(**second_venue_data)
 
         third_venue_data = self.base_venue_info_data.copy()
         third_venue_data["venue"] = third_venue
         third_venue_data["street_address"] = "Third street"
-        third_venue_info = VenueInfo.objects.create(**third_venue_data)
+        VenueInfo.objects.create(**third_venue_data)
 
         # Assign venues to club 1 (York)
         self.second_club_venue = ClubVenue.objects.create(
@@ -341,7 +341,8 @@ class ClubsPageDynamicTests(TestCase):
             pos_second_venue < pos_third_venue < pos_first_venue,
             msg=(
                 "Venues should be listed in alphabetical order:"
-                f"{second_venue.name} then {third_venue.name} then {first_venue.name}"
+                f"{second_venue.name} then {third_venue.name}"
+                f" then {first_venue.name}"
             ),
         )
 
@@ -995,7 +996,8 @@ class DeleteClubInfoTests(TestCase):
         self.assertContains(response, 'type="checkbox"')
         self.assertContains(
             response,
-            "I understand that this will cause the club to disappear from the Clubs page",
+            "I understand that this will cause the club to disappear"
+            " from the Clubs page",
         )
 
     def test_delete_club_info_has_buttons(self):
@@ -1078,3 +1080,70 @@ class DeleteClubInfoTests(TestCase):
         self.assertEqual(msgs[0].level, messages.WARNING)
         self.assertIn("An error occurred.", msgs[0].message)
         self.assertEqual(ClubInfo.objects.filter(club=self.club).count(), 2)
+
+
+class UnassignVenueViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+        self.venue = Venue.objects.create(name="Test Venue")
+        self.club_venue = ClubVenue.objects.create(
+            club=self.club, venue=self.venue
+        )
+
+        self.url = reverse("unassign_venue", args=[self.venue.id])
+
+    # Access restriction tests
+    def test_redirects_unauthenticated_user(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_forbids_non_club_admin_user(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_rejects_get_request(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    # Valid POST request behaviour
+    def test_successfully_unassigns_venue(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "clubs/partials/admin_club_info_section.html"
+        )
+        self.assertFalse(
+            ClubVenue.objects.filter(club=self.club, venue=self.venue).exists()
+        )
+
+    def test_post_when_venue_not_assigned_does_not_error(self):
+        self.club_venue.delete()
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "clubs/partials/admin_club_info_section.html"
+        )
+
+    def test_post_with_nonexistent_venue_does_not_error(self):
+        self.client.force_login(self.user)
+        url = reverse("unassign_venue", args=[9999])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "clubs/partials/admin_club_info_section.html"
+        )
