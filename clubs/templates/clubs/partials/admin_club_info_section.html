@@ -102,7 +102,7 @@
                 <p class="ms-5 fst-italic">Click the Assign button to see if the venue already exists. If it doesn't, click the Create button.</p>
               </div>
               <div class="flex-shrink-0 d-flex gap-1">
-                <a href="#" class="btn" aria-label="Assign Existing Venue" title="Assign Existing Venue">
+                <a href="{% url 'assign_venue' %}" class="btn" aria-label="Assign Existing Venue" title="Assign Existing Venue">
                   <i class="fa-solid fa-link"></i>
                 </a>
                 <a href="#" class="btn" aria-label="Create New Venue" title="Create New Venue">
@@ -113,7 +113,7 @@
             {% endfor %}
           </ul>
           <div class="d-flex justify-content-start row-gap-3 col-gap-5 py-3 px-4">
-            <a href="#"><i class="fa-solid fa-link me-2"></i>Assign Existing Venue</a>
+            <a href="{% url 'assign_venue' %}"><i class="fa-solid fa-link me-2"></i>Assign Existing Venue</a>
             <a href="#"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
           </div>
         </section>

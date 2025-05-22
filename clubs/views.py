@@ -4,7 +4,7 @@ from django.http import HttpResponseForbidden
 from django.forms.models import model_to_dict
 from django.contrib import messages
 from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
-from .forms import UpdateClubInfoForm
+from .forms import UpdateClubInfoForm, AssignClubVenueForm
 from .decorators import club_admin_required
 
 
@@ -268,9 +268,7 @@ def unassign_venue(request, venue_id):
     # This approach silently handles missing Venue or ClubVenue objects
     venue = Venue.objects.filter(id=venue_id).first()
     if venue:
-        club_venue = ClubVenue.objects.filter(
-            club=club, venue=venue
-        ).first()
+        club_venue = ClubVenue.objects.filter(club=club, venue=venue).first()
         if club_venue:
             club_venue.delete()
 
@@ -281,4 +279,38 @@ def unassign_venue(request, venue_id):
         request,
         "clubs/partials/admin_club_info_section.html",
         {"club": club_dict},
+    )
+
+
+@club_admin_required
+def assign_venue(request):
+    # Get Club
+    club = request.user.club_admin.club
+
+    if request.method == "POST":
+        form = AssignClubVenueForm(request.POST, club=club)
+        if form.is_valid():
+            # Assign venue
+            club_venue = form.save(commit=False)
+            club_venue.club = club
+            club_venue.save()
+
+            # Message and redirect
+            messages.success(request, "Venue has been assigned.")
+            return redirect("club_admin_dashboard")
+        else:
+            messages.warning(
+                request,
+                "Something went wrong."
+                " Please check that the venue is not already assigned.",
+            )
+    else:
+        form = AssignClubVenueForm(club=club)
+
+    no_available_venues = not form.fields["venue"].queryset.exists()
+
+    return render(
+        request,
+        "clubs/assign_venue.html",
+        {"form": form, "no_available_venues": no_available_venues},
     )

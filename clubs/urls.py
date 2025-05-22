@@ -24,4 +24,9 @@ urlpatterns = [
         views.unassign_venue,
         name="unassign_venue",
     ),
+    path(
+        "venue/assign/",
+        views.assign_venue,
+        name="assign_venue",
+    ),
 ]

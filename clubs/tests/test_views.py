@@ -1147,3 +1147,129 @@ class UnassignVenueViewTests(TestCase):
         self.assertTemplateUsed(
             response, "clubs/partials/admin_club_info_section.html"
         )
+
+
+class AssignVenueTests(TestCase):
+    def setUp(self):
+        # Create user and club
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+        # Create venue
+        self.venue = Venue.objects.create(name="Venue 1")
+
+        # Assign URL
+        self.url = reverse("assign_venue")
+
+    # Access restriction tests
+    def test_redirects_unauthenticated_user(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_forbids_user_without_club_admin_status(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    # GET requests
+    def test_get_request_renders_form_with_available_venues(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/assign_venue.html")
+        self.assertContains(response, "Assign Venue</h1>")
+        self.assertIn("form", response.context)
+        self.assertFalse(response.context["no_available_venues"])
+
+    def test_get_request_when_no_available_venues(self):
+        self.client.force_login(self.user)
+
+        # Make venue assigned to club already
+        ClubVenue.objects.create(club=self.club, venue=self.venue)
+        response = self.client.get(self.url)
+
+        # Check context
+        self.assertTrue(response.context["no_available_venues"])
+
+        # Check page rendering
+        self.assertContains(response, "No other venues exist!")
+        self.assertContains(response, "Go Back</a>")
+
+    def test_get_request_contains_csrf_token(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    # POST (valid)
+    def test_valid_post_assigns_venue_to_club(self):
+        self.client.force_login(self.user)
+        form_data = {"venue": self.venue.id}
+        response = self.client.post(self.url, data=form_data, follow=True)
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        self.assertTrue(
+            ClubVenue.objects.filter(club=self.club, venue=self.venue).exists()
+        )
+
+        msgs = list(response.context["messages"])
+        self.assertEqual(msgs[0].message, "Venue has been assigned.")
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+    # POST (invalid)
+    def test_invalid_post_data_rerenders_form(self):
+        self.client.force_login(self.user)
+        form_data = {"venue": ""}  # Empty is invalid
+        response = self.client.post(self.url, data=form_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "form", "venue", "This field is required."
+        )
+
+    def test_post_with_invalid_venue_id_shows_form_error(self):
+        self.client.force_login(self.user)
+        form_data = {"venue": 999}  # Invalid ID
+        response = self.client.post(self.url, data=form_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response,
+            "form",
+            "venue",
+            "Select a valid choice. That choice is not one of the available choices.",
+        )
+
+    def test_venue_becomes_unavailable_before_form_submission(self):
+        self.client.force_login(self.user)
+
+        # Render form (GET request)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        form = response.context["form"]
+        self.assertIn(self.venue, form.fields["venue"].queryset)
+
+        # Simulate another user assigning the venue before form is submitted
+        ClubVenue.objects.create(club=self.club, venue=self.venue)
+
+        # Attempt to submit form with now unavailable venue
+        form_data = {"venue": self.venue.id}
+        response = self.client.post(self.url, form_data)
+
+        # Check warning message
+        self.assertEqual(response.status_code, 200)
+        msgs = list(response.context["messages"])
+        self.assertIn("Something went wrong.", msgs[0].message)
+        self.assertEqual(msgs[0].level, messages.WARNING)
+
+        # Check that the venue is still only assigned once
+        self.assertEqual(
+            ClubVenue.objects.filter(club=self.club, venue=self.venue).count(),
+            1,
+        )

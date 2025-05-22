@@ -1,5 +1,5 @@
 from django import forms
-from .models import ClubInfo
+from .models import ClubInfo, ClubVenue, Venue
 
 
 class UpdateClubInfoForm(forms.ModelForm):
@@ -37,3 +37,30 @@ class UpdateClubInfoForm(forms.ModelForm):
             "membership_required": "Membership is required",
             "free_taster": "Free taster sessions available",
         }
+
+
+class AssignClubVenueForm(forms.ModelForm):
+    class Meta:
+        model = ClubVenue
+        fields = [
+            "venue",
+        ]
+        labels = {
+            "venue": "Choose a venue",
+        }
+
+    def __init__(self, *args, **kwargs):
+        # Pass custom 'club' argument when form is initialised
+        club = kwargs.pop(
+            "club", None
+        )
+        super().__init__(*args, **kwargs)
+
+        # Exclude venues already assigned to the club from the dropdown
+        if club:
+            assigned_venue_ids = ClubVenue.objects.filter(
+                club=club
+            ).values_list("venue_id", flat=True)
+            self.fields["venue"].queryset = Venue.objects.exclude(
+                id__in=assigned_venue_ids
+            )

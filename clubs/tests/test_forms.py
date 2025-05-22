@@ -1,5 +1,6 @@
 from django.test import TestCase
-from clubs.forms import UpdateClubInfoForm
+from clubs.forms import UpdateClubInfoForm, AssignClubVenueForm
+from clubs.models import Club, Venue, ClubVenue
 
 
 class UpdateClubInfoFormTests(TestCase):
@@ -87,3 +88,38 @@ class UpdateClubInfoFormTests(TestCase):
         form = UpdateClubInfoForm(data=self.data)
         self.assertFalse(form.is_valid())
         self.assertIn("contact_email", form.errors)
+
+
+class AssignClubVenueFormTests(TestCase):
+    def setUp(self):
+        self.club = Club.objects.create(name="Test Club")
+        self.venue_1 = Venue.objects.create(name="Venue 1")
+        self.venue_2 = Venue.objects.create(name="Venue 2")
+
+    def test_form_field_label(self):
+        form = AssignClubVenueForm(club=self.club)
+        self.assertEqual(form.fields["venue"].label, "Choose a venue")
+
+    def test_form_excludes_already_assigned_venues(self):
+        ClubVenue.objects.create(club=self.club, venue=self.venue_1)
+        form = AssignClubVenueForm(club=self.club)
+        self.assertNotIn(self.venue_1, form.fields["venue"].queryset)
+        self.assertIn(self.venue_2, form.fields["venue"].queryset)
+
+    def test_form_includes_all_venues_if_none_assigned(self):
+        form = AssignClubVenueForm(club=self.club)
+        self.assertIn(self.venue_1, form.fields["venue"].queryset)
+        self.assertIn(self.venue_2, form.fields["venue"].queryset)
+
+    def test_form_valid_when_venue_is_available(self):
+        form_data = {"venue": self.venue_1.id}
+        form = AssignClubVenueForm(data=form_data, club=self.club)
+        self.assertTrue(form.is_valid())
+
+    def test_form_invalid_when_venue_is_not_in_queryset(self):
+        # Assign venue_1 so it is excluded from queryset
+        ClubVenue.objects.create(club=self.club, venue=self.venue_1)
+        form_data = {"venue": self.venue_1.id}
+        form = AssignClubVenueForm(data=form_data, club=self.club)
+        self.assertFalse(form.is_valid())
+        self.assertIn("venue", form.errors)
