@@ -280,11 +280,11 @@ footer a:hover {
 }
 
 /* CLUB ADMIN PAGE */
-#club-info-admin {
+#club-info-management {
     background-color: var(--light-1);
 }
 
-#club-info-admin ul {
+#club-info-management ul {
     background-color: var(--light-2);
     list-style: none;
     padding: 0;
