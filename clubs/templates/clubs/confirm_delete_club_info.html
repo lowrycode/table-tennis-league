@@ -7,13 +7,18 @@
     <div class="row">
         <div class="col-12 mt-5">
             <h1 class="text-center mb-5">Delete Club Information</h1>
-            <p class="fw-bold m-0">Deleting club information cannot be undone.</p>
-            <p class="fst-italic mb-4">
-                If you want to edit the club information instead, click
-                <a href="{% url "update_club_info" %}" aria-label="Edit club info" title="Edit club info">
-                    here
-                </a>.
-            </p>
+            <div class="form-info border p-3 mb-5">
+                <p class="fw-bold fs-5 mb-2">
+                    <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
+                    Deleting club information cannot be undone.
+                </p>
+                <p class="fst-italic mb-2">
+                    If you want to update the club information instead, click
+                    <a href="{% url "update_club_info" %}" aria-label="Update club info" title="Update club info">
+                        here
+                    </a>.
+                </p>
+            </div>
             <form method="POST" action="{% url 'delete_club_info' %}">
                 {% csrf_token %}
                 <div class="border p-3 mb-4">
