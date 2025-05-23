@@ -516,7 +516,7 @@ class ClubAdminDashboardTests(TestCase):
         self.client.force_login(self.user)
         ClubVenue.objects.all().delete()
         response = self.client.get(reverse("club_admin_dashboard"))
-        self.assertContains(response, "Venue Information REQUIRED")
+        self.assertContains(response, "Venue REQUIRED")
 
     def test_page_elements_for_one_assigned_venue(self):
         self.client.force_login(self.user)
@@ -1204,7 +1204,7 @@ class AssignVenueTests(TestCase):
         self.assertContains(
             response, "There are no available venues to assign."
         )
-        self.assertContains(response, "Go Back</a>")
+        self.assertContains(response, "Cancel</a>")
 
     def test_get_request_contains_csrf_token(self):
         self.client.force_login(self.user)
