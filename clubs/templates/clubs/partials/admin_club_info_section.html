@@ -105,7 +105,7 @@
                 <a href="{% url 'assign_venue' %}" class="btn" aria-label="Assign Venue" title="Assign Venue">
                   <i class="fa-solid fa-link"></i>
                 </a>
-                <a href="#" class="btn" aria-label="Create New Venue" title="Create New Venue">
+                <a "{% url 'create_venue' %}" class="btn" aria-label="Create New Venue" title="Create New Venue">
                   <i class="fa-solid fa-circle-plus"></i>
                 </a>
               </div>
@@ -114,7 +114,7 @@
           </ul>
           <div class="d-flex justify-content-start row-gap-3 col-gap-5 py-3 px-4">
             <a href="{% url 'assign_venue' %}"><i class="fa-solid fa-link me-2"></i>Assign Venue</a>
-            <a href="#"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
+            <a href="{% url 'create_venue' %}"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
           </div>
         </section>
         

@@ -11,7 +11,7 @@
                 <p class="fw-bold mb-1">There are no available venues to assign.</p>
                 <p class="fst-italic mb-4">
                     Click
-                    <a href="#" aria-label="Create new venue" title="Create new venue">
+                    <a "{% url 'create_venue' %}" aria-label="Create new venue" title="Create new venue">
                         here
                     </a>
                     to create a new venue.
@@ -33,7 +33,7 @@
             <p class="fst-italic my-5">
                 <strong>Can't find your venue?</strong><br>
                 Click
-                <a href="#" aria-label="Create new venue" title="Create new venue">
+                <a "{% url 'create_venue' %}" aria-label="Create new venue" title="Create new venue">
                     here
                 </a>
                 to create a new venue.

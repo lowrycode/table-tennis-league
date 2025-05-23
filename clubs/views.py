@@ -1,10 +1,16 @@
+from django.db import transaction
 from django.db.models import Prefetch
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
 from django.forms.models import model_to_dict
 from django.contrib import messages
 from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
-from .forms import UpdateClubInfoForm, AssignClubVenueForm, UpdateVenueInfoForm
+from .forms import (
+    UpdateClubInfoForm,
+    AssignClubVenueForm,
+    UpdateVenueInfoForm,
+    CreateVenueForm,
+)
 from .decorators import club_admin_required
 
 
@@ -377,4 +383,37 @@ def update_venue_info(request, venue_id):
         request,
         "clubs/update_venue_info.html",
         {"venue": venue, "form": form, "is_shared_venue": is_shared_venue},
+    )
+
+
+@club_admin_required
+def create_venue(request):
+    if request.method == "POST":
+        venue_form = CreateVenueForm(request.POST)
+        venue_info_form = UpdateVenueInfoForm(request.POST)
+        if venue_form.is_valid() and venue_info_form.is_valid():
+            # Create venue and venue_info record
+            with transaction.atomic():
+                venue = venue_form.save()
+                venue_info = venue_info_form.save(commit=False)
+                venue_info.venue = venue
+                venue_info.save()
+
+            # Success message and redirect
+            messages.success(
+                request,
+                "Venue has been created and can now be assigned to a club.",
+            )
+            return redirect("club_admin_dashboard")
+    else:
+        venue_form = CreateVenueForm()
+        venue_info_form = UpdateVenueInfoForm()
+
+    return render(
+        request,
+        "clubs/create_venue.html",
+        {
+            "venue_form": venue_form,
+            "venue_info_form": venue_info_form,
+        },
     )

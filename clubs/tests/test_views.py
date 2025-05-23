@@ -1245,7 +1245,10 @@ class AssignVenueTests(TestCase):
             response,
             "form",
             "venue",
-            "Select a valid choice. That choice is not one of the available choices.",
+            (
+                "Select a valid choice."
+                " That choice is not one of the available choices."
+            ),
         )
 
     def test_venue_becomes_unavailable_before_form_submission(self):
@@ -1498,3 +1501,120 @@ class UpdateVenueInfoTests(TestCase):
         self.assertNotContains(
             response, "This venue is shared with other clubs."
         )
+
+
+class CreateVenueTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+
+        # Grant club admin status
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+        self.valid_venue_data = {
+            "name": "New Venue",
+        }
+
+        self.valid_venue_info_data = {
+            "street_address": "123 Street",
+            "address_line_2": "",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1AA",
+            "num_tables": 5,
+            "parking_info": "Parking is available nearby.",
+        }
+
+        self.url = reverse("create_venue")
+
+    # Access Restrictions
+    def test_redirects_unauthenticated_user(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_redirects_user_without_club_admin_status(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            "Looks like you don't have permission to view this page.",
+            status_code=403,
+        )
+
+    def test_authenticated_club_admin_can_view_page(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/create_venue.html")
+        self.assertContains(response, "Create Venue")
+
+    def test_page_contains_csrf_token(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    # Form Submission
+    def test_valid_post_creates_venue_and_info(self):
+        self.client.force_login(self.user)
+        post_data = {**self.valid_venue_data, **self.valid_venue_info_data}
+
+        response = self.client.post(self.url, post_data, follow=True)
+
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertIn("Venue has been created", messages_list[0].message)
+
+        # Check Database objects
+        venue = Venue.objects.get(name=self.valid_venue_data["name"])
+        venue_info = VenueInfo.objects.get(venue=venue)
+        self.assertEqual(
+            venue_info.street_address,
+            self.valid_venue_info_data["street_address"],
+        )
+
+    def test_invalid_post_does_not_create_objects(self):
+        self.client.force_login(self.user)
+        invalid_data = {
+            "name": "",  # Invalidates venue form
+            "street_address": "",  # Invalidates venue_info form
+        }
+        response = self.client.post(self.url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertFormError(
+            response, "venue_form", "name", "This field is required."
+        )
+        self.assertFormError(
+            response,
+            "venue_info_form",
+            "street_address",
+            "This field is required.",
+        )
+        self.assertEqual(Venue.objects.count(), 0)
+        self.assertEqual(VenueInfo.objects.count(), 0)
+
+    def test_duplicate_venue_name_shows_error(self):
+        self.client.force_login(self.user)
+        Venue.objects.create(name="New Venue")
+
+        post_data = {**self.valid_venue_data, **self.valid_venue_info_data}
+        response = self.client.post(self.url, post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response,
+            "venue_form",
+            "name",
+            "Venue with this Name already exists.",
+        )
+        self.assertEqual(Venue.objects.count(), 1)
+        self.assertEqual(VenueInfo.objects.count(), 0)

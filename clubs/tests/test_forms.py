@@ -3,6 +3,7 @@ from clubs.forms import (
     UpdateClubInfoForm,
     AssignClubVenueForm,
     UpdateVenueInfoForm,
+    CreateVenueForm,
 )
 from clubs.models import Club, Venue, ClubVenue
 
@@ -187,3 +188,43 @@ class UpdateVenueInfoFormTests(TestCase):
         form = UpdateVenueInfoForm(data=self.valid_data)
         self.assertFalse(form.is_valid())
         self.assertIn("num_tables", form.errors)
+
+
+class CreateVenueFormTests(TestCase):
+    def setUp(self):
+        self.valid_data = {
+            "name": "Example Venue",
+        }
+
+    def test_form_field_labels(self):
+        form = CreateVenueForm()
+        self.assertEqual(form.fields["name"].label, "Name")
+
+    def test_form_field_help_texts(self):
+        form = CreateVenueForm()
+        self.assertEqual(
+            form.fields["name"].help_text,
+            "This cannot be changed after the venue is created.",
+        )
+
+    def test_valid_form(self):
+        form = CreateVenueForm(data=self.valid_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form_with_missing_name(self):
+        data = {
+            "name": "",
+        }
+        form = CreateVenueForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("name", form.errors)
+        self.assertEqual(form.errors["name"], ["This field is required."])
+
+    def test_invalid_form_with_duplicate_venue_name(self):
+        Venue.objects.create(name=self.valid_data["name"])
+        form = CreateVenueForm(data=self.valid_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("name", form.errors)
+        self.assertEqual(
+            form.errors["name"], ["Venue with this Name already exists."]
+        )

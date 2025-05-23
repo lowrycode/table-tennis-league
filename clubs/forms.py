@@ -2,6 +2,40 @@ from django import forms
 from .models import ClubInfo, ClubVenue, Venue, VenueInfo
 
 
+class AssignClubVenueForm(forms.ModelForm):
+    class Meta:
+        model = ClubVenue
+        fields = [
+            "venue",
+        ]
+        labels = {
+            "venue": "Choose a venue",
+        }
+
+    def __init__(self, *args, **kwargs):
+        # Pass custom 'club' argument when form is initialised
+        club = kwargs.pop("club", None)
+        super().__init__(*args, **kwargs)
+
+        # Exclude venues already assigned to the club from the dropdown
+        if club:
+            assigned_venue_ids = ClubVenue.objects.filter(
+                club=club
+            ).values_list("venue_id", flat=True)
+            self.fields["venue"].queryset = Venue.objects.exclude(
+                id__in=assigned_venue_ids
+            )
+
+
+class CreateVenueForm(forms.ModelForm):
+    class Meta:
+        model = Venue
+        fields = ["name"]
+        help_texts = {
+            "name": "This cannot be changed after the venue is created."
+        }
+
+
 class UpdateClubInfoForm(forms.ModelForm):
     class Meta:
         model = ClubInfo
@@ -37,33 +71,6 @@ class UpdateClubInfoForm(forms.ModelForm):
             "membership_required": "Membership is required",
             "free_taster": "Free taster sessions available",
         }
-
-
-class AssignClubVenueForm(forms.ModelForm):
-    class Meta:
-        model = ClubVenue
-        fields = [
-            "venue",
-        ]
-        labels = {
-            "venue": "Choose a venue",
-        }
-
-    def __init__(self, *args, **kwargs):
-        # Pass custom 'club' argument when form is initialised
-        club = kwargs.pop(
-            "club", None
-        )
-        super().__init__(*args, **kwargs)
-
-        # Exclude venues already assigned to the club from the dropdown
-        if club:
-            assigned_venue_ids = ClubVenue.objects.filter(
-                club=club
-            ).values_list("venue_id", flat=True)
-            self.fields["venue"].queryset = Venue.objects.exclude(
-                id__in=assigned_venue_ids
-            )
 
 
 class UpdateVenueInfoForm(forms.ModelForm):

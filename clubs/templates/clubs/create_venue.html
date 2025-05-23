@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-max-6 my-5">
+    <div class="row">
+        <div class="col-12 mt-5">
+            <h1 class="text-center">Create Venue</h1>
+            <p class="mb-5 text-center fs-4">{{ club.name }}</p>
+            <div class="form-info border p-3 mb-5">
+                <p class="fw-semibold">
+                    Have you checked that the venue doesn't exist already?
+                </p>
+            </div>
+            <form method="POST" action="{% url "create_venue" %}">
+                {% csrf_token %}
+                {{ venue_form|crispy }}
+                {{ venue_info_form|crispy }}
+                {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                    <button class="btn btn-custom" type="submit">Create Venue</button>
+                    <a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Go Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

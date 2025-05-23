@@ -25,6 +25,11 @@ urlpatterns = [
         name="assign_venue",
     ),
     path(
+        "venue/create/",
+        views.create_venue,
+        name="create_venue",
+    ),
+    path(
         "venue/<int:venue_id>/unassign/",
         views.unassign_venue,
         name="unassign_venue",
