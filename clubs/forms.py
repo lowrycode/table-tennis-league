@@ -1,5 +1,5 @@
 from django import forms
-from .models import ClubInfo, ClubVenue, Venue
+from .models import ClubInfo, ClubVenue, Venue, VenueInfo
 
 
 class UpdateClubInfoForm(forms.ModelForm):
@@ -64,3 +64,22 @@ class AssignClubVenueForm(forms.ModelForm):
             self.fields["venue"].queryset = Venue.objects.exclude(
                 id__in=assigned_venue_ids
             )
+
+
+class UpdateVenueInfoForm(forms.ModelForm):
+    class Meta:
+        model = VenueInfo
+        fields = [
+            "street_address",
+            "address_line_2",
+            "city",
+            "county",
+            "postcode",
+            "num_tables",
+            "parking_info",
+        ]
+        labels = {
+            "street_address": "Street",
+            "address_line_2": "Address Line 2 (optional)",
+            "num_tables": "Number of tables",
+        }

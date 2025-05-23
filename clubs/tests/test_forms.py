@@ -1,5 +1,9 @@
 from django.test import TestCase
-from clubs.forms import UpdateClubInfoForm, AssignClubVenueForm
+from clubs.forms import (
+    UpdateClubInfoForm,
+    AssignClubVenueForm,
+    UpdateVenueInfoForm,
+)
 from clubs.models import Club, Venue, ClubVenue
 
 
@@ -123,3 +127,63 @@ class AssignClubVenueFormTests(TestCase):
         form = AssignClubVenueForm(data=form_data, club=self.club)
         self.assertFalse(form.is_valid())
         self.assertIn("venue", form.errors)
+
+
+class UpdateVenueInfoFormTests(TestCase):
+    def setUp(self):
+        self.valid_data = {
+            "street_address": "123 Main Street",
+            "address_line_2": "Apartment 2",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1AA",
+            "num_tables": 6,
+            "parking_info": "Ample parking available",
+        }
+
+    def test_form_field_labels(self):
+        form = UpdateVenueInfoForm()
+        self.assertEqual(form.fields["street_address"].label, "Street")
+        self.assertEqual(
+            form.fields["address_line_2"].label, "Address Line 2 (optional)"
+        )
+        self.assertEqual(form.fields["num_tables"].label, "Number of tables")
+
+    def test_valid_form(self):
+        form = UpdateVenueInfoForm(data=self.valid_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form_with_missing_required_fields(self):
+        data = {
+            "street_address": "",
+            "address_line_2": "",
+            "city": "",
+            "county": "",
+            "postcode": "",
+            "num_tables": "",
+            "parking_info": "",
+        }
+        form = UpdateVenueInfoForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("street_address", form.errors)
+        self.assertIn("city", form.errors)
+        self.assertIn("postcode", form.errors)
+        self.assertIn("num_tables", form.errors)
+        self.assertNotIn("address_line_2", form.errors)  # Optional
+
+    def test_optional_field_address_line_2_can_be_blank(self):
+        self.valid_data["address_line_2"] = ""
+        form = UpdateVenueInfoForm(data=self.valid_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form_with_negative_num_tables(self):
+        self.valid_data["num_tables"] = -1
+        form = UpdateVenueInfoForm(data=self.valid_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("num_tables", form.errors)
+
+    def test_invalid_form_with_non_integer_num_tables(self):
+        self.valid_data["num_tables"] = "five"
+        form = UpdateVenueInfoForm(data=self.valid_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("num_tables", form.errors)

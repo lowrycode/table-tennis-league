@@ -4,7 +4,7 @@ from django.http import HttpResponseForbidden
 from django.forms.models import model_to_dict
 from django.contrib import messages
 from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
-from .forms import UpdateClubInfoForm, AssignClubVenueForm
+from .forms import UpdateClubInfoForm, AssignClubVenueForm, UpdateVenueInfoForm
 from .decorators import club_admin_required
 
 
@@ -313,4 +313,62 @@ def assign_venue(request):
         request,
         "clubs/assign_venue.html",
         {"form": form, "no_available_venues": no_available_venues},
+    )
+
+
+@club_admin_required
+def update_venue_info(request, venue_id):
+    # Get club
+    club = request.user.club_admin.club
+
+    # Ensure venue is assigned to this club
+    try:
+        club_venue = ClubVenue.objects.get(club=club, venue__id=venue_id)
+        venue = club_venue.venue
+    except ClubVenue.DoesNotExist:
+        messages.warning(request, "Unable to edit venue information.")
+        return redirect("club_admin_dashboard")
+
+    if request.method == "POST":
+        form = UpdateVenueInfoForm(request.POST)
+        if form.is_valid():
+            venue_info = form.save(commit=False)
+            venue_info.venue = venue
+            venue_info.save()
+
+            # Cleanup records no longer needed
+            latest_approved = (
+                VenueInfo.objects.filter(venue=venue, approved=True)
+                .exclude(pk=venue_info.pk)
+                .order_by("-created_on")
+                .first()
+            )
+            VenueInfo.objects.filter(venue=venue).exclude(
+                pk__in=[venue_info.pk]
+                + ([latest_approved.pk] if latest_approved else [])
+            ).delete()
+
+            # Success message and redirect
+            messages.success(request, "Venue info has been updated.")
+            return redirect("club_admin_dashboard")
+        else:
+            messages.warning(
+                request,
+                ("Please correct the highlighted errors below and try again."),
+            )
+    else:
+        # Get the latest venueInfo (or None)
+        latest_venue_info = (
+            VenueInfo.objects.filter(venue=venue)
+            .order_by("-created_on")
+            .first()
+        )
+        if latest_venue_info:
+            initial_data = model_to_dict(latest_venue_info)
+        else:
+            initial_data = {}
+        form = UpdateVenueInfoForm(initial=initial_data)
+
+    return render(
+        request, "clubs/update_venue_info.html", {"venue": venue, "form": form}
     )

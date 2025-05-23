@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-max-6 my-5">
+    <div class="row">
+        <div class="col-12 mt-5">
+            <h1 class="text-center">Update Venue Information</h1>
+            <p class="mb-5 text-center fs-4">{{ venue.name }}</p>
+            <div class="form-info border p-3 mb-3">
+                <p class="fst-italic m-0">
+                    <strong>NOTE: </strong>If your club has moved to a new venue
+                    you should create / assign a new venue rather than editing
+                    the details for your old venue.
+                </p>
+                <div class="d-flex justify-content-start row-gap-3 col-gap-5 py-3 px-4">
+                    <a href="{% url 'assign_venue' %}"><i class="fa-solid fa-link me-2"></i>Assign Venue</a>
+                    <a href="#"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
+                </div>
+            </div>
+            <div class="form-info border p-3 mb-5">
+                <p class="fst-italic">
+                    <strong>NOTE: </strong>The name of the venue can only be changed
+                    by the league administrator. This is to avoid potential confusion
+                    by league players in other clubs.
+                </p>
+                <p class="fst-italic m-0">
+                    If you do wish to change the name of the venue,
+                    please contact the league administrator.
+                </p>
+            </div>
+            <form method="POST" action="{% url 'update_venue_info' venue.id %}">
+                {% csrf_token %}
+                {{ form|crispy }}
+                {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                    <button class="btn btn-custom" type="submit">Update Venue Info</button>
+                    <a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Go Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

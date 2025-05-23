@@ -20,13 +20,18 @@ urlpatterns = [
         name="delete_club_info",
     ),
     path(
+        "venue/assign/",
+        views.assign_venue,
+        name="assign_venue",
+    ),
+    path(
         "venue/<int:venue_id>/unassign/",
         views.unassign_venue,
         name="unassign_venue",
     ),
     path(
-        "venue/assign/",
-        views.assign_venue,
-        name="assign_venue",
+        "venue/<int:venue_id>/update/",
+        views.update_venue_info,
+        name="update_venue_info",
     ),
 ]

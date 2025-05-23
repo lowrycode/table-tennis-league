@@ -569,7 +569,7 @@ class ClubAdminDashboardTests(TestCase):
 
 class UpdateClubInfoTests(TestCase):
     def setUp(self):
-        # Create user
+        # Create user and club
         self.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
@@ -1201,7 +1201,7 @@ class AssignVenueTests(TestCase):
         self.assertTrue(response.context["no_available_venues"])
 
         # Check page rendering
-        self.assertContains(response, "No other venues exist!")
+        self.assertContains(response, "There are no available venues to assign.")
         self.assertContains(response, "Go Back</a>")
 
     def test_get_request_contains_csrf_token(self):
@@ -1273,3 +1273,196 @@ class AssignVenueTests(TestCase):
             ClubVenue.objects.filter(club=self.club, venue=self.venue).count(),
             1,
         )
+
+
+class UpdateVenueInfoTests(TestCase):
+    def setUp(self):
+        # Create user and club
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+
+        # Assign ClubAdmin
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+        # Create Venue and link to club
+        self.venue = Venue.objects.create(name="Test Venue")
+        self.club_venue = ClubVenue.objects.create(
+            club=self.club, venue=self.venue
+        )
+
+        # Base VenueInfo data
+        self.base_venue_info_data = {
+            "venue": self.venue,
+            "street_address": "1 Main Street",
+            "address_line_2": "",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1HA",
+            "num_tables": 5,
+            "parking_info": "There is a free carpark at the venue",
+            "meets_league_standards": True,
+            "approved": True,
+        }
+
+        # Create VenueInfo object
+        self.venue_info = VenueInfo.objects.create(**self.base_venue_info_data)
+
+        self.url = reverse("update_venue_info", args=[self.venue.id])
+
+    # Access Restrictions
+    def test_page_displays_for_authenticated_club_admin(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/update_venue_info.html")
+        self.assertContains(response, "Update Venue Information")
+
+    def test_redirects_unauthenticated_user_to_login_page(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_rejects_authenticated_user_without_club_admin_status(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            "Looks like you don't have permission to view this page.",
+            status_code=403,
+        )
+
+    def test_rejects_club_admin_not_associated_with_venue(self):
+        other_venue = Venue.objects.create(name="Other Venue")
+        other_url = reverse("update_venue_info", args=[other_venue.id])
+        self.client.force_login(self.user)
+        response = self.client.get(other_url)
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+    # GET request and form rendering
+    def test_update_venue_info_form_prefills_latest_venue_info_data(self):
+        self.client.force_login(self.user)
+
+        new_info_data = self.base_venue_info_data.copy()
+        new_info_data["street_address"] = "123 New Street"
+        new_info_data["city"] = "New City"
+        new_info = VenueInfo.objects.create(**new_info_data)
+        new_info.created_on = timezone.now() + timezone.timedelta(minutes=1)
+        new_info.save()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["form"].initial["street_address"],
+            "123 New Street",
+        )
+        self.assertEqual(response.context["form"].initial["city"], "New City")
+
+    def test_update_venue_info_form_renders_when_no_previous_data(self):
+        self.client.force_login(self.user)
+        VenueInfo.objects.all().delete()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("form", response.context)
+        self.assertNotIn("street_address", response.context["form"].initial)
+
+    def test_csrf_token_is_present_in_form(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    # POST request - Valid submission
+    def test_club_admin_can_submit_valid_form(self):
+        self.client.force_login(self.user)
+        form_data = {
+            "street_address": "45 New Road",
+            "address_line_2": "Apartment 2",
+            "city": "Newcastle",
+            "county": "Tyne and Wear",
+            "postcode": "NE1 1AA",
+            "num_tables": 6,
+            "parking_info": "Underground parking",
+        }
+        response = self.client.post(self.url, form_data, follow=True)
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        # Message test
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertIn("Venue info has been updated", messages_list[0].message)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+
+        # Database entry test
+        self.assertTrue(
+            VenueInfo.objects.filter(
+                venue=self.venue,
+                street_address="45 New Road",
+                city="Newcastle",
+            ).exists()
+        )
+
+    def test_previous_venue_info_cleanup_after_submission(self):
+        self.client.force_login(self.user)
+
+        # Create another older record
+        old_info = VenueInfo.objects.create(
+            **{**self.base_venue_info_data, "street_address": "Old Address"}
+        )
+        old_info.created_on = timezone.now() - timezone.timedelta(minutes=1)
+        old_info.save()
+
+        form_data = {
+            "street_address": "New Address",
+            "address_line_2": "",
+            "city": "Leeds",
+            "county": "West Yorkshire",
+            "postcode": "LS1 4AB",
+            "num_tables": 12,
+            "parking_info": "Free street parking",
+        }
+        response = self.client.post(self.url, form_data, follow=True)
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        venue_infos = VenueInfo.objects.filter(venue=self.venue)
+        self.assertEqual(venue_infos.count(), 2)
+        self.assertTrue(
+            venue_infos.filter(street_address="New Address").exists()
+        )
+
+    # POST request - Invalid submission
+    def test_invalid_form_submission_shows_warning_and_errors(self):
+        self.client.force_login(self.user)
+        form_data = {
+            "street_address": "",
+            "city": "Invalid City",
+            "county": "County",
+            "postcode": "",
+            "num_tables": "",
+            "parking_info": "",
+        }
+        response = self.client.post(self.url, form_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "form", "street_address", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "postcode", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "num_tables", "This field is required."
+        )
+
+        # Check warning message
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertIn(
+            "Please correct the highlighted errors", messages_list[0].message
+        )
+        self.assertEqual(messages_list[0].level, messages.WARNING)

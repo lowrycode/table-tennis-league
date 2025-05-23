@@ -86,7 +86,7 @@
                 >
                   <i class="fa-solid fa-link-slash" aria-hidden="true"></i>
                 </button>
-                <a href="#" class="btn" aria-label="Edit venue details" title="Edit venue details">
+                <a href="{% url 'update_venue_info' venue.id %}" class="btn" aria-label="Edit venue details" title="Edit venue details">
                   <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                 </a>
                 <a href="#" class="btn"  aria-label="Delete venue" title="Delete venue">
