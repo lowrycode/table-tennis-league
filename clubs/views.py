@@ -329,6 +329,10 @@ def update_venue_info(request, venue_id):
         messages.warning(request, "Unable to edit venue information.")
         return redirect("club_admin_dashboard")
 
+    # Check if venue is shared
+    club_venues_count = ClubVenue.objects.filter(venue=venue).count()
+    is_shared_venue = True if club_venues_count > 1 else False
+
     if request.method == "POST":
         form = UpdateVenueInfoForm(request.POST)
         if form.is_valid():
@@ -370,5 +374,7 @@ def update_venue_info(request, venue_id):
         form = UpdateVenueInfoForm(initial=initial_data)
 
     return render(
-        request, "clubs/update_venue_info.html", {"venue": venue, "form": form}
+        request,
+        "clubs/update_venue_info.html",
+        {"venue": venue, "form": form, "is_shared_venue": is_shared_venue},
     )

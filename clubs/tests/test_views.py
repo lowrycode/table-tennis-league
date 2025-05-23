@@ -1201,7 +1201,9 @@ class AssignVenueTests(TestCase):
         self.assertTrue(response.context["no_available_venues"])
 
         # Check page rendering
-        self.assertContains(response, "There are no available venues to assign.")
+        self.assertContains(
+            response, "There are no available venues to assign."
+        )
         self.assertContains(response, "Go Back</a>")
 
     def test_get_request_contains_csrf_token(self):
@@ -1466,3 +1468,33 @@ class UpdateVenueInfoTests(TestCase):
             "Please correct the highlighted errors", messages_list[0].message
         )
         self.assertEqual(messages_list[0].level, messages.WARNING)
+
+    # Shared Venue Tests
+    def test_shared_venues_message_displays_for_shared_venue(self):
+        self.client.force_login(self.user)
+
+        # Create another club which shares the venue
+        club_2 = Club.objects.create(name="Club 2")
+        ClubVenue.objects.create(club=club_2, venue=self.venue)
+
+        response = self.client.get(self.url)
+        self.assertIn(
+            "is_shared_venue",
+            response.context,
+            msg="is_shared_venue not found as a context variable",
+        )
+        self.assertTrue(response.context["is_shared_venue"])
+        self.assertContains(response, "This venue is shared with other clubs.")
+
+    def test_shared_venues_message_not_displayed_for_non_shared_venue(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertIn(
+            "is_shared_venue",
+            response.context,
+            msg="is_shared_venue not found as a context variable",
+        )
+        self.assertFalse(response.context["is_shared_venue"])
+        self.assertNotContains(
+            response, "This venue is shared with other clubs."
+        )
