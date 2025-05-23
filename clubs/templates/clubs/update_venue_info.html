@@ -8,24 +8,26 @@
             <h1 class="text-center">Update Venue Information</h1>
             <p class="mb-5 text-center fs-4">{{ venue.name }}</p>
             <div class="form-info border p-3 mb-3">
-                <p class="fst-italic m-0">
-                    <strong>NOTE: </strong>If your club has moved to a new venue
-                    you should create / assign a new venue rather than editing
-                    the details for your old venue.
+                <p class="fw-semibold fs-5 m-0">
+                    <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
+                    If your club has moved to a new venue you should create / assign
+                    another venue rather than editing the details for your old venue.
                 </p>
                 <div class="d-flex justify-content-start row-gap-3 col-gap-5 py-3 px-4">
                     <a href="{% url 'assign_venue' %}"><i class="fa-solid fa-link me-2"></i>Assign Venue</a>
-                    <a "{% url 'create_venue' %}"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
+                    <a href="{% url 'create_venue' %}"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
                 </div>
             </div>
             <div class="form-info border p-3 mb-5">
-                <p class="fst-italic">
-                    <strong>NOTE: </strong>The name of the venue can only be changed
-                    by the league administrator. This is to avoid potential confusion
-                    by league players in other clubs.
+                <p class="fw-semibold fs-5">
+                    <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
+                    The name of the venue can only be changed by the league administrator. 
                 </p>
-                <p class="fst-italic m-0">
-                    If you do wish to change the name of the venue,
+                <p class="fst-italic mb-2">
+                    This is to avoid potential confusion by league players in other clubs.
+                </p>
+                <p class="fst-italic mb-2">
+                    If you do wish to change the name of the club,
                     please contact the league administrator.
                 </p>
             </div>
@@ -48,7 +50,7 @@
                 {% endif %}
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
                     <button class="btn btn-custom" type="submit">Update Venue Info</button>
-                    <a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Go Back</a>
+                    <a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Cancel</a>
                 </div>
             </form>
         </div>
