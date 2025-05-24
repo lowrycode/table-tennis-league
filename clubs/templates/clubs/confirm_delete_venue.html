@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-max-6 my-5">
+    <div class="row">
+        <div class="col-12 mt-5">
+            <h1 class="text-center">Delete Venue</h1>
+            <p class="text-center mb-5 fs-4">{{ venue.name }}</p>
+            <div class="form-info border p-3 mb-5">
+                <p class="fw-bold fs-5 mb-2">
+                    <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
+                    Deleting venue or related information cannot be undone.
+                </p>
+                <p class="fst-italic mb-3">
+                    You can only delete the venue if it is not shared with other clubs or linked to
+                    historic league data.
+                </p>
+                <p class="fst-italic mb-1">
+                    If you want to update the venue information instead, click
+                    <a href="{% url "update_venue_info" venue.id %}" aria-label="Update venue info" title="Update venue info">
+                        here
+                    </a>.
+                </p>
+            </div>
+            {% if is_shared_venue %}
+            <div class="form-info border p-3 mb-5">
+                <p class="fw-bold fs-5">
+                    <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
+                    This venue is shared with other clubs.</p>
+                <p class="fst-italic">
+                    Deleting unapproved venue information may delete changes that were made
+                    by other club admins.
+                </p>
+            </div>
+            {% endif %}
+            <form method="POST" action="{% url 'delete_venue' venue.id %}">
+                {% csrf_token %}
+                <div class="border p-3 mb-4">
+                    <label class="form-label">Choose what to delete:</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="delete_option" id="delete_unapproved_info" value="unapproved" checked>
+                        <label class="form-check-label" for="delete_unapproved_info">
+                            Delete only <strong>unapproved venue information</strong><br>
+                            <em>(the venue will still exist and can be assigned to a club in the future)</em>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="delete_option" id="delete-venue-and-info" value="all" {% if is_shared_venue %}disabled{% endif %}>
+                        <label class="form-check-label" for="delete-venue-and-info">
+                            Delete <strong>the venue</strong><br>
+                            <em>(the venue will not exist and cannot be assigned to a club in the future)</em>
+                        </label>
+                    </div>
+                </div>
+                <div id="delete-venue-warning" class="visually-hidden form-check mb-5">
+                    <input id="confirm-venue-delete" class="form-check-input" type="checkbox" name="confirm_delete">
+                    <label for="confirm-venue-delete" class="form-check-label">
+                        I understand that this will permanently delete the venue and prevent clubs from
+                        assigning this venue in the future.
+                    </label>
+                </div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <button id="btn-delete-venue" class="btn btn-custom" type="submit">Delete</button>
+                    <a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{% static "js/clubs/delete_venue.js" %}"></script>
+{% endblock %}

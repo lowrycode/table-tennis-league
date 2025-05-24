@@ -30,6 +30,11 @@ urlpatterns = [
         name="create_venue",
     ),
     path(
+        "venue/<int:venue_id>/delete/",
+        views.delete_venue,
+        name="delete_venue",
+    ),
+    path(
         "venue/<int:venue_id>/unassign/",
         views.unassign_venue,
         name="unassign_venue",

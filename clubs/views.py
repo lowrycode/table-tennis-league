@@ -417,3 +417,84 @@ def create_venue(request):
             "venue_info_form": venue_info_form,
         },
     )
+
+
+@club_admin_required
+def delete_venue(request, venue_id):
+    # Get Club and Venue
+    club = request.user.club_admin.club
+    venue = Venue.objects.filter(id=venue_id).first()
+
+    # Exit early if venue doesn't exist
+    if not venue:
+        # Redirect to club admin page with warning message
+        messages.warning(request, ("Unable to delete venue."))
+        return redirect("club_admin_dashboard")
+
+    # Exit early if venue not currently assigned to this club
+    if not ClubVenue.objects.filter(venue=venue, club=club).exists():
+        messages.warning(request, "Unable to delete venue.")
+        return redirect("club_admin_dashboard")
+
+    # Assign is_shared_venue context variable
+    is_shared_venue = (
+        ClubVenue.objects.filter(venue=venue).exclude(club=club).exists()
+    )
+
+    # Process delete request
+    if request.method == "POST":
+        data = request.POST
+        option = data.get("delete_option")
+        if option == "all":
+            if is_shared_venue:
+                messages.warning(
+                    request,
+                    (
+                        "Cannot delete venue because it is shared with"
+                        " at least one other club."
+                    ),
+                )
+            elif data.get("confirm_delete") != "on":
+                messages.warning(
+                    request,
+                    (
+                        "Please tick the confirmation checkbox to confirm"
+                        " that you understand the implications of this action."
+                    ),
+                )
+            else:
+                # Delete venue
+                Venue.objects.filter(id=venue.id).delete()
+                messages.success(request, "Venue has been deleted.")
+                return redirect("club_admin_dashboard")
+
+        elif option == "unapproved":
+            # Delete unapproved venue infos
+            unapproved_venue_infos = VenueInfo.objects.filter(
+                venue=venue
+            ).exclude(approved=True)
+            if unapproved_venue_infos.count() == 0:
+                messages.warning(
+                    request,
+                    "There is no unapproved venue information to delete.",
+                )
+            else:
+                unapproved_venue_infos.delete()
+                messages.success(
+                    request, "Unapproved venue info has been deleted."
+                )
+                return redirect("club_admin_dashboard")
+        else:
+            messages.warning(
+                request,
+                (
+                    "An error occurred."
+                    " Please contact the league administrator."
+                ),
+            )
+
+    return render(
+        request,
+        "clubs/confirm_delete_venue.html",
+        {"venue": venue, "is_shared_venue": is_shared_venue},
+    )

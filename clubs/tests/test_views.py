@@ -1618,3 +1618,196 @@ class CreateVenueTests(TestCase):
         )
         self.assertEqual(Venue.objects.count(), 1)
         self.assertEqual(VenueInfo.objects.count(), 0)
+
+
+class DeleteVenueTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="user@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+        self.club_admin = ClubAdmin.objects.create(
+            user=self.user, club=self.club
+        )
+
+        self.venue = Venue.objects.create(name="Test Venue")
+        self.club_venue = ClubVenue.objects.create(
+            club=self.club, venue=self.venue
+        )
+
+        self.url = reverse("delete_venue", args=[self.venue.id])
+
+    # Access Restrictions
+    def test_redirects_unauthenticated_user(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_redirects_user_without_club_admin_status(self):
+        self.club_admin.delete()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            "Looks like you don't have permission to view this page.",
+            status_code=403,
+        )
+
+    def test_authenticated_club_admin_can_view_page(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/confirm_delete_venue.html")
+        self.assertContains(response, "Delete Venue")
+
+    # GET Page Rendering
+    def test_shared_venue_notification_displays_when_venue_is_shared(self):
+        self.client.force_login(self.user)
+
+        # Create club which shares venue
+        sharing_club = Club.objects.create(name="Sharing Club")
+        ClubVenue.objects.create(club=sharing_club, venue=self.venue)
+
+        response = self.client.get(self.url)
+        self.assertContains(response, "This venue is shared with other clubs.")
+
+    def test_shared_venue_notification_not_displayed_when_venue_not_shared(
+        self,
+    ):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertNotContains(
+            response, "This venue is shared with other clubs."
+        )
+
+    # POST Logic - Unapproved Info Only
+    def test_delete_unapproved_info_only(self):
+        self.client.force_login(self.user)
+        unapproved_info = VenueInfo.objects.create(
+            venue=self.venue,
+            street_address="123",
+            city="York",
+            county="Yorkshire",
+            postcode="YO1 1AA",
+            num_tables=4,
+            parking_info="None",
+            approved=False,
+        )
+        post_data = {"delete_option": "unapproved"}
+        response = self.client.post(self.url, post_data, follow=True)
+
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertEqual(
+            "Unapproved venue info has been deleted.", messages_list[0].message
+        )
+
+        self.assertFalse(
+            VenueInfo.objects.filter(id=unapproved_info.id).exists()
+        )
+
+    def test_delete_unapproved_info_shows_warning_when_none_exist(self):
+        self.client.force_login(self.user)
+        post_data = {"delete_option": "unapproved"}
+        response = self.client.post(self.url, post_data, follow=True)
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertEqual(
+            "There is no unapproved venue information to delete.",
+            messages_list[0].message,
+        )
+
+    # POST Logic - Delete Venue
+    def test_delete_venue_with_checkbox_checked(self):
+        self.client.force_login(self.user)
+        post_data = {
+            "delete_option": "all",
+            "confirm_delete": "on",
+        }
+        response = self.client.post(self.url, post_data, follow=True)
+
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertEqual("Venue has been deleted.", messages_list[0].message)
+
+        self.assertFalse(Venue.objects.filter(id=self.venue.id).exists())
+
+    def test_cannot_delete_venue_if_shared(self):
+        sharing_club = Club.objects.create(name="Sharing Club")
+        ClubVenue.objects.create(club=sharing_club, venue=self.venue)
+        self.client.force_login(self.user)
+
+        post_data = {
+            "delete_option": "all",
+            "confirm_delete": "on",
+        }
+        response = self.client.post(self.url, post_data)
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn(
+            "Cannot delete venue because it is shared",
+            messages_list[0].message,
+        )
+
+        self.assertTrue(Venue.objects.filter(id=self.venue.id).exists())
+
+    def test_delete_venue_requires_checkbox_confirmation(self):
+        self.client.force_login(self.user)
+        post_data = {"delete_option": "all"}  # checkbox omitted
+        response = self.client.post(self.url, post_data, follow=True)
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn(
+            "Please tick the confirmation checkbox", messages_list[0].message
+        )
+
+        self.assertTrue(Venue.objects.filter(id=self.venue.id).exists())
+
+    def test_invalid_post_option_returns_error_message(self):
+        self.client.force_login(self.user)
+        post_data = {"delete_option": "invalid"}
+        response = self.client.post(self.url, post_data, follow=True)
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("An error occurred", messages_list[0].message)
+
+    def test_redirect_if_venue_does_not_exist(self):
+        self.client.force_login(self.user)
+        invalid_url = reverse("delete_venue", args=[999])
+        response = self.client.get(invalid_url, follow=True)
+
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("Unable to delete venue.", messages_list[0].message)
+
+    def test_redirect_if_venue_not_assigned_to_club(self):
+        other_venue = Venue.objects.create(name="Other Venue")
+        other_url = reverse("delete_venue", args=[other_venue.id])
+        self.client.force_login(self.user)
+        response = self.client.get(other_url, follow=True)
+
+        self.assertRedirects(response, reverse("club_admin_dashboard"))
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("Unable to delete venue.", messages_list[0].message)
