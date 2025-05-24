@@ -112,6 +112,10 @@ main {
     color: #ffffff;
 }
 
+.btn-toggle {
+    color: var(--dark-2)
+}
+
 /* Links */
 a {
     text-decoration: none;
@@ -126,6 +130,13 @@ a:hover {
 /* Form Info */
 .form-info {
     background-color: var(--light-2);
+}
+
+/* Filter Menus */
+.filter-box {
+    border: 1px solid var(--dark-2);
+    background-color: var(--light-2);
+    color: var(--dark-2);
 }
 
 /* Navbar */

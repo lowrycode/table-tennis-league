@@ -12,6 +12,7 @@ from .forms import (
     CreateVenueForm,
 )
 from .decorators import club_admin_required
+from .filters import ClubInfoFilter
 
 
 # Helper functions
@@ -82,11 +83,17 @@ def clubs(request):
         "-created_on"
     )
 
-    # Prefetch approved ClubInfos
+    # Filter approved ClubInfos
+    club_info_filter = ClubInfoFilter(
+        request.GET, queryset=approved_club_infos_qs
+    )
+    filtered_club_infos_qs = club_info_filter.qs
+
+    # Prefetch filtered approved ClubInfos
     # to make accessible via club.approved_club_infos
     approved_club_infos_pf = Prefetch(
         "club_infos",
-        queryset=approved_club_infos_qs,
+        queryset=filtered_club_infos_qs,
         to_attr="approved_club_infos",
     )
 
@@ -142,7 +149,18 @@ def clubs(request):
             # Append club data
             clubs_dict.append(club_dict)
 
-    return render(request, "clubs/clubs.html", {"clubs": clubs_dict})
+    # Deduce whether filters are applied by checking for get parameters
+    filters_applied = len(request.GET) > 0
+
+    return render(
+        request,
+        "clubs/clubs.html",
+        {
+            "clubs": clubs_dict,
+            "filter": club_info_filter,
+            "filters_applied": filters_applied,
+        },
+    )
 
 
 @club_admin_required
