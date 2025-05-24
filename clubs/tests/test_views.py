@@ -386,6 +386,230 @@ class ClubsPageDynamicTests(TestCase):
         )
 
 
+class ClubsPageFilterTests(TestCase):
+    def setUp(self):
+        # Create Club objects
+        self.club_1 = Club.objects.create(name="Club 1")
+        self.club_2 = Club.objects.create(name="Club 2")
+        self.club_3 = Club.objects.create(name="Club 3")
+
+        # Base ClubInfo data
+        self.base_club_info_data = {
+            "club": None,
+            "image": "",
+            "website": "https://www.example.com",
+            "contact_name": "Joe Bloggs",
+            "contact_email": "example@example.com",
+            "contact_phone": "01234556778",
+            "description": "This club is the best!",
+            "session_info": "We do every night of the week.",
+            "beginners": False,
+            "intermediates": False,
+            "advanced": False,
+            "kids": False,
+            "adults": False,
+            "coaching": False,
+            "league": False,
+            "equipment_provided": False,
+            "membership_required": False,
+            "free_taster": False,
+            "approved": True,
+        }
+
+        # Create ClubInfo objects
+        self.club_info_data_1 = self.base_club_info_data.copy()
+        self.club_info_data_1["club"] = self.club_1
+        self.club_info_data_1["contact_name"] = "Club 1 contact"
+        self.club_info_1 = ClubInfo.objects.create(**self.club_info_data_1)
+
+        self.club_info_data_2 = self.base_club_info_data.copy()
+        self.club_info_data_2["club"] = self.club_2
+        self.club_info_data_2["contact_name"] = "Club 2 contact"
+        self.club_info_data_2["beginners"] = True
+        self.club_info_data_2["intermediates"] = True
+        self.club_info_data_2["advanced"] = True
+        self.club_info_data_2["kids"] = True
+        self.club_info_data_2["adults"] = True
+        self.club_info_data_2["coaching"] = True
+        self.club_info_data_2["league"] = True
+        self.club_info_data_2["equipment_provided"] = True
+        self.club_info_data_2["membership_required"] = True
+        self.club_info_data_2["free_taster"] = True
+        self.club_info_2 = ClubInfo.objects.create(**self.club_info_data_2)
+
+        self.club_info_data_3 = self.base_club_info_data.copy()
+        self.club_info_data_3["club"] = self.club_3
+        self.club_info_data_3["contact_name"] = "Club 3 contact"
+        self.club_info_data_3["beginners"] = True
+        self.club_info_data_3["intermediates"] = False
+        self.club_info_data_3["advanced"] = True
+        self.club_info_data_3["kids"] = False
+        self.club_info_data_3["adults"] = True
+        self.club_info_data_3["coaching"] = False
+        self.club_info_data_3["league"] = True
+        self.club_info_data_3["equipment_provided"] = False
+        self.club_info_data_3["membership_required"] = True
+        self.club_info_data_3["free_taster"] = False
+        self.club_info_3 = ClubInfo.objects.create(**self.club_info_data_3)
+
+        # Create Venue objects
+        self.venue_1 = Venue.objects.create(name="Venue 1")
+        self.venue_2 = Venue.objects.create(name="Venue 2")
+        self.venue_3 = Venue.objects.create(name="Venue 3")
+
+        # Base VenueInfo data
+        self.base_venue_info_data = {
+            "venue": None,
+            "street_address": "1 Main Street",
+            "address_line_2": "",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1HA",
+            "num_tables": 5,
+            "parking_info": "There is a free carpark at the venue",
+            "meets_league_standards": True,
+            "approved": True,
+        }
+
+        # Create VenueInfo objects
+        self.venue_info_data_1 = self.base_venue_info_data.copy()
+        self.venue_info_data_1["venue"] = self.venue_1
+        self.venue_info_1 = VenueInfo.objects.create(**self.venue_info_data_1)
+
+        self.venue_info_data_2 = self.base_venue_info_data.copy()
+        self.venue_info_data_2["venue"] = self.venue_2
+        self.venue_info_data_2["street_address"] = "2 Main Street"
+        self.venue_info_2 = VenueInfo.objects.create(**self.venue_info_data_2)
+
+        self.venue_info_data_3 = self.base_venue_info_data.copy()
+        self.venue_info_data_3["venue"] = self.venue_3
+        self.venue_info_data_3["street_address"] = "3 Main Street"
+        self.venue_info_3 = VenueInfo.objects.create(**self.venue_info_data_3)
+
+        # Create ClubVenue objects
+        self.club_venue_1 = ClubVenue.objects.create(
+            club=self.club_1, venue=self.venue_1
+        )
+        self.club_venue_2 = ClubVenue.objects.create(
+            club=self.club_2, venue=self.venue_2
+        )
+        self.club_venue_3 = ClubVenue.objects.create(
+            club=self.club_3, venue=self.venue_3
+        )
+
+        # Url
+        self.url = reverse("clubs")
+
+    def test_no_filters_returns_all_approved_clubs(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_beginners_true(self):
+        response = self.client.get(self.url, {"beginners": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_intermediates_true(self):
+        response = self.client.get(self.url, {"intermediates": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_advanced_true(self):
+        response = self.client.get(self.url, {"advanced": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_kids_true(self):
+        response = self.client.get(self.url, {"kids": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_adults_true(self):
+        response = self.client.get(self.url, {"adults": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_coaching_true(self):
+        response = self.client.get(self.url, {"coaching": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_league_true(self):
+        response = self.client.get(self.url, {"league": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_equipment_provided_true(self):
+        response = self.client.get(self.url, {"equipment_provided": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_free_taster_true(self):
+        response = self.client.get(self.url, {"free_taster": "true"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_membership_required_true(self):
+        response = self.client.get(self.url, {"membership_required": "True"})
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_membership_required_false(self):
+        response = self.client.get(self.url, {"membership_required": "False"})
+        self.assertContains(response, self.club_info_1.contact_name)
+        self.assertNotContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_3.contact_name)
+
+    def test_filter_by_membership_required_any(self):
+        # Should return all approved clubs (like no filter)
+        response = self.client.get(self.url, {"membership_required": ""})
+        self.assertContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertContains(response, self.club_info_3.contact_name)
+
+    def test_combined_filters(self):
+        response = self.client.get(self.url, {
+            "beginners": "true",
+            "intermediates": "true",
+        })
+        self.assertNotContains(response, self.club_info_1.contact_name)
+        self.assertContains(response, self.club_info_2.contact_name)
+        self.assertNotContains(response, self.club_info_3.contact_name)
+
+    def test_filters_applied_context_flag(self):
+        # When query params exist, filters_applied should be True
+        response = self.client.get(self.url, {"beginners": "true"})
+        self.assertTrue(response.context["filters_applied"])
+
+        # When no query params, filters_applied should be False
+        response = self.client.get(self.url)
+        self.assertFalse(response.context["filters_applied"])
+
+    def test_unapproved_clubs_never_appear_even_if_filter_matches(self):
+        self.club_info_1.approved = False
+        self.club_info_1.save()
+        response = self.client.get(self.url, {"beginners": "true"})
+        self.assertNotContains(response, self.club_1.name)
+
+    def test_club_with_no_approved_club_info_does_not_appear(self):
+        # Create club without club info
+        club_no_info = Club.objects.create(name="No Info Club")
+        response = self.client.get(self.url, {"beginners": "true"})
+        self.assertNotContains(response, club_no_info.name)
+
+
 class ClubAdminDashboardTests(TestCase):
     def setUp(self):
         # Create user
