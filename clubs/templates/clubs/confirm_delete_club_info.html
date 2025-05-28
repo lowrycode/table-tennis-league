@@ -3,54 +3,58 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-max-5 my-5">
+  <div class="container-max-5 my-5">
     <div class="row">
-        <div class="col-12 mt-5">
-            <h1 class="h2-style text-center mb-5">Delete Club Information</h1>
-            <div class="form-info border p-3 mb-5">
-                <p class="fw-bold fs-5 mb-2">
-                    <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
-                    Deleting club information cannot be undone.
-                </p>
-                <p class="fst-italic mb-2">
-                    If you want to update the club information instead, click
-                    <a href="{% url "update_club_info" %}" aria-label="Update club info" title="Update club info">
-                        here
-                    </a>.
-                </p>
-            </div>
-            <form method="POST" action="{% url 'delete_club_info' %}">
-                {% csrf_token %}
-                <div class="border p-3 mb-4">
-                    <label class="form-label">Choose what to delete:</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="delete_option" id="delete_unapproved" value="unapproved" checked>
-                        <label class="form-check-label" for="delete_unapproved">
-                            Delete only <strong>unapproved</strong> club info
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="delete_option" id="delete_all" value="all">
-                        <label class="form-check-label" for="delete_all">
-                            Delete both <strong>approved</strong> and <strong>unapproved</strong> club infos
-                        </label>
-                    </div>
-                </div>
-                <div id="delete-approved-club-info-warning" class="visually-hidden form-check mb-5">
-                    <input id="confirm-club-info-delete" class="form-check-input" type="checkbox" name="confirm_action">
-                    <label for="confirm-club-info-delete" class="form-check-label">
-                        I understand that this will cause the club to disappear from the Clubs page until new club
-                        information is submitted and approved by the league administrator.
-                    </label>
-                </div>
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <button id="btn-delete-club-info" class="btn btn-custom-warning" type="submit">Delete Club Info</button>
-                    <a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Cancel</a>
-                </div>
-            </form>
+      <div class="col-12 mt-5">
+        <h1 class="h2-style text-center mb-5">Delete Club Information</h1>
+        <!-- Clarifying Information -->
+        <div class="form-info border p-3 mb-5">
+          <p class="fw-bold fs-5 mb-2">
+            <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
+            Deleting club information cannot be undone.
+          </p>
+          <p class="fst-italic mb-2">
+            If you want to update the club information instead, click
+            <a href="{% url "update_club_info" %}" aria-label="Update club info" title="Update club info">
+              here
+            </a>.
+          </p>
         </div>
+        <form method="POST" action="{% url 'delete_club_info' %}">
+          {% csrf_token %}
+          <!-- Radio Buttons -->
+          <fieldset class="border p-3 mb-4">
+            <legend class="fs-5">Choose what to delete:</legend>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delete_option" id="delete_unapproved" value="unapproved" checked>
+              <label class="form-check-label" for="delete_unapproved">
+                Delete only <strong>unapproved</strong> club info
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delete_option" id="delete_all" value="all">
+              <label class="form-check-label" for="delete_all">
+                Delete both <strong>approved</strong> and <strong>unapproved</strong> club infos
+              </label>
+            </div>
+          </fieldset>
+          <!-- Confirmation Checkbox -->
+          <div id="delete-approved-club-info-warning" class="visually-hidden form-check mb-5">
+            <input id="confirm-club-info-delete" class="form-check-input" type="checkbox" name="confirm_action">
+            <label for="confirm-club-info-delete" class="form-check-label">
+              I understand that this will cause the club to disappear from the Clubs page until new club
+              information is submitted and approved by the league administrator.
+            </label>
+          </div>
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <button id="btn-delete-club-info" class="btn btn-custom-danger" type="submit">Delete Club Info</button>
+            <a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Cancel</a>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="{% static "js/clubs/delete_club_info.js" %}"></script>
+  <script src="{% static "js/clubs/delete_club_info.js" %}"></script>
 {% endblock %}
