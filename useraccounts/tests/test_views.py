@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from clubs.models import Club, ClubAdmin
 
 User = get_user_model()
 
@@ -544,6 +545,22 @@ class AccountSettingsPageTests(TestCase):
         response = self.client.get(reverse("account_settings"))
         self.assertContains(response, "Password</h2>")
 
+    def test_page_has_club_admin_section_if_user_has_club_admin_status(self):
+        # Create Club and Club Admin
+        club = Club.objects.create(name="Test Club")
+        club_admin = ClubAdmin.objects.create(user=self.user, club=club)
+
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+
+        self.assertContains(response, "Club Admin</h2>")
+        self.assertContains(response, club_admin.club.name)
+
+    def test_page_has_no_club_admin_section_if_no_club_admin_status(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+        self.assertNotContains(response, "Club Admin</h2>")
+
     def test_page_has_delete_account_section(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
@@ -737,3 +754,119 @@ class ConfirmAccountDeletePageTests(TestCase):
             msgs[0].message,
         )
         self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+
+class ConfirmDropClubAdminStatusPageTests(TestCase):
+    def setUp(self):
+        # Create Users
+        self.user_with_admin = User.objects.create_user(
+            username="adminuser",
+            email="admin@example.com",
+            password="difficulttoguess!",
+        )
+        self.user_without_admin = User.objects.create_user(
+            username="regularuser",
+            email="user@example.com",
+            password="difficulttoguess!",
+        )
+
+        # Create Club
+        self.club = Club.objects.create(name="Test Club")
+
+        # Create ClubAdmin for user_with_admin
+        ClubAdmin.objects.create(user=self.user_with_admin, club=self.club)
+
+    def test_page_returns_correct_status_code(self):
+        self.client.force_login(self.user_with_admin)
+        response = self.client.get(reverse("drop_club_admin_status"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_returns_correct_template(self):
+        self.client.force_login(self.user_with_admin)
+        response = self.client.get(reverse("drop_club_admin_status"))
+        self.assertTemplateUsed(
+            response, "useraccounts/confirm_drop_club_admin_status.html"
+        )
+
+    def test_page_redirects_unauthenticated_user(self):
+        response = self.client.get(reverse("drop_club_admin_status"))
+        self.assertRedirects(
+            response,
+            f"{reverse('account_login')}?next="
+            f"{reverse('drop_club_admin_status')}",
+        )
+
+    def test_page_contains_expected_content(self):
+        self.client.force_login(self.user_with_admin)
+        response = self.client.get(reverse("drop_club_admin_status"))
+        self.assertContains(response, "<h1")
+        self.assertContains(response, "Drop Club Admin Status?")
+        self.assertContains(
+            response, "The club itself will not be deleted.", status_code=200
+        )
+
+    def test_post_without_confirm_delete_shows_warning(self):
+        self.client.force_login(self.user_with_admin)
+        response = self.client.post(reverse("drop_club_admin_status"), {})
+
+        # User's ClubAdmin should still exist
+        self.assertTrue(
+            ClubAdmin.objects.filter(user=self.user_with_admin).exists()
+        )
+
+        # Check warning message
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "You must confirm before dropping your club admin status.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.WARNING)
+
+    def test_post_with_confirm_delete_deletes_club_admin_and_redirects(self):
+        self.client.force_login(self.user_with_admin)
+        response = self.client.post(
+            reverse("drop_club_admin_status"),
+            {"confirm_action": "on"},
+            follow=True,
+        )
+        # ClubAdmin should be deleted
+        self.assertFalse(
+            ClubAdmin.objects.filter(user=self.user_with_admin).exists()
+        )
+
+        # Redirects to account_settings
+        self.assertRedirects(response, reverse("account_settings"))
+
+        # Success message
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "Your account no longer has club admin status.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+    def test_post_with_confirm_delete_for_user_without_club_admin(self):
+        self.client.force_login(self.user_without_admin)
+        response = self.client.post(
+            reverse("drop_club_admin_status"),
+            {"confirm_action": "on"},
+            follow=True,
+        )
+        # Confirm no ClubAdmin exists
+        self.assertFalse(
+            ClubAdmin.objects.filter(user=self.user_without_admin).exists()
+        )
+
+        # Redirects to account_settings
+        self.assertRedirects(response, reverse("account_settings"))
+
+        # Warning message about no club admin status
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "You do not currently have club admin status.",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.WARNING)

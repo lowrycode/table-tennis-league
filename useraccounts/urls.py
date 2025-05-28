@@ -8,4 +8,9 @@ urlpatterns = [
     path(
         "account/delete/confirm/", views.delete_account, name="delete_account"
     ),
+    path(
+        "account/drop-club-admin-status/confirm/",
+        views.drop_club_admin_status,
+        name="drop_club_admin_status",
+    ),
 ]
