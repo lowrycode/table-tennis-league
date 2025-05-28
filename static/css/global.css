@@ -103,6 +103,10 @@ h6 {
     color: red;
 }
 
+.blue {
+    color: var(--primary-2);
+}
+
 /* Containers */
 .container-max-4 {
     max-width: 400px;
@@ -200,10 +204,6 @@ a:hover {
 /* Navbar */
 .navbar {
     padding: 2px 0;
-}
-
-#nav-logo {
-    height: 35px;
 }
 
 .nav-user-highlight {
