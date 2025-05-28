@@ -4,8 +4,8 @@
 {% block content %}
 <div class="container-max-4">
     <div class="row">
-        <div class="col-12 mt-5">
-            <h1 class="my-4 text-center">Log in</h1>
+        <div class="col-12 my-5">
+            <h1 class="h2-style my-4 text-center">Log in</h1>
             <form method="POST" action="{{ login_url }}">
                 {% csrf_token %}
                 {{ form|crispy }}

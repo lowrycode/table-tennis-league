@@ -5,7 +5,7 @@
 <div class="container-max-6 my-5">
     <div class="row">
         <div class="col-12 mt-5">
-            <h1 class="text-center">Update Venue Information</h1>
+            <h1 class="h2-style text-center">Update Venue Information</h1>
             <p class="mb-5 text-center fs-4">{{ venue.name }}</p>
             <div class="form-info border p-3 mb-3">
                 <p class="fw-semibold fs-5 m-0">
@@ -18,7 +18,7 @@
                     <a href="{% url 'create_venue' %}"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
                 </div>
             </div>
-            <div class="form-info border p-3 mb-5">
+            <div class="form-info border p-3 mb-3">
                 <p class="fw-semibold fs-5">
                     <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
                     The name of the venue can only be changed by the league administrator. 
@@ -32,7 +32,7 @@
                 </p>
             </div>
             {% if is_shared_venue %}
-            <div class="form-info border p-3 mb-5">
+            <div class="form-info border p-3 mb-3">
                 <p class="fw-bold fs-5">
                     <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
                     This venue is shared with other clubs.</p>
@@ -42,7 +42,7 @@
                 </p>
             </div>
             {% endif %}
-            <form method="POST" action="{% url 'update_venue_info' venue.id %}">
+            <form class="mt-5" method="POST" action="{% url 'update_venue_info' venue.id %}">
                 {% csrf_token %}
                 {{ form|crispy }}
                 {% if redirect_field_value %}
