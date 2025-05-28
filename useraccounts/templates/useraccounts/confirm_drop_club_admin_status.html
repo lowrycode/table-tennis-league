@@ -3,33 +3,58 @@
 {% load static %}
 
 {% block content %}
-<div class="container-max-6">
+  <div class="container-max-6">
     <div class="row">
-        <div class="col-12 my-5">
-            <h1 class="h2-style my-4 text-center">Drop Club Admin Status?</h1>
-            <p class="fw-bold">You will no longer be able to manage information about your club.</p>
-            <div class="border px-4">
-                <p class="my-3">The club itself will not be deleted. Club details and venues will remain on the clubs page.</p>
-                <p class="my-3">If you later require club admin status, a request must be made to the League Administrator.</p>
-            </div>
-            <form method="POST" action="{% url 'drop_club_admin_status' %}">
-                {% csrf_token %}
-                <div class="form-check my-3">
-                    <input id="confirm-drop-club-admin-status" class="form-check-input confirmation-checkbox" type="checkbox" name="confirm_action" required>
-                    <label for="confirm-drop-club-admin-status" class="form-check-label">
-                        I understand that I will no longer be able to manage club and venue information
-                        and that a request must be made to the League Administrator if I later require
-                        club admin status again.
-                    </label>
-                </div>
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <button id="btn-drop-club-admin-status" class="btn btn-custom-danger confirmation-required" type="submit" disabled>Drop Club Admin Status</button>
-                    <a href="{% url 'account_settings' %}" class="btn btn-custom2">Cancel</a>
-                </div>
-            </form>
+      <div class="col-12 my-5">
+        <h1 class="h2-style my-4 text-center">Drop Club Admin Status?</h1>
+        <!-- Clarifying Information -->
+        <p class="fw-bold">
+          You will no longer be able to manage information about your club.
+        </p>
+        <div class="border px-4">
+          <p class="my-3">
+            The club itself will not be deleted. Club details and venues will remain on the clubs page.
+          </p>
+          <p class="my-3">
+            If you later require club admin status, a request must be made to the League Administrator.
+          </p>
         </div>
+        <!-- Form -->
+        <form method="POST" action="{% url 'drop_club_admin_status' %}">
+          {% csrf_token %}
+          <!-- Confirm Checkbox -->
+          <div class="form-check my-3">
+            <input
+              id="confirm-drop-club-admin-status"
+              class="form-check-input confirmation-checkbox"
+              type="checkbox"
+              name="confirm_action"
+              required
+            >
+            <label for="confirm-drop-club-admin-status" class="form-check-label">
+              I understand that I will no longer be able to manage club and venue information
+              and that a request must be made to the League Administrator if I later require
+              club admin status again.
+            </label>
+          </div>
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <button
+              id="btn-drop-club-admin-status"
+              class="btn btn-custom-danger confirmation-required"
+              type="submit"
+              disabled
+            >
+              Drop Club Admin Status
+            </button>
+            <a href="{% url 'account_settings' %}" class="btn btn-custom2">Cancel</a>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
+{% endblock %}
 
-<script src="{% static "js/enable_button_on_confirm.js" %}"></script>
+{% block scripts %}
+  <script src="{% static "js/enable_button_on_confirm.js" %}"></script>
 {% endblock %}
