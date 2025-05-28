@@ -382,6 +382,12 @@ footer a:hover {
   background-color: var(--light-2);
 }
 
+.club-checkboxes ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .venue {
   background-color: var(--light-2);
 }
