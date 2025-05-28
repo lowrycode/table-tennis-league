@@ -21,7 +21,7 @@ class HomePageStaticTests(TestCase):
     # Hero Section
     def test_homepage_contains_hero_section(self):
         response = self.client.get(reverse("home"))
-        self.assertContains(response, '<section id="hero"')
+        self.assertContains(response, 'id="hero"')
 
     def test_homepage_contains_hero_image(self):
         response = self.client.get(reverse("home"))

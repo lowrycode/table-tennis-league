@@ -382,9 +382,8 @@ class ChangePasswordPageTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
         self.assertContains(response, "<a")
-        self.assertContains(response, "href")
+        self.assertContains(response, f'href="{reverse("account_settings")}"')
         self.assertContains(response, "Go Back")
-        self.assertContains(response, "javascript:history.back()")
 
     def test_invalid_form_missing_required_fields(self):
         form_data = {
@@ -540,6 +539,11 @@ class AccountSettingsPageTests(TestCase):
         self.assertContains(response, self.user.email)
         self.assertContains(response, "Change</a>")
 
+    def test_page_has_password_section(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("account_settings"))
+        self.assertContains(response, "Password</h2>")
+
     def test_page_has_delete_account_section(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
@@ -588,9 +592,8 @@ class ChangeEmailPageTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse("change_email"))
         self.assertContains(response, "<a")
-        self.assertContains(response, "href")
+        self.assertContains(response, f'href="{reverse("account_settings")}"')
         self.assertContains(response, "Go Back")
-        self.assertContains(response, "javascript:history.back()")
 
     def test_user_can_update_email(self):
         self.client.force_login(self.user)
@@ -682,9 +685,8 @@ class ConfirmAccountDeletePageTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_account"))
         self.assertContains(response, "<a")
-        self.assertContains(response, "href")
+        self.assertContains(response, f'href="{reverse("account_settings")}"')
         self.assertContains(response, "Cancel")
-        self.assertContains(response, "javascript:history.back()")
 
     def test_page_contains_confirm_delete_checkbox(self):
         self.client.force_login(self.user)

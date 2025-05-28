@@ -880,7 +880,7 @@ class UpdateClubInfoTests(TestCase):
         response = self.client.get(reverse("update_club_info"))
         self.assertContains(response, '<input type="text"')
         self.assertContains(response, "<label")
-        self.assertContains(response, "Club website (optional)")  # A label
+        self.assertContains(response, "Club Website")  # A label
         self.assertIn("form", response.context)
         self.assertIsInstance(response.context["form"], UpdateClubInfoForm)
 

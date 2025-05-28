@@ -33,7 +33,7 @@ class UpdateClubInfoFormTests(TestCase):
     def test_form_field_labels(self):
         form = UpdateClubInfoForm()
         self.assertEqual(
-            form.fields["website"].label, "Club website (optional)"
+            form.fields["website"].label, "Club Website"
         )
         self.assertEqual(
             form.fields["beginners"].label, "Suitable for beginners"
@@ -46,8 +46,8 @@ class UpdateClubInfoFormTests(TestCase):
             form.fields["advanced"].label,
             "Suitable for advanced level players",
         )
-        self.assertEqual(form.fields["kids"].label, "Kids are welcome")
-        self.assertEqual(form.fields["adults"].label, "Adults are welcome")
+        self.assertEqual(form.fields["kids"].label, "Suitable for kids")
+        self.assertEqual(form.fields["adults"].label, "Suitable for adults")
         self.assertEqual(
             form.fields["coaching"].label, "Coaching is available"
         )
@@ -146,9 +146,9 @@ class UpdateVenueInfoFormTests(TestCase):
         form = UpdateVenueInfoForm()
         self.assertEqual(form.fields["street_address"].label, "Street")
         self.assertEqual(
-            form.fields["address_line_2"].label, "Address Line 2 (optional)"
+            form.fields["address_line_2"].label, "Address Line 2"
         )
-        self.assertEqual(form.fields["num_tables"].label, "Number of tables")
+        self.assertEqual(form.fields["num_tables"].label, "Number of Tables")
 
     def test_valid_form(self):
         form = UpdateVenueInfoForm(data=self.valid_data)
