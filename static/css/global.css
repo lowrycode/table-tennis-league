@@ -296,6 +296,10 @@ footer a:hover {
     --bs-accordion-btn-focus-box-shadow: 0 0 0 1px var(--primary-2);
 }
 
+.accordion-body {
+    background-color: var(--primary-5);
+}
+
 .accordion-button:not(.collapsed) {
     background-color: var(--primary-2);
     color: #fff;
