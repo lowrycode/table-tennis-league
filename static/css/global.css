@@ -206,6 +206,24 @@ a:hover {
     padding: 2px 0;
 }
 
+.navbar a:focus, .navbar button:focus {
+    outline: 2px solid var(--light-1);
+    outline-offset: -1px;
+}
+
+#nav-logo {
+    height: 35px;
+}
+
+#nav-logo-text {
+    font-family: "Figtree", sans-serif;
+    font-weight: 600;
+}
+
+#nav-logo-text > span {
+    color: var(--primary-4);
+}
+
 .nav-user-highlight {
     color: var(--primary-4);
 }

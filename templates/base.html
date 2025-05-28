@@ -75,7 +75,7 @@
               alt="City and District Table Tennis League Logo"
               id="nav-logo"
             >
-            <div>CITY AND DISTRICT</div>
+            <div id="nav-logo-text">CITY <span>AND</span> DISTRICT</div>
           </a>
           <button
             class="navbar-toggler"
@@ -156,8 +156,8 @@
 
     <!-- Main -->
     <main>
-      <!-- Show logged in user-->
       {% if user.is_authenticated %}
+      <!-- Show logged in user-->
       <div class="user-banner w-100">
         <div class="container-lg d-flex justify-content-end">
             <div class="user-logged-in fst-italic">
@@ -167,14 +167,14 @@
       </div>
       {% endif %}
       
-      <!-- Messages -->
       {% if messages %}
+      <!-- Messages -->
       <div class="container-lg bring-to-front">
         <div class="row">
           <div class="col-12">
             <div class="alert-container">
               {% for message in messages %}
-                  <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                  <div class="alert alert-{{ message.tags }} alert-dismissible fade show m-0">
                       {{ message }}
                       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
