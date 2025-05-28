@@ -6,31 +6,31 @@
         <div class="d-flex justify-content-between mb-4">
           <h2>Club and Venue Information</h2>
           {% if club.info %}
-          <button
-            class="btn btn-custom2"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#club-info-preview"
-            aria-expanded="false"
-            aria-controls="club-info-preview"
-          >
-            Toggle Preview
-          </button>
+            <button
+              class="btn btn-custom2"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#club-info-preview"
+              aria-expanded="false"
+              aria-controls="club-info-preview"
+            >
+              Toggle Preview
+            </button>
           {% endif %}
         </div>
 
         {% if club.info %}
-        <!-- Club Info Preview -->
-        <section id="club-info-preview" class="collapse py-2 px-4 my-4">
-          <h3 class="visually-hidden">Preview Club Information</h3>
-          {% if club.has_pending_info %}
-          <p class="fw-semibold text-white fst-italic m-0">
-            NOTE: The preview below includes information that is awaiting approval.
-            Once approved, the information on the Clubs page will look like this.
-          </p>
-          {% endif %}
-          {% include 'clubs/partials/club_info.html' %} 
-        </section>
+          <!-- Club Info Preview -->
+          <section id="club-info-preview" class="collapse py-2 px-4 my-4">
+            <h3 class="visually-hidden">Preview Club Information</h3>
+            {% if club.has_pending_info %}
+              <p class="fw-semibold text-white fst-italic m-0">
+                NOTE: The preview below includes information that is awaiting approval.
+                Once approved, the information on the Clubs page will look like this.
+              </p>
+            {% endif %}
+            {% include 'clubs/partials/club_info.html' %}
+          </section>
         {% endif %}
 
         <!-- Club Info Status Panel -->
@@ -39,104 +39,161 @@
           <ul>
             <li class="border d-flex justify-content-between align-items-center gap-3 px-4 py-2">
               {% if club.info %}
-                <div 
+                <div
                   class="m-0"
                   title="{{ club.info.approved|yesno:'Approved,Pending approval' }}"
                 >
-                  <i class="fa-solid fa-circle {{ club.info.approved|yesno:'green,amber' }} me-2" aria-hidden="true"></i>
-                  <span aria-hidden="true">Club Information {{ club.info.approved|yesno:',(PENDING APPROVAL)' }}</span>
-                  <span class="visually-hidden">, {{ club.info.approved|yesno:'Approved,Pending approval' }}</span>
+                  <i
+                    class="fa-solid fa-circle {{ club.info.approved|yesno:'green,amber' }} me-2"
+                    aria-hidden="true"
+                  ></i>
+                  <span aria-hidden="true">
+                    Club Information {{ club.info.approved|yesno:',(PENDING APPROVAL)' }}
+                  </span>
+                  <span class="visually-hidden">
+                    , {{ club.info.approved|yesno:'Approved,Pending approval' }}
+                  </span>
                 </div>
                 <div class="flex-shrink-0 d-flex gap-1">
-                  <a href="{% url "update_club_info" %}" class="btn" aria-label="Edit club info details" title="Edit club info details">
+                  <a
+                    href="{% url 'update_club_info' %}"
+                    class="btn"
+                    aria-label="Edit club info details"
+                    title="Edit club info details"
+                  >
                     <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                   </a>
-                  <a href="{% url "delete_club_info" %}" class="btn"  aria-label="Delete club info" title="Delete club info">
+                  <a
+                    href="{% url 'delete_club_info' %}"
+                    class="btn"
+                    aria-label="Delete club info"
+                    title="Delete club info"
+                  >
                     <i class="fa-solid fa-trash"  aria-hidden="true"></i>
                   </a>
-                </div>                
+                </div>
               {% else %}
-              <div class="m-0" title="Missing club info">
-                <i class="fa-solid fa-circle-exclamation red me-2" aria-hidden="true"></i>
-                <span class="fw-semibold">Club Information REQUIRED</span>
-              </div>
-              <a href="{% url "update_club_info" %}" class="btn flex-shrink-0" aria-label="Add club details" title="Add club details">
-                Add<i class="fa-solid fa-circle-plus ms-2"></i>
-              </a>
+                <div class="m-0" title="Missing club info">
+                  <i class="fa-solid fa-circle-exclamation red me-2" aria-hidden="true"></i>
+                  <span class="fw-semibold">Club Information REQUIRED</span>
+                </div>
+                <a
+                  href="{% url 'update_club_info' %}"
+                  class="btn flex-shrink-0"
+                  aria-label="Add club details"
+                  title="Add club details"
+                >
+                  Add<i class="fa-solid fa-circle-plus ms-2"></i>
+                </a>
               {% endif %}
             </li>
             {% for venue in club.venues %}
               {% if venue.approved is not None %}
-              <li class="border d-flex justify-content-between align-items-center gap-3 px-4 py-2">
-                <div
-                  class="m-0"
-                  title="{{ venue.approved|yesno:'Approved,Pending approval,Info Required' }}"
-                >
-                  <i class="fa-solid fa-circle {{ venue.approved|yesno:'green,amber' }} me-2"></i>
-                  <span>{{ venue.name }}</span>
-                  <span class="visually-hidden">, {{ venue.approved|yesno:'Approved,Pending approval,Info Required' }}</span>
-                </div>
-                <div class="flex-shrink-0 d-flex gap-1">
-                  <button
-                    hx-post="{% url 'unassign_venue' venue.id %}"
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    hx-confirm="Are you sure you want to unassign this venue?"
-                    hx-target="#club-info-management"
-                    hx-swap="outerHTML"
-                    class="btn"
-                    aria-label="Unassign venue"
-                    title="Unassign venue"
+                <li class="border d-flex justify-content-between align-items-center gap-3 px-4 py-2">
+                  <div
+                    class="m-0"
+                    title="{{ venue.approved|yesno:'Approved,Pending approval,Info Required' }}"
                   >
-                    <i class="fa-solid fa-link-slash" aria-hidden="true"></i>
-                  </button>
-                  <a href="{% url 'update_venue_info' venue.id %}" class="btn" aria-label="Edit venue details" title="Edit venue details">
-                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
-                  </a>
-                  <a href="{% url 'delete_venue' venue.id %}" class="btn"  aria-label="Delete venue" title="Delete venue">
-                    <i class="fa-solid fa-trash"  aria-hidden="true"></i>
-                  </a>
-                </div>
-              </li>
+                    <i class="fa-solid fa-circle {{ venue.approved|yesno:'green,amber' }} me-2"></i>
+                    <span>{{ venue.name }}</span>
+                    <span class="visually-hidden">
+                      , {{ venue.approved|yesno:'Approved,Pending approval,Info Required' }}
+                    </span>
+                  </div>
+                  <div class="flex-shrink-0 d-flex gap-1">
+                    <button
+                      hx-post="{% url 'unassign_venue' venue.id %}"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                      hx-confirm="Are you sure you want to unassign this venue?"
+                      hx-target="#club-info-management"
+                      hx-swap="outerHTML"
+                      class="btn"
+                      aria-label="Unassign venue"
+                      title="Unassign venue"
+                    >
+                      <i class="fa-solid fa-link-slash" aria-hidden="true"></i>
+                    </button>
+                    <a
+                      href="{% url 'update_venue_info' venue.id %}"
+                      class="btn"
+                      aria-label="Edit venue details"
+                      title="Edit venue details"
+                    >
+                      <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                    </a>
+                    <a
+                      href="{% url 'delete_venue' venue.id %}"
+                      class="btn"
+                      aria-label="Delete venue"
+                      title="Delete venue"
+                    >
+                      <i class="fa-solid fa-trash"  aria-hidden="true"></i>
+                    </a>
+                  </div>
+                </li>
               {% else %}
-              <li class="border d-flex justify-content-between align-items-center gap-3 px-4 py-2">
-                <div class="m-0" title="Missing venue info">
-                  <i class="fa-solid fa-circle-exclamation red me-2" aria-hidden="true"></i>
-                  <span class="fw-semibold">{{ venue.name }} (INFO REQUIRED)</span>
-                </div>
-                <div class="flex-shrink-0 d-flex gap-1">
-                  <button
-                    hx-post="{% url 'unassign_venue' venue.id %}"
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    hx-confirm="Are you sure you want to unassign this venue?"
-                    hx-target="#club-info-management"
-                    hx-swap="outerHTML"
-                    class="btn"
-                    aria-label="Unassign venue"
-                    title="Unassign venue"
-                  >
-                    <i class="fa-solid fa-link-slash" aria-hidden="true"></i>
-                  </button>
-                  <a href="{% url 'update_venue_info' venue.id %}" class="btn" aria-label="Edit venue details" title="Edit venue details">
-                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
-                  </a>
-                  <a href="{% url 'delete_venue' venue.id %}" class="btn"  aria-label="Delete venue" title="Delete venue">
-                    <i class="fa-solid fa-trash"  aria-hidden="true"></i>
-                  </a>
-                </div>
-              </li>
+                <li class="border d-flex justify-content-between align-items-center gap-3 px-4 py-2">
+                  <div class="m-0" title="Missing venue info">
+                    <i class="fa-solid fa-circle-exclamation red me-2" aria-hidden="true"></i>
+                    <span class="fw-semibold">{{ venue.name }} (INFO REQUIRED)</span>
+                  </div>
+                  <div class="flex-shrink-0 d-flex gap-1">
+                    <button
+                      hx-post="{% url 'unassign_venue' venue.id %}"
+                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                      hx-confirm="Are you sure you want to unassign this venue?"
+                      hx-target="#club-info-management"
+                      hx-swap="outerHTML"
+                      class="btn"
+                      aria-label="Unassign venue"
+                      title="Unassign venue"
+                    >
+                      <i class="fa-solid fa-link-slash" aria-hidden="true"></i>
+                    </button>
+                    <a
+                      href="{% url 'update_venue_info' venue.id %}"
+                      class="btn"
+                      aria-label="Edit venue details"
+                      title="Edit venue details"
+                    >
+                      <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                    </a>
+                    <a
+                      href="{% url 'delete_venue' venue.id %}"
+                      class="btn"
+                      aria-label="Delete venue"
+                      title="Delete venue"
+                    >
+                      <i class="fa-solid fa-trash"  aria-hidden="true"></i>
+                    </a>
+                  </div>
+                </li>
               {% endif %}
             {% empty %}
               <li class="border d-flex justify-content-between align-items-center gap-3 px-4 py-2">
                 <div class="m-0" title="Venue required">
                   <i class="fa-solid fa-circle-exclamation red me-2" aria-hidden="true"></i>
                   <span class="fw-semibold">Venue REQUIRED</span>
-                  <p class="ms-5 fst-italic">Click the Assign button to see if the venue already exists. If it doesn't, click the Create button.</p>
+                  <p class="ms-5 fst-italic">
+                    Click the Assign button to see if the venue already exists.
+                    If it doesn't, click the Create button.
+                  </p>
                 </div>
                 <div class="flex-shrink-0 d-flex gap-1">
-                  <a href="{% url 'assign_venue' %}" class="btn" aria-label="Assign Venue" title="Assign Venue">
+                  <a
+                    href="{% url 'assign_venue' %}"
+                    class="btn"
+                    aria-label="Assign Venue"
+                    title="Assign Venue"
+                  >
                     <i class="fa-solid fa-link"></i>
                   </a>
-                  <a href="{% url 'create_venue' %}" class="btn" aria-label="Create New Venue" title="Create New Venue">
+                  <a
+                    href="{% url 'create_venue' %}"
+                    class="btn"
+                    aria-label="Create New Venue"
+                    title="Create New Venue"
+                  >
                     <i class="fa-solid fa-circle-plus"></i>
                   </a>
                 </div>
@@ -148,7 +205,6 @@
             <a href="{% url 'create_venue' %}"><i class="fa-solid fa-circle-plus me-2"></i>Create New Venue</a>
           </div>
         </section>
-        
       </div>
     </div>
   </div>
