@@ -10,13 +10,12 @@
       <div class="col-12 col-lg-9 px-0">
         <div class="my-5">
           <div class="d-flex justify-content-between">
-            <h2 class="text-center flex-grow-1">Clubs</h2>
+            <h2 class="text-center flex-grow-1 m-0">Clubs</h2>
             <button class="btn-toggle btn fs-4" data-target="#filter-clubs">
-              {% if filters_applied %}
-              <i class="fa-solid fa-filter-circle-xmark"></i>
-              {% else %}
-              <i class="fa-solid fa-filter"></i>
-              {% endif %}
+              <i 
+                class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"
+                aria-label="Filter is {{ filters_applied|yesno:' active, not active' }}"
+              ></i>
             </button>
           </div>
           <form id="filter-clubs" class="filter-box mt-2 p-3 d-none" method="get">
