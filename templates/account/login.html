@@ -2,29 +2,29 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-max-4">
+  <div class="container-max-4">
     <div class="row">
-        <div class="col-12 my-5">
-            <h1 class="h2-style my-4 text-center">Log in</h1>
-            <form method="POST" action="{{ login_url }}">
-                {% csrf_token %}
-                {{ form|crispy }}
-                {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                {% endif %}
-                <div class="d-flex justify-content-start align-items-center flex-wrap row-gap-3 col-gap-4">
-                    <button class="btn btn-custom" type="submit">Log In</button>
-                    <p class="fst-italic m-0">
-                        Forgot your password?<br>
-                        <a href="{% url "contact" %}">Contact the league administrator.</a>
-                    </p>
-                    <p class="fst-italic m-0">
-                        Don't have an account yet?
-                        <a href="{% url "account_signup" %}">Sign up.</a>
-                    </p>
-                </div>
-            </form>
-        </div>
+      <div class="col-12 my-5">
+        <h1 class="h2-style my-4 text-center">Log in</h1>
+        <form method="POST" action="{{ login_url }}">
+          {% csrf_token %}
+          {{ form|crispy }}
+          {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+          <div class="d-flex justify-content-start align-items-center flex-wrap row-gap-3 col-gap-4">
+            <button class="btn btn-custom" type="submit">Log In</button>
+            <p class="fst-italic m-0">
+              Forgot your password?<br>
+              <a href="{% url "contact" %}">Contact the league administrator.</a>
+            </p>
+            <p class="fst-italic m-0">
+              Don't have an account yet?
+              <a href="{% url "account_signup" %}">Sign up.</a>
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock %}
