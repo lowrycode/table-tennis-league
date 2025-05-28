@@ -2,16 +2,25 @@
 {% load static %}
 
 {% block content %}
-<div class="container-max-4 d-flex justify-content-center align-items-center flex-grow-1">
+  <div
+    class="container-max-4 d-flex justify-content-center align-items-center flex-grow-1"
+  >
     <div class="row">
-        <div class="col-12 text-center">
-            <h1 class="visually-hidden">500 - Server Error</h1>
-            <img src="{% static 'images/error-500.png' %}" alt="500 Server Error" class="img-fluid">
-            <p>Oops! We dropped the ball.</p>
-            <p>Please try again later or contact the league administrator if the problem persists.</p>
-            <a href="{% url "home" %}" class="btn btn-custom mb-5">Go to Homepage</a>
-        </div>
+      <div class="col-12 text-center">
+        <h1 class="visually-hidden">500 - Server Error</h1>
+        <img
+          src="{% static 'images/error-500.png' %}"
+          alt="500 Server Error"
+          class="img-fluid"
+        />
+        <p>Oops! We dropped the ball.</p>
+        <p>
+          Please try again later or
+          <a href="{% url 'contact' %}">contact the league administrator</a>
+          if the problem persists.
+        </p>
+        <a href="{% url 'home' %}" class="btn btn-custom mb-5">Go to Homepage</a>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock content %}
-
