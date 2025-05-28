@@ -1,4 +1,6 @@
-/* Common Page Elements */
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* CSS Variables */
 :root {
     /* Accounting for navbar */
     --navbar-height: 49px;
@@ -7,21 +9,26 @@
     --light-1: #fff;
     --light-2: #f0f0f0;
     --light-3: #cfcfcf;
+    --light-4: #b5b5b5;
     --dark-1: #0f0f0f;
     --dark-2: #202020;
-    --primary-1: #0b2151;
-    --primary-2: #1e4989;
-    --primary-3: #b9c8dd;
+    --primary-1: #08193c;
+    --primary-2: #032571;
+    --primary-3: #1f55ce;
+    --primary-4: #b1c5e1;
+    --primary-5: #dfecfc;
     --secondary-1: #a62521;
     --secondary-2: #cd2f29;
-    --secondary-3: #a25a58;
 }
 
+/* Global Element Styles */
 html, body {
     height: 100%;
     margin: 0;
     display: flex;
     flex-direction: column;
+    font-family: "Figtree", sans-serif;
+    font-weight: 400;
 }
 
 main {
@@ -32,6 +39,37 @@ main {
     align-items: center;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: "PT Serif", serif;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: 2.7rem;
+}
+
+h2, .h2-style {
+    font-size: 2.2rem;
+}
+
+h3 {
+    font-size: 1.6rem;
+}
+
+h4 {
+    font-size: 1.4rem;
+}
+
+h5 {
+    font-size: 1.2rem;
+}
+
+h6 {
+    font-size: 1.1rem;
+}
+
+/* UTILITIES */
+/* Layout Utilities */
 .bring-to-front {
     z-index: 1000;
 }
@@ -52,6 +90,7 @@ main {
     column-gap: 3rem;
 }
 
+/* Text Colour Utilities */
 .green {
     color: green;
 }
@@ -62,6 +101,10 @@ main {
 
 .red {
     color: red;
+}
+
+.blue {
+    color: var(--primary-2);
 }
 
 /* Containers */
@@ -85,31 +128,49 @@ main {
     margin: 0 1rem;
 }
 
+/* BASE COMPONENTS */
 /* Buttons */
 .btn-custom {
-    background-color: var(--secondary-2);
-    border: 2px solid var(--secondary-1);
+    background-color: var(--primary-2);
+    border: 1px solid var(--primary-1);
     color: #f0f0f0;
     padding: 0.3rem 0.6rem;
     border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .btn-custom:hover {
-    background-color: #a62521;
+    background-color: var(--primary-3);
     color: #ffffff;
 }
 
 .btn-custom2 {
-    background-color: var(--primary-3);
-    border: 2px solid var(--primary-2);
+    background-color: var(--light-1);
+    border: 1px solid var(--light-4);
     color: var(--dark-2);
     padding: 0.3rem 0.6rem;
     border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .btn-custom2:hover {
-    background-color: var(--primary-2);
-    color: #ffffff;
+    background-color: var(--light-3);
+    border: 1px solid var(--light-4);
+}
+
+.btn-custom-danger {
+    background-color: var(--secondary-1);
+    border: 1px solid var(--dark-2);
+    color: var(--light-2);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-custom-danger:hover {
+    background-color: var(--secondary-2);
+    border: 1px solid var(--dark-2);
+    color: var(--light-1);
 }
 
 .btn-toggle {
@@ -119,12 +180,12 @@ main {
 /* Links */
 a {
     text-decoration: none;
-    color: var(--primary-1);
+    color: var(--primary-2);
     font-weight: 600;
 }
 
 a:hover {
-    color: var(--primary-2);
+    color: var(--primary-3);
 }
 
 /* Form Info */
@@ -139,20 +200,35 @@ a:hover {
     color: var(--dark-2);
 }
 
+/* LAYOUT SECTIONS */
 /* Navbar */
 .navbar {
     padding: 2px 0;
+}
+
+.navbar a:focus, .navbar button:focus {
+    outline: 2px solid var(--light-1);
+    outline-offset: -1px;
 }
 
 #nav-logo {
     height: 35px;
 }
 
-.nav-user-highlight {
-    color: var(--primary-3);
+#nav-logo-text {
+    font-family: "Figtree", sans-serif;
+    font-weight: 600;
 }
 
-/* User banner */
+#nav-logo-text > span {
+    color: var(--primary-4);
+}
+
+.nav-user-highlight {
+    color: var(--primary-4);
+}
+
+/* Title and User banner */
 .user-banner {
     position: absolute;
     top: var(--navbar-height);
@@ -161,13 +237,29 @@ a:hover {
 
 .user-logged-in {
     padding: 0.2rem 1rem;
-    background-color: var(--primary-3);
+    background-color: var(--primary-4);
     color: var(--dark-2);
+}
+
+.title {
+    width: 100%;
+    background: linear-gradient(
+      rgba(0, 0, 0, 0.9), 
+      rgba(0, 0, 0, 0.1)
+    ),
+    url("../images/hero.jpg");
+    background-position: bottom;
+    background-size: 250% auto;
+    padding: 2.5rem 1rem;
+    color: var(--light-1);
+}
+
+.title.with-user-banner {
+    padding-top: 3.5rem;
 }
 
 /* Footer */
 footer a {
-    /* text-decoration: none; */
     color: var(--light-3);
 }
 
@@ -179,7 +271,6 @@ footer a:hover {
     font-size: 1.5rem;
     margin: 0 0.2rem;
 }
-
 
 /* HOMEPAGE */
 /* Hero section */
@@ -237,11 +328,15 @@ footer a:hover {
 
 /* Override bootstrap accordion styles */
 .accordion {
-    --bs-accordion-btn-focus-box-shadow: 0 0 0 1px #bf2622;
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 1px var(--primary-2);
+}
+
+.accordion-body {
+    background-color: var(--primary-5);
 }
 
 .accordion-button:not(.collapsed) {
-    background-color: #bf2622;
+    background-color: var(--primary-2);
     color: #fff;
 }    
 
@@ -255,6 +350,8 @@ footer a:hover {
 
 /* CONTACT PAGE */
 #contact-info-box {
+    background-color: var(--light-2);
+    color: var(--dark-2);
     border: 1px solid black;
     padding: 0 3rem;
 }
@@ -301,7 +398,6 @@ footer a:hover {
     padding: 0;
     margin: 0;
 }
-
 
 /* Media Queries */
 @media (min-width: 900px) { 
