@@ -5,7 +5,10 @@ from .models import Enquiry
 class EnquiryForm(forms.ModelForm):
     class Meta:
         model = Enquiry
-        fields = ['name', 'email', 'phone', 'subject', 'message']
+        fields = ["name", "email", "phone", "subject", "message"]
         labels = {
-            'phone': 'Contact Number',
+            "phone": "Contact Number",
+        }
+        widgets = {
+            "phone": forms.TextInput(attrs={"placeholder": "(optional)"}),
         }

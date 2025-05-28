@@ -59,17 +59,27 @@ class UpdateClubInfoForm(forms.ModelForm):
             "free_taster",
         ]
         labels = {
-            "website": "Club website (optional)",
+            "contact_name": "Contact Name",
+            "contact_email": "Contact Email",
+            "contact_phone": "Contact Phone",
+            "website": "Club Website",
+            "session_info": "Session Info",
             "beginners": "Suitable for beginners",
             "intermediates": "Suitable for intermediate level players",
             "advanced": "Suitable for advanced level players",
-            "kids": "Kids are welcome",
-            "adults": "Adults are welcome",
+            "kids": "Suitable for kids",
+            "adults": "Suitable for adults",
             "coaching": "Coaching is available",
             "league": "Club participates in the league",
             "equipment_provided": "Equipment is provided",
             "membership_required": "Membership is required",
             "free_taster": "Free taster sessions available",
+        }
+        widgets = {
+            "contact_phone": forms.TextInput(
+                attrs={"placeholder": "(optional)"}
+            ),
+            "website": forms.TextInput(attrs={"placeholder": "(optional)"}),
         }
 
 
@@ -87,6 +97,12 @@ class UpdateVenueInfoForm(forms.ModelForm):
         ]
         labels = {
             "street_address": "Street",
-            "address_line_2": "Address Line 2 (optional)",
-            "num_tables": "Number of tables",
+            "address_line_2": "Address Line 2",
+            "parking_info": "Parking Info",
+            "num_tables": "Number of Tables",
+        }
+        widgets = {
+            "address_line_2": forms.TextInput(
+                attrs={"placeholder": "(optional)"}
+            )
         }
