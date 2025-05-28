@@ -137,10 +137,9 @@
                     <li><a class="dropdown-item" href="{{ club_admin_dashboard_url }}">Club Admin</a></li>
                     <li><hr class="dropdown-divider"></li>
                     {% endif %}
-                  <li><a class="dropdown-item" href="{{ logout_url }}">Logout</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="{{ change_password_url }}?next={{ request.path }}">Change Password</a></li>
                   <li><a class="dropdown-item" href="{{ account_settings_url }}">Account Settings</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{{ logout_url }}">Logout</a></li>
                   {% else %}
                   <li><a class="dropdown-item" href="{{ login_url }}">Login</a></li>
                   <li><hr class="dropdown-divider"></li>
