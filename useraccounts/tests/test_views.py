@@ -734,7 +734,7 @@ class ConfirmAccountDeletePageTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("delete_account"),
-            {"confirm_delete": "on"},
+            {"confirm_action": "on"},
             follow=True,
         )
 

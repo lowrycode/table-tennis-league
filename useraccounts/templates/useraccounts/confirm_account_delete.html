@@ -15,7 +15,7 @@
             <form method="POST" action="{% url 'delete_account' %}">
                 {% csrf_token %}
                 <div class="form-check my-3">
-                    <input id="confirm-account-delete" class="form-check-input confirmation-checkbox" type="checkbox" name="confirm_delete" required>
+                    <input id="confirm-account-delete" class="form-check-input confirmation-checkbox" type="checkbox" name="confirm_action" required>
                     <label for="confirm-account-delete" class="form-check-label">
                     I understand that my account will be permanently deleted and that this action cannot be undone.
                     </label>

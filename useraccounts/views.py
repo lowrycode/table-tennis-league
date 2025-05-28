@@ -26,7 +26,7 @@ def change_email(request):
 @login_required
 def delete_account(request):
     if request.method == "POST":
-        if request.POST.get("confirm_delete"):
+        if request.POST.get("confirm_action"):
             user = request.user
             user.delete()
             messages.success(request, "Your account has been deleted.")

@@ -238,7 +238,7 @@ def delete_club_info(request):
         data = request.POST
         option = data.get("delete_option")
         if option == "all":
-            if data.get("confirm_delete") != "on":
+            if data.get("confirm_action") != "on":
                 messages.warning(
                     request,
                     (
@@ -472,7 +472,7 @@ def delete_venue(request, venue_id):
                         " at least one other club."
                     ),
                 )
-            elif data.get("confirm_delete") != "on":
+            elif data.get("confirm_action") != "on":
                 messages.warning(
                     request,
                     (

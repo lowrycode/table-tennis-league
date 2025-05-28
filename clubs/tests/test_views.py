@@ -1236,7 +1236,7 @@ class DeleteClubInfoTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("delete_club_info"),
-            {"delete_option": "all", "confirm_delete": "on"},
+            {"delete_option": "all", "confirm_action": "on"},
             follow=True,
         )
         self.assertRedirects(response, reverse("club_admin_dashboard"))
@@ -1953,7 +1953,7 @@ class DeleteVenueTests(TestCase):
         self.client.force_login(self.user)
         post_data = {
             "delete_option": "all",
-            "confirm_delete": "on",
+            "confirm_action": "on",
         }
         response = self.client.post(self.url, post_data, follow=True)
 
@@ -1973,7 +1973,7 @@ class DeleteVenueTests(TestCase):
 
         post_data = {
             "delete_option": "all",
-            "confirm_delete": "on",
+            "confirm_action": "on",
         }
         response = self.client.post(self.url, post_data)
 
