@@ -2,56 +2,57 @@
 {% load static %}
 
 {% block content %}
-<h1 class="visually-hidden">Clubs Page</h1>
-<!-- Club Info Section -->
-<section id="club-info" class="w-100 mt-4 px-2">
-  <div class="container-lg">
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-9 px-0">
-        <div class="my-5">
-          <div class="d-flex justify-content-between">
-            <h2 class="text-center flex-grow-1 m-0">Clubs</h2>
-            <button class="btn-toggle btn fs-4" data-target="#filter-clubs">
-              <i 
-                class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"
-                aria-label="Filter is {{ filters_applied|yesno:' active, not active' }}"
-              ></i>
-            </button>
-          </div>
-          <form id="filter-clubs" class="filter-box mt-2 p-3 d-none" method="get">
-            <div class="d-flex align-items-center flex-wrap row-gap-3 col-gap-4">
-              <!-- Show textbox before label -->
-              {% for field in filter.form %}
-                {% if field.name == "membership_required" %}
-                  {% comment %} Label then dropdown {% endcomment %}
-                  <div class="p-0">
-                    {{ field.label_tag }} {{ field }}
-                  </div>
-                {% else %}
-                  {% comment %} Checkbox then label {% endcomment %}
-                  <div class="form-check p-0">
-                    {{ field }}
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                  </div>
-                {% endif %}
-              {% endfor %}
-              <div class="d-flex gap-3">
-                <a href="{% url 'clubs' %}" class="btn btn-custom2 btn-sm">Clear Filters</a>
-                <button type="submit" class="btn btn-custom btn-sm">Apply Filters</button>
-              </div>
+  <h1 class="visually-hidden">Clubs Page</h1>
+  <!-- Club Info Section -->
+  <section id="club-info" class="w-100 mt-4 px-2">
+    <div class="container-lg">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-9 px-0">
+          <div class="my-5">
+            <div class="d-flex justify-content-between">
+              <h2 class="text-center flex-grow-1 m-0">Clubs</h2>
+              <button class="btn-toggle btn fs-4" data-target="#filter-clubs">
+                <i
+                  class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"
+                  aria-label="{{ filters_applied|yesno:'Filters active,No filters applied' }}"
+                ></i>
+              </button>
             </div>
-          </form>
+            <!-- Filters Form -->
+            <form id="filter-clubs" class="filter-box mt-2 p-3 d-none" method="get">
+              <div class="d-flex align-items-center flex-wrap row-gap-3 col-gap-4">
+                <!-- Show textbox before label -->
+                {% for field in filter.form %}
+                  {% if field.name == "membership_required" %}
+                    {% comment %} Label then dropdown {% endcomment %}
+                    <div class="p-0">
+                      {{ field.label_tag }} {{ field }}
+                    </div>
+                  {% else %}
+                    {% comment %} Checkbox then label {% endcomment %}
+                    <div class="form-check p-0">
+                      {{ field }}
+                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+                <div class="d-flex gap-3">
+                  <a href="{% url 'clubs' %}" class="btn btn-custom2 btn-sm">Clear Filters</a>
+                  <button type="submit" class="btn btn-custom btn-sm">Apply Filters</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- All Clubs -->
+          {% for club in clubs %}
+            {% include 'clubs/partials/club_info.html' %}
+          {% empty %}
+            <p class="text-center m-1">No clubs found.</p>
+          {% endfor %}
         </div>
-        <!-- All Clubs -->
-        {% for club in clubs %}
-          {% include 'clubs/partials/club_info.html' %}
-        {% empty %}
-          <p class="text-center m-1">No clubs found.</p>
-        {% endfor %}
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<script src="{% static 'js/toggle_btn.js' %}"></script>
+  <script src="{% static 'js/toggle_btn.js' %}"></script>
 {% endblock %}
