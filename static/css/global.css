@@ -241,6 +241,23 @@ a:hover {
     color: var(--dark-2);
 }
 
+.title {
+    width: 100%;
+    background: linear-gradient(
+      rgba(0, 0, 0, 0.9), 
+      rgba(0, 0, 0, 0.1)
+    ),
+    url("../images/hero.jpg");
+    background-position: bottom;
+    background-size: 250% auto;
+    padding: 2.5rem 1rem;
+    color: var(--light-1);
+}
+
+.title.with-user-banner {
+    padding-top: 3.5rem;
+}
+
 /* Footer */
 footer a {
     color: var(--light-3);
