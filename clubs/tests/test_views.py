@@ -10,27 +10,44 @@ User = get_user_model()
 
 
 class ClubsPageStaticTests(TestCase):
+    """
+    Tests for static aspects of the clubs page, including structure,
+    template and presence of elements.
+    """
+
     def test_page_returns_correct_status_code(self):
+        """Verify clubs page returns a 200 OK status."""
         response = self.client.get(reverse("clubs"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """Verify correct template is used for rendering clubs page."""
         response = self.client.get(reverse("clubs"))
         self.assertTemplateUsed(response, "clubs/clubs.html")
 
     def test_page_has_hidden_title(self):
+        """Verify clubs page includes a visually hidden h1 title."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, '<h1 class="visually-hidden"')
         self.assertContains(response, "Clubs Page")
 
     # club-info Section
     def test_page_contains_club_info_section(self):
+        """Verify clubs page includes a section for club information."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, '<section id="club-info"')
 
 
 class ClubsPageDynamicTests(TestCase):
+    """
+    Tests for dynamic data rendering on the clubs page based on Club,
+    ClubInfo, Venue, and VenueInfo data.
+    """
+
     def setUp(self):
+        """
+        Create clubs, venues and their related information for use in tests.
+        """
         # Create Club objects
         self.club_1 = Club.objects.create(name="York Club")
         self.club_2 = Club.objects.create(name="Durham Club")
@@ -121,28 +138,38 @@ class ClubsPageDynamicTests(TestCase):
 
     # Club Info
     def test_page_displays_placeholder_when_no_approved_clubs(self):
+        """
+        Verify placeholder text is shown when there are no approved clubs.
+        """
         ClubInfo.objects.all().delete()
         Club.objects.all().delete()
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, "No clubs found.")
 
     def test_page_displays_contact_names(self):
+        """Verify that contact name is shown for approved club."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, self.club_info_1.contact_name)
 
     def test_page_displays_contact_email(self):
+        """Verify contact email is shown for approved club."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, self.club_info_1.contact_email)
 
     def test_page_displays_contact_phone(self):
+        """Verify contact phone number is shown for approved club."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, self.club_info_1.contact_phone)
 
     def test_page_displays_club_description(self):
+        """Verify club description is shown for approved club."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, self.club_info_1.description)
 
     def test_page_displays_placeholder_image_for_missing_image(self):
+        """
+        Verify placeholder image is shown when no image is provided for a club.
+        """
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, "<picture>")
         self.assertContains(response, 'alt="No club image provided"')
@@ -150,6 +177,7 @@ class ClubsPageDynamicTests(TestCase):
         self.assertContains(response, "placeholder.jpg")
 
     def test_page_displays_image_when_provided(self):
+        """Verify that the club's image appears when it is provided."""
         # simulate non-placeholder
         self.club_info_1.image = "custom-image.jpg"
         self.club_info_1.save()
@@ -159,11 +187,15 @@ class ClubsPageDynamicTests(TestCase):
         self.assertContains(response, f'alt="{self.club_1.name} image"')
 
     def test_page_displays_club_session_info(self):
+        """Verify session information is shown for approved club."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, "Sessions</h4>")
         self.assertContains(response, self.club_info_1.session_info)
 
     def test_page_displays_checkboxes(self):
+        """
+        Verify all feature checkboxes are rendered when enabled for a club.
+        """
         # Ensure all checkboxes should appear
         self.club_info_1.beginners = True
         self.club_info_1.intermediates = True
@@ -192,6 +224,7 @@ class ClubsPageDynamicTests(TestCase):
         self.assertContains(response, "Free taster sessions")
 
     def test_page_displays_only_approved_club_info(self):
+        """Verify that only clubs with approved ClubInfo entries are shown."""
         response = self.client.get(reverse("clubs"))
 
         # Approved clubs should be shown
@@ -202,6 +235,7 @@ class ClubsPageDynamicTests(TestCase):
         self.assertNotContains(response, self.club_2.name)
 
     def test_page_displays_clubs_alphabetically(self):
+        """Verify clubs are listed in alphabetical order by name."""
         response = self.client.get(reverse("clubs"))
         content = response.content.decode()
 
@@ -221,6 +255,10 @@ class ClubsPageDynamicTests(TestCase):
         )
 
     def test_page_displays_latest_club_info_version(self):
+        """
+        Verify most recently created ClubInfo version
+        is displayed (if approved).
+        """
         self.club_info_data_1_newer = self.base_club_info_data.copy()
         self.club_info_data_1_newer["club"] = self.club_1
         self.club_info_data_1_newer["contact_name"] = "Club 1 New Contact"
@@ -244,6 +282,7 @@ class ClubsPageDynamicTests(TestCase):
         self.assertNotContains(response, self.club_info_1.contact_name)
 
     def test_club_with_no_club_info(self):
+        """Verify that clubs with no ClubInfo are not displayed."""
         self.club = Club.objects.create(name="Club not linked to ClubInfo")
         response = self.client.get(reverse("clubs"))
 
@@ -255,12 +294,17 @@ class ClubsPageDynamicTests(TestCase):
 
     # Venue Info
     def test_page_displays_placeholder_when_no_approved_venues(self):
+        """Verify placeholder text appears when no venues are approved."""
         self.venue_info_1.approved = False
         self.venue_info_1.save()
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, "No venues are currently listed.")
 
     def test_page_displays_venue_names(self):
+        """
+        Verify venue names are shown only if linked to approved ClubInfo
+        and approved themselves.
+        """
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, self.venue_1.name)
         # ClubInfo not approved so this venue should not display
@@ -268,10 +312,12 @@ class ClubsPageDynamicTests(TestCase):
         self.assertContains(response, self.venue_3.name)
 
     def test_page_displays_number_of_tables(self):
+        """Verify the number of tables is shown for an approved venue."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, f"{self.venue_info_1.num_tables} tables")
 
     def test_page_displays_venue_address(self):
+        """Verify that the full address of an approved venue is displayed."""
         self.venue_info_1.address_line_2 = "Address Line 2"
         self.venue_info_1.save()
         response = self.client.get(reverse("clubs"))
@@ -282,10 +328,12 @@ class ClubsPageDynamicTests(TestCase):
         self.assertContains(response, self.venue_info_1.postcode)
 
     def test_page_displays_parking_info(self):
+        """Verify that parking information is shown for venues."""
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, self.venue_info_1.parking_info)
 
     def test_page_displays_only_approved_venue_info(self):
+        """Verify that only approved VenueInfo entries appear on the page."""
         # Unapprove venue 1
         self.venue_info_1.approved = False
         self.venue_info_1.save()
@@ -300,6 +348,9 @@ class ClubsPageDynamicTests(TestCase):
         self.assertNotContains(response, self.venue_1.name)
 
     def test_page_displays_venues_alphabetically(self):
+        """
+        Verify venues are displayed in alphabetical order under each club.
+        """
         # Create additional venues
         first_venue = self.venue_1
         second_venue = Venue.objects.create(name="Another York Venue 2")
@@ -347,6 +398,10 @@ class ClubsPageDynamicTests(TestCase):
         )
 
     def test_page_displays_latest_venue_info_version(self):
+        """
+        Verify most recent VenueInfo version is shown for a venue
+        (if approved).
+        """
         self.venue_info_1.street_address = "Old Street Address"
         self.venue_info_1.save()
 
@@ -373,6 +428,9 @@ class ClubsPageDynamicTests(TestCase):
         self.assertNotContains(response, self.venue_info_1.street_address)
 
     def test_venue_with_no_approved_venue_info(self):
+        """
+        Verify venues with no approved VenueInfo entries are not displayed.
+        """
         # Delete all VenueInfos for venue_1
         VenueInfo.objects.filter(venue=self.venue_1).delete()
 
@@ -387,7 +445,15 @@ class ClubsPageDynamicTests(TestCase):
 
 
 class ClubsPageFilterTests(TestCase):
+    """
+    Tests for verifying the filtering functionality on the clubs listing page.
+    """
+
     def setUp(self):
+        """
+        Create clubs, club info, venues, venue info, and club venue instances
+        for use in tests.
+        """
         # Create Club objects
         self.club_1 = Club.objects.create(name="Club 1")
         self.club_2 = Club.objects.create(name="Club 2")
@@ -501,78 +567,129 @@ class ClubsPageFilterTests(TestCase):
         self.url = reverse("clubs")
 
     def test_no_filters_returns_all_approved_clubs(self):
+        """
+        Verify all approved clubs are returned when no filters are applied.
+        """
         response = self.client.get(self.url)
         self.assertContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_beginners_true(self):
+        """
+        Verify only clubs with beginners=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"beginners": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_intermediates_true(self):
+        """
+        Verify only clubs with intermediates=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"intermediates": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_advanced_true(self):
+        """
+        Verify only clubs with advanced=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"advanced": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_kids_true(self):
+        """
+        Verify only clubs with kids=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"kids": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_adults_true(self):
+        """
+        Verify only clubs with adults=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"adults": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_coaching_true(self):
+        """
+        Verify only clubs with coaching=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"coaching": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_league_true(self):
+        """
+        Verify only clubs with league=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"league": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_equipment_provided_true(self):
+        """
+        Verify only clubs with equipment_provided=True are returned when the
+        filter is applied.
+        """
         response = self.client.get(self.url, {"equipment_provided": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_free_taster_true(self):
+        """
+        Verify only clubs with free_taster=True are returned when the filter
+        is applied.
+        """
         response = self.client.get(self.url, {"free_taster": "true"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_membership_required_true(self):
+        """
+        Verify only clubs with membership_required=True are returned when the
+        filter is applied (via dropdown).
+        """
         response = self.client.get(self.url, {"membership_required": "True"})
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_membership_required_false(self):
+        """
+        Verify only clubs with membership_required=False are returned when the
+        filter is applied (via dropdown).
+        """
         response = self.client.get(self.url, {"membership_required": "False"})
         self.assertContains(response, self.club_info_1.contact_name)
         self.assertNotContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_3.contact_name)
 
     def test_filter_by_membership_required_any(self):
+        """
+        Verify all approved clubs are returned when membership_required is
+        unspecified.
+        """
         # Should return all approved clubs (like no filter)
         response = self.client.get(self.url, {"membership_required": ""})
         self.assertContains(response, self.club_info_1.contact_name)
@@ -580,15 +697,25 @@ class ClubsPageFilterTests(TestCase):
         self.assertContains(response, self.club_info_3.contact_name)
 
     def test_combined_filters(self):
-        response = self.client.get(self.url, {
-            "beginners": "true",
-            "intermediates": "true",
-        })
+        """
+        Verify that multiple filters can be combined to refine results.
+        """
+        response = self.client.get(
+            self.url,
+            {
+                "beginners": "true",
+                "intermediates": "true",
+            },
+        )
         self.assertNotContains(response, self.club_info_1.contact_name)
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_3.contact_name)
 
     def test_filters_applied_context_flag(self):
+        """
+        Verify that the context variable 'filters_applied' is correctly set
+        based on the presence of filters.
+        """
         # When query params exist, filters_applied should be True
         response = self.client.get(self.url, {"beginners": "true"})
         self.assertTrue(response.context["filters_applied"])
@@ -598,12 +725,19 @@ class ClubsPageFilterTests(TestCase):
         self.assertFalse(response.context["filters_applied"])
 
     def test_unapproved_clubs_never_appear_even_if_filter_matches(self):
+        """
+        Verify unapproved club info entries are excluded from results,
+        even if they match the filters.
+        """
         self.club_info_1.approved = False
         self.club_info_1.save()
         response = self.client.get(self.url, {"beginners": "true"})
         self.assertNotContains(response, self.club_1.name)
 
     def test_club_with_no_approved_club_info_does_not_appear(self):
+        """
+        Verify clubs without any approved club info are excluded from results.
+        """
         # Create club without club info
         club_no_info = Club.objects.create(name="No Info Club")
         response = self.client.get(self.url, {"beginners": "true"})
@@ -611,7 +745,15 @@ class ClubsPageFilterTests(TestCase):
 
 
 class ClubAdminDashboardTests(TestCase):
+    """
+    Tests for verifying behaviour of the Club Admin Dashboard page.
+    """
+
     def setUp(self):
+        """
+        Creates user, club, club info, venue info and club admin instances
+        for using in tests.
+        """
         # Create user
         self.user = User.objects.create_user(
             username="testuser",
@@ -671,7 +813,11 @@ class ClubAdminDashboardTests(TestCase):
         )
 
     # Club Info
-    def test_page_displays_for_authenticated_user(self):
+    def test_page_displays_for_authenticated_user_with_admin_status(self):
+        """
+        Verify that the dashboard is accessible for authenticated users
+        with club admin status.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertEqual(response.status_code, 200)
@@ -679,11 +825,16 @@ class ClubAdminDashboardTests(TestCase):
         self.assertContains(response, "Club Admin Dashboard")
 
     def test_page_redirects_unauthenticated_user_to_login_page(self):
+        """Verify unauthenticated users are redirected to the login page."""
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_page_redirects_authenticated_user_without_club_admin_status(self):
+        """
+        Verify that authenticated users without club admin privileges are
+        denied access.
+        """
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.get(reverse("club_admin_dashboard"))
@@ -695,6 +846,7 @@ class ClubAdminDashboardTests(TestCase):
 
     # Club Info
     def test_page_elements_for_missing_club_info(self):
+        """Verify that a prompt is shown when club info is missing."""
         self.client.force_login(self.user)
         ClubInfo.objects.all().delete()
         response = self.client.get(reverse("club_admin_dashboard"))
@@ -702,6 +854,10 @@ class ClubAdminDashboardTests(TestCase):
         self.assertNotContains(response, "Toggle Preview")
 
     def test_page_elements_for_unapproved_club_info(self):
+        """
+        Verify pending approval status prompt is displayed if club info
+        has approved=False.
+        """
         self.client.force_login(self.user)
         self.club_info_1.approved = False
         self.club_info_1.save()
@@ -711,6 +867,9 @@ class ClubAdminDashboardTests(TestCase):
         self.assertContains(response, self.club_info_1.contact_name)
 
     def test_page_elements_for_approved_club_info(self):
+        """
+        Verify approved club info is displayed correctly in the dashboard.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertContains(response, "Club and Venue Information</h2>")
@@ -718,6 +877,10 @@ class ClubAdminDashboardTests(TestCase):
         self.assertContains(response, self.club_info_1.contact_name)
 
     def test_club_info_preview_shows_latest_unapproved_info(self):
+        """
+        Verify preview section shows the latest unapproved club info
+        (if it exists).
+        """
         self.client.force_login(self.user)
 
         # Create new unapproved ClubInfo object
@@ -737,17 +900,26 @@ class ClubAdminDashboardTests(TestCase):
 
     # Venue Info
     def test_page_elements_for_no_assigned_venues(self):
+        """
+        Verify prompt is displayed if no venues are assigned to the club.
+        """
         self.client.force_login(self.user)
         ClubVenue.objects.all().delete()
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertContains(response, "Venue REQUIRED")
 
     def test_page_elements_for_one_assigned_venue(self):
+        """
+        Verify that the dashboard displays a single assigned venue correctly.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertContains(response, self.venue_info_1.venue.name)
 
     def test_page_elements_for_multiple_assigned_venues(self):
+        """
+        Verify that the dashboard displays all venues assigned to the club.
+        """
         self.client.force_login(self.user)
 
         # Create Second Venue
@@ -768,6 +940,9 @@ class ClubAdminDashboardTests(TestCase):
         self.assertContains(response, self.venue_info_2.venue.name)
 
     def test_page_displays_unapproved_venue(self):
+        """
+        Verify unapproved venue info is still displayed on the dashboard.
+        """
         self.client.force_login(self.user)
 
         # Unapprove venue
@@ -778,6 +953,9 @@ class ClubAdminDashboardTests(TestCase):
         self.assertContains(response, self.venue_info_1.venue.name)
 
     def test_page_displays_venue_with_missing_venue_info(self):
+        """
+        Verify venue without venue info is still listed on the dashboard.
+        """
         self.client.force_login(self.user)
 
         # Create Venue objects
@@ -792,7 +970,15 @@ class ClubAdminDashboardTests(TestCase):
 
 
 class UpdateClubInfoTests(TestCase):
+    """
+    Tests for updating club info using the update_club_info view.
+    """
+
     def setUp(self):
+        """
+        Create user, club, club admin, club info, venue and venue info
+        instances for using in tests.
+        """
         # Create user and club
         self.user = User.objects.create_user(
             username="testuser",
@@ -853,6 +1039,9 @@ class UpdateClubInfoTests(TestCase):
 
     # Access Restrictions
     def test_update_club_info_page_displays_for_authenticated_user(self):
+        """
+        Verify page loads for an authenticated user with club admin status.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("update_club_info"))
         self.assertEqual(response.status_code, 200)
@@ -860,11 +1049,18 @@ class UpdateClubInfoTests(TestCase):
         self.assertContains(response, "Update Club Information</h1>")
 
     def test_page_redirects_unauthenticated_user_to_login_page(self):
+        """
+        Verify unauthenticated users are redirected to the login page.
+        """
         response = self.client.get(reverse("update_club_info"))
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_page_redirects_authenticated_user_without_club_admin_status(self):
+        """
+        Verify authenticated users without admin status receive a
+        403 Forbidden error.
+        """
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.get(reverse("update_club_info"))
@@ -876,6 +1072,9 @@ class UpdateClubInfoTests(TestCase):
 
     # Test form rendering for GET request
     def test_update_club_info_page_renders_form(self):
+        """
+        Verify form is rendered correctly on GET request for authorised users.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("update_club_info"))
         self.assertContains(response, '<input type="text"')
@@ -885,11 +1084,17 @@ class UpdateClubInfoTests(TestCase):
         self.assertIsInstance(response.context["form"], UpdateClubInfoForm)
 
     def test_page_contains_csrf(self):
+        """
+        Verify presence of CSRF token.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("update_club_info"))
         self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_update_club_info_form_prefills_latest_club_info_data(self):
+        """
+        Verify form pre-fills with the latest club info data.
+        """
         self.client.force_login(self.user)
 
         # Create Newer ClubInfo object
@@ -946,6 +1151,9 @@ class UpdateClubInfoTests(TestCase):
     def test_update_club_info_form_renders_when_no_previous_club_info_data(
         self,
     ):
+        """
+        Verify form renders without errors when no prior club info exists.
+        """
         self.client.force_login(self.user)
 
         # Delete ClubInfo records
@@ -959,6 +1167,10 @@ class UpdateClubInfoTests(TestCase):
 
     # Test form submissions with POST request
     def test_authenticated_user_can_submit_valid_update_club_info_form(self):
+        """
+        Verify valid form submission by an authorised user creates a new
+        ClubInfo and shows a success message.
+        """
         self.client.force_login(self.user)
         form_data = {
             "image": "",
@@ -996,6 +1208,10 @@ class UpdateClubInfoTests(TestCase):
         self.assertEqual(club_info.session_info, form_data["session_info"])
 
     def test_unauthenticated_user_cannot_submit_form(self):
+        """
+        Verify unauthenticated users cannot submit the form and are redirected
+        to login page.
+        """
         form_data = {
             "image": "",
             "website": "https://www.newexample.com",
@@ -1025,6 +1241,10 @@ class UpdateClubInfoTests(TestCase):
         )
 
     def test_club_info_record_cleanup_after_valid_form_submission(self):
+        """
+        Verify only latest approved and submitted ClubInfo records remain
+        after a new submission.
+        """
         self.client.force_login(self.user)
 
         # Create Another approved ClubInfo object
@@ -1099,6 +1319,10 @@ class UpdateClubInfoTests(TestCase):
 
     # Test Invalid form submissions
     def test_invalid_form_submission_shows_warning(self):
+        """
+        Verify submitting invalid form data shows field-specific errors and
+        a warning message.
+        """
         self.client.force_login(self.user)
         form_data = {
             "image": "",
@@ -1132,7 +1356,15 @@ class UpdateClubInfoTests(TestCase):
 
 
 class DeleteClubInfoTests(TestCase):
+    """
+    Tests club information deletion using the delete_club_info view.
+    """
+
     def setUp(self):
+        """
+        Create user, club, club admin, and initial ClubInfo records
+        (approved and unapproved) for use in tests.
+        """
         self.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
@@ -1167,17 +1399,28 @@ class DeleteClubInfoTests(TestCase):
 
     # Access restriction tests
     def test_page_redirects_unauthenticated_user(self):
+        """
+        Verify unauthenticated users are redirected to login page when
+        attempt to access the delete page.
+        """
         response = self.client.get(reverse("delete_club_info"))
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_page_restricts_non_club_admin_user(self):
+        """
+        Verify users without club admin status receive a 403 Forbidden error.
+        """
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
         self.assertEqual(response.status_code, 403)
 
     def test_delete_club_info_renders_on_get(self):
+        """
+        Verify the delete confirmation page renders correctly on GET request
+        for authorised users.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
         self.assertEqual(response.status_code, 200)
@@ -1187,6 +1430,9 @@ class DeleteClubInfoTests(TestCase):
 
     # Check page elements exist
     def test_delete_club_info_has_heading_and_warning(self):
+        """
+        Verify page includes heading and warning text.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
 
@@ -1196,7 +1442,10 @@ class DeleteClubInfoTests(TestCase):
         )
         self.assertContains(response, "href=")
 
-    def test_delete_club_info_has_form(self):
+    def test_delete_club_info_form_has_crsf_token(self):
+        """
+        Verify the delete club info form is rendered with a CSRF token.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
 
@@ -1204,6 +1453,9 @@ class DeleteClubInfoTests(TestCase):
         self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_delete_club_info_has_radio_buttons(self):
+        """
+        Verify the form contains the correct radio buttons for delete options.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
 
@@ -1214,6 +1466,9 @@ class DeleteClubInfoTests(TestCase):
         self.assertContains(response, 'value="unapproved"')
 
     def test_delete_club_info_has_confirmation_checkbox(self):
+        """
+        Verify the form includes a required confirmation checkbox.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
 
@@ -1225,6 +1480,9 @@ class DeleteClubInfoTests(TestCase):
         )
 
     def test_delete_club_info_has_buttons(self):
+        """
+        Verify the form includes Delete and Cancel buttons.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
 
@@ -1233,6 +1491,10 @@ class DeleteClubInfoTests(TestCase):
 
     # Test DELETE ALL behaviour
     def test_delete_all_with_confirmation_checkbox_checked(self):
+        """
+        Verify all ClubInfo records are deleted when 'all' is selected
+        and confirmation checkbox is checked.
+        """
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("delete_club_info"),
@@ -1246,6 +1508,10 @@ class DeleteClubInfoTests(TestCase):
         self.assertIn("Club info has been deleted.", msgs[0].message)
 
     def test_delete_all_without_confirmation_checkbox_shows_warning(self):
+        """
+        Verify warning is shown if 'all' is selected but confirmation checkbox
+        is not checked.
+        """
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("delete_club_info"),
@@ -1258,6 +1524,10 @@ class DeleteClubInfoTests(TestCase):
 
     # Test DELETE UNAPPROVED behaviour
     def test_delete_unapproved_only(self):
+        """
+        Verify only unapproved ClubInfo records are deleted when 'unapproved'
+        is selected.
+        """
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("delete_club_info"),
@@ -1276,6 +1546,9 @@ class DeleteClubInfoTests(TestCase):
         )
 
     def test_delete_unapproved_when_none_exist_shows_warning(self):
+        """
+        Verify warning is shown if there are no unapproved records to delete.
+        """
         self.client.force_login(self.user)
         self.club_info_unapproved.delete()
         response = self.client.post(
@@ -1293,6 +1566,9 @@ class DeleteClubInfoTests(TestCase):
 
     # Test invalid option
     def test_invalid_delete_option_shows_warning(self):
+        """
+        Verify warning is shown when an invalid delete option is submitted.
+        """
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("delete_club_info"),
@@ -1307,7 +1583,15 @@ class DeleteClubInfoTests(TestCase):
 
 
 class UnassignVenueViewTests(TestCase):
+    """
+    Tests for unassigning a venue from a club using the unassign_venue view.
+    """
+
     def setUp(self):
+        """
+        Create user, club, club admin, venue and club venue records for using
+        in tests.
+        """
         self.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
@@ -1327,23 +1611,32 @@ class UnassignVenueViewTests(TestCase):
 
     # Access restriction tests
     def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_forbids_non_club_admin_user(self):
+        """
+        Verify access is forbidden for authenticated users without club admin
+        status.
+        """
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, 403)
 
     def test_rejects_get_request(self):
+        """Verify GET requests are rejected with a 403 status."""
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
     # Valid POST request behaviour
     def test_successfully_unassigns_venue(self):
+        """
+        Verify POST successfully unassigns a venue for an authorised user.
+        """
         self.client.force_login(self.user)
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, 200)
@@ -1355,6 +1648,7 @@ class UnassignVenueViewTests(TestCase):
         )
 
     def test_post_when_venue_not_assigned_does_not_error(self):
+        """Verify POST does not error when the venue is already unassigned."""
         self.club_venue.delete()
         self.client.force_login(self.user)
         response = self.client.post(self.url)
@@ -1364,6 +1658,9 @@ class UnassignVenueViewTests(TestCase):
         )
 
     def test_post_with_nonexistent_venue_does_not_error(self):
+        """
+        Verify POST with a nonexistent venue id does not result in an error.
+        """
         self.client.force_login(self.user)
         url = reverse("unassign_venue", args=[9999])
         response = self.client.post(url)
@@ -1374,7 +1671,15 @@ class UnassignVenueViewTests(TestCase):
 
 
 class AssignVenueTests(TestCase):
+    """
+    Tests for assigning venues to clubs using the assign_venue view.
+    """
+
     def setUp(self):
+        """
+        Create user, club, club admin and venue records ready for assigning
+        venues to clubs.
+        """
         # Create user and club
         self.user = User.objects.create_user(
             username="testuser",
@@ -1394,11 +1699,13 @@ class AssignVenueTests(TestCase):
 
     # Access restriction tests
     def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_forbids_user_without_club_admin_status(self):
+        """Verify users without club admin status cannot access the view."""
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -1406,6 +1713,7 @@ class AssignVenueTests(TestCase):
 
     # GET requests
     def test_get_request_renders_form_with_available_venues(self):
+        """Verify GET renders the form with available venues for assignment."""
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -1415,6 +1723,7 @@ class AssignVenueTests(TestCase):
         self.assertFalse(response.context["no_available_venues"])
 
     def test_get_request_when_no_available_venues(self):
+        """Verify prompt when no venues are available to assign."""
         self.client.force_login(self.user)
 
         # Make venue assigned to club already
@@ -1431,12 +1740,17 @@ class AssignVenueTests(TestCase):
         self.assertContains(response, "Cancel</a>")
 
     def test_get_request_contains_csrf_token(self):
+        """Verify CSRF token is present in the rendered form."""
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertContains(response, "csrfmiddlewaretoken")
 
     # POST (valid)
     def test_valid_post_assigns_venue_to_club(self):
+        """
+        Verify valid form submission assigns a venue and displays a
+        success message.
+        """
         self.client.force_login(self.user)
         form_data = {"venue": self.venue.id}
         response = self.client.post(self.url, data=form_data, follow=True)
@@ -1452,6 +1766,7 @@ class AssignVenueTests(TestCase):
 
     # POST (invalid)
     def test_invalid_post_data_rerenders_form(self):
+        """Verify form is rendered with errors when data is invalid."""
         self.client.force_login(self.user)
         form_data = {"venue": ""}  # Empty is invalid
         response = self.client.post(self.url, data=form_data)
@@ -1461,6 +1776,7 @@ class AssignVenueTests(TestCase):
         )
 
     def test_post_with_invalid_venue_id_shows_form_error(self):
+        """Verify form displays appropriate error for an invalid venue ID."""
         self.client.force_login(self.user)
         form_data = {"venue": 999}  # Invalid ID
         response = self.client.post(self.url, data=form_data)
@@ -1476,6 +1792,8 @@ class AssignVenueTests(TestCase):
         )
 
     def test_venue_becomes_unavailable_before_form_submission(self):
+        """Verify error message is shown if venue becomes unavailable after
+        form load."""
         self.client.force_login(self.user)
 
         # Render form (GET request)
@@ -1506,6 +1824,10 @@ class AssignVenueTests(TestCase):
 
 class UpdateVenueInfoTests(TestCase):
     def setUp(self):
+        """
+        Create user, club, club admin, venue, venue info and club venue
+        records ready forupdating venue information.
+        """
         # Create user and club
         self.user = User.objects.create_user(
             username="testuser",
@@ -1546,6 +1868,9 @@ class UpdateVenueInfoTests(TestCase):
 
     # Access Restrictions
     def test_page_displays_for_authenticated_club_admin(self):
+        """
+        Verify authenticated club admin can access the update page.
+        """
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -1553,11 +1878,13 @@ class UpdateVenueInfoTests(TestCase):
         self.assertContains(response, "Update Venue Information")
 
     def test_redirects_unauthenticated_user_to_login_page(self):
+        """Verify unauthenticated users are redirected to login."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_rejects_authenticated_user_without_club_admin_status(self):
+        """Verify that non-admin users receive a 403 on access attempt."""
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -1568,6 +1895,7 @@ class UpdateVenueInfoTests(TestCase):
         )
 
     def test_rejects_club_admin_not_associated_with_venue(self):
+        """Verify admins not linked to the venue are redirected."""
         other_venue = Venue.objects.create(name="Other Venue")
         other_url = reverse("update_venue_info", args=[other_venue.id])
         self.client.force_login(self.user)
@@ -1576,6 +1904,7 @@ class UpdateVenueInfoTests(TestCase):
 
     # GET request and form rendering
     def test_update_venue_info_form_prefills_latest_venue_info_data(self):
+        """Verify form is prefilled with the latest VenueInfo data."""
         self.client.force_login(self.user)
 
         new_info_data = self.base_venue_info_data.copy()
@@ -1594,6 +1923,7 @@ class UpdateVenueInfoTests(TestCase):
         self.assertEqual(response.context["form"].initial["city"], "New City")
 
     def test_update_venue_info_form_renders_when_no_previous_data(self):
+        """Verify form renders correctly when no prior VenueInfo exists."""
         self.client.force_login(self.user)
         VenueInfo.objects.all().delete()
 
@@ -1603,12 +1933,17 @@ class UpdateVenueInfoTests(TestCase):
         self.assertNotIn("street_address", response.context["form"].initial)
 
     def test_csrf_token_is_present_in_form(self):
+        """Verify that the CSRF token is included in the form."""
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertContains(response, "csrfmiddlewaretoken")
 
     # POST request - Valid submission
     def test_club_admin_can_submit_valid_form(self):
+        """
+        Verify valid form submission creates a new VenueInfo and redirects.
+        """
+        ...
         self.client.force_login(self.user)
         form_data = {
             "street_address": "45 New Road",
@@ -1638,6 +1973,10 @@ class UpdateVenueInfoTests(TestCase):
         )
 
     def test_previous_venue_info_cleanup_after_submission(self):
+        """
+        Verify outdated VenueInfo entries are removed after creating
+        a new venue info record.
+        """
         self.client.force_login(self.user)
 
         # Create another older record
@@ -1667,6 +2006,9 @@ class UpdateVenueInfoTests(TestCase):
 
     # POST request - Invalid submission
     def test_invalid_form_submission_shows_warning_and_errors(self):
+        """
+        Verify form errors and warnings are shown for invalid submissions.
+        """
         self.client.force_login(self.user)
         form_data = {
             "street_address": "",
@@ -1698,6 +2040,10 @@ class UpdateVenueInfoTests(TestCase):
 
     # Shared Venue Tests
     def test_shared_venues_message_displays_for_shared_venue(self):
+        """
+        Verify shared venue message appears when venue is linked to
+        multiple clubs.
+        """
         self.client.force_login(self.user)
 
         # Create another club which shares the venue
@@ -1714,6 +2060,9 @@ class UpdateVenueInfoTests(TestCase):
         self.assertContains(response, "This venue is shared with other clubs.")
 
     def test_shared_venues_message_not_displayed_for_non_shared_venue(self):
+        """
+        Verify shared venue message is absent when venue is not shared.
+        """
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertIn(
@@ -1728,7 +2077,13 @@ class UpdateVenueInfoTests(TestCase):
 
 
 class CreateVenueTests(TestCase):
+    """Tests for creating a venue using the create_venue view."""
+
     def setUp(self):
+        """
+        Set up user, club, club admin records and initial venue info data
+        for use in the tests.
+        """
         self.user = User.objects.create_user(
             username="testuser",
             email="test@example.com",
@@ -1759,11 +2114,15 @@ class CreateVenueTests(TestCase):
 
     # Access Restrictions
     def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_redirects_user_without_club_admin_status(self):
+        """
+        Verify users without club admin status receive a 403 permission error.
+        """
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -1774,6 +2133,9 @@ class CreateVenueTests(TestCase):
         )
 
     def test_authenticated_club_admin_can_view_page(self):
+        """
+        Verify authenticated club admins can access the create venue page.
+        """
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -1781,12 +2143,16 @@ class CreateVenueTests(TestCase):
         self.assertContains(response, "Create Venue")
 
     def test_page_contains_csrf_token(self):
+        """Verify CSRF token is present."""
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertContains(response, "csrfmiddlewaretoken")
 
     # Form Submission
     def test_valid_post_creates_venue_and_info(self):
+        """
+        Verify valid form submission creates venue and associated info objects.
+        """
         self.client.force_login(self.user)
         post_data = {**self.valid_venue_data, **self.valid_venue_info_data}
 
@@ -1807,6 +2173,10 @@ class CreateVenueTests(TestCase):
         )
 
     def test_invalid_post_does_not_create_objects(self):
+        """
+        Verify form errors prevent venue and info creation when invalid data
+        is submitted.
+        """
         self.client.force_login(self.user)
         invalid_data = {
             "name": "",  # Invalidates venue form
@@ -1828,6 +2198,10 @@ class CreateVenueTests(TestCase):
         self.assertEqual(VenueInfo.objects.count(), 0)
 
     def test_duplicate_venue_name_shows_error(self):
+        """
+        Verify error is shown when attempting to create a venue with
+        a duplicate name.
+        """
         self.client.force_login(self.user)
         Venue.objects.create(name="New Venue")
 
@@ -1845,7 +2219,11 @@ class CreateVenueTests(TestCase):
 
 
 class DeleteVenueTests(TestCase):
+    """Tests for deleting venue functionality using the delete_venue view."""
+
     def setUp(self):
+        """Create user, club, club admin, venue and club venue records
+        ready for the deletion tests."""
         self.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
@@ -1865,11 +2243,19 @@ class DeleteVenueTests(TestCase):
 
     # Access Restrictions
     def test_redirects_unauthenticated_user(self):
+        """
+        Verify unauthenticated users are redirected to login page when
+        accessing venue deletion confirmation page.
+        """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_redirects_user_without_club_admin_status(self):
+        """
+        Verify non-admin users are denied access to venue deletion
+        confirmation page.
+        """
         self.club_admin.delete()
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -1880,6 +2266,9 @@ class DeleteVenueTests(TestCase):
         )
 
     def test_authenticated_club_admin_can_view_page(self):
+        """
+        Verify club admin can access the venue deletion confirmation page.
+        """
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -1888,6 +2277,10 @@ class DeleteVenueTests(TestCase):
 
     # GET Page Rendering
     def test_shared_venue_notification_displays_when_venue_is_shared(self):
+        """
+        Verify shared venue warning is shown when venue is used by multiple
+        clubs.
+        """
         self.client.force_login(self.user)
 
         # Create club which shares venue
@@ -1900,6 +2293,9 @@ class DeleteVenueTests(TestCase):
     def test_shared_venue_notification_not_displayed_when_venue_not_shared(
         self,
     ):
+        """
+        Verify no warning appears if the venue is not shared with other clubs.
+        """
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertNotContains(
@@ -1908,6 +2304,7 @@ class DeleteVenueTests(TestCase):
 
     # POST Logic - Unapproved Info Only
     def test_delete_unapproved_info_only(self):
+        """Verify only unapproved venue info is deleted when selected."""
         self.client.force_login(self.user)
         unapproved_info = VenueInfo.objects.create(
             venue=self.venue,
@@ -1936,6 +2333,10 @@ class DeleteVenueTests(TestCase):
         )
 
     def test_delete_unapproved_info_shows_warning_when_none_exist(self):
+        """
+        Verify warning message is shown if no unapproved venue info exists
+        to delete.
+        """
         self.client.force_login(self.user)
         post_data = {"delete_option": "unapproved"}
         response = self.client.post(self.url, post_data, follow=True)
@@ -1950,6 +2351,9 @@ class DeleteVenueTests(TestCase):
 
     # POST Logic - Delete Venue
     def test_delete_venue_with_checkbox_checked(self):
+        """
+        Verify venue is deleted when 'delete all' is selected and confirmed.
+        """
         self.client.force_login(self.user)
         post_data = {
             "delete_option": "all",
@@ -1967,6 +2371,7 @@ class DeleteVenueTests(TestCase):
         self.assertFalse(Venue.objects.filter(id=self.venue.id).exists())
 
     def test_cannot_delete_venue_if_shared(self):
+        """Verify venue cannot be deleted if it is shared with other clubs."""
         sharing_club = Club.objects.create(name="Sharing Club")
         ClubVenue.objects.create(club=sharing_club, venue=self.venue)
         self.client.force_login(self.user)
@@ -1988,6 +2393,7 @@ class DeleteVenueTests(TestCase):
         self.assertTrue(Venue.objects.filter(id=self.venue.id).exists())
 
     def test_delete_venue_requires_checkbox_confirmation(self):
+        """Verify checkbox confirmation is required to delete venue."""
         self.client.force_login(self.user)
         post_data = {"delete_option": "all"}  # checkbox omitted
         response = self.client.post(self.url, post_data, follow=True)
@@ -2002,6 +2408,7 @@ class DeleteVenueTests(TestCase):
         self.assertTrue(Venue.objects.filter(id=self.venue.id).exists())
 
     def test_invalid_post_option_returns_error_message(self):
+        """Verify invalid delete option returns appropriate error message."""
         self.client.force_login(self.user)
         post_data = {"delete_option": "invalid"}
         response = self.client.post(self.url, post_data, follow=True)
@@ -2012,6 +2419,7 @@ class DeleteVenueTests(TestCase):
         self.assertIn("An error occurred", messages_list[0].message)
 
     def test_redirect_if_venue_does_not_exist(self):
+        """Verify user is redirected if venue does not exist."""
         self.client.force_login(self.user)
         invalid_url = reverse("delete_venue", args=[999])
         response = self.client.get(invalid_url, follow=True)
@@ -2024,6 +2432,9 @@ class DeleteVenueTests(TestCase):
         self.assertIn("Unable to delete venue.", messages_list[0].message)
 
     def test_redirect_if_venue_not_assigned_to_club(self):
+        """
+        Verify user is redirected if venue is not assigned to user's club.
+        """
         other_venue = Venue.objects.create(name="Other Venue")
         other_url = reverse("delete_venue", args=[other_venue.id])
         self.client.force_login(self.user)

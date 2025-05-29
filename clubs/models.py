@@ -1,3 +1,11 @@
+"""
+Models representing table tennis clubs, their venues, and associated
+administrators.
+
+Includes support for managing both approved and draft (unapproved) versions of
+club and venue details.
+"""
+
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -9,6 +17,12 @@ User = get_user_model()
 
 
 class Club(models.Model):
+    """
+    Represents a table tennis club and includes just a name field.
+
+    Other club information is stored in the related ClubInfo model
+    to allow for storing both approved and unapproved versions.
+    """
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
@@ -19,6 +33,12 @@ class Club(models.Model):
 
 
 class ClubInfo(models.Model):
+    """
+    Stores information about a table tennis club.
+
+    Multiple ClubInfo instances can be linked to a club to allow for
+    storing both approved and unapproved versions.
+    """
     club = models.ForeignKey(
         Club, on_delete=models.CASCADE, related_name="club_infos"
     )
@@ -55,6 +75,7 @@ class ClubInfo(models.Model):
         return f"{self.club.name} ({created_on_str})"
 
     def clean(self):
+        """Validates character limits on text fields."""
         super().clean()
         if len(self.description) > 500:
             raise ValidationError(
@@ -67,6 +88,15 @@ class ClubInfo(models.Model):
 
 
 class Venue(models.Model):
+    """
+    Represents a physical venue where a club can meet and includes just a
+    name field.
+
+    Other venue information is stored in the related VenueInfo model
+    to allow for storing both approved and unapproved versions.
+
+    Venues can be linked to multiple clubs to allow for shared use.
+    """
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
@@ -77,6 +107,12 @@ class Venue(models.Model):
 
 
 class VenueInfo(models.Model):
+    """
+    Stores information about a venue.
+
+    Multiple VenueInfo instances can be linked to a venue to allow for
+    storing both approved and unapproved versions.
+    """
     venue = models.ForeignKey(
         Venue, on_delete=models.CASCADE, related_name="venue_infos"
     )
@@ -102,6 +138,7 @@ class VenueInfo(models.Model):
         return f"{self.venue} ({created_on_str})"
 
     def clean(self):
+        """Validates character limits on parking information."""
         super().clean()
         if len(self.parking_info) > 500:
             raise ValidationError(
@@ -110,6 +147,11 @@ class VenueInfo(models.Model):
 
 
 class ClubVenue(models.Model):
+    """
+    Junction model linking clubs and venues.
+
+    Represents an assignment of a specific venue to a specific club.
+    """
     club = models.ForeignKey(
         Club, on_delete=models.CASCADE, related_name="club_venues"
     )
@@ -126,6 +168,11 @@ class ClubVenue(models.Model):
 
 
 class ClubAdmin(models.Model):
+    """
+    Links a user to administrative permissions for a specific club.
+
+    Each user can only be assigned to one club as an admin.
+    """
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="club_admin"
     )

@@ -17,6 +17,21 @@ from .filters import ClubInfoFilter
 
 # Helper functions
 def build_club_context_for_admin(club):
+    """
+    Builds a dictionary representing the latest state of a club for admin use.
+
+    Includes
+    - the most recent ClubInfo (approved or not)
+    - a list of associated venues with their latest VenueInfo
+    - a flag indicating if there is any unapproved club or venue information.
+
+    Args:
+        club (Club): The club for which to build the context variable.
+
+    Returns:
+        dict: A dictionary containing club details, venue info, and approval
+        status to be passed to the template.
+    """
     # Get the latest ClubInfo (or None)
     latest_club_info = (
         ClubInfo.objects.filter(club=club).order_by("-created_on").first()
@@ -78,6 +93,20 @@ def build_club_context_for_admin(club):
 
 # View functions
 def clubs(request):
+    """
+    Renders a public-facing list of all clubs with approved information.
+
+    Filters ClubInfo records based on GET parameters, then attaches approved
+    ClubInfo and VenueInfo to each club for display.
+
+    Displays only clubs that have approved club information.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML page with clubs and filters.
+    """
     # Get all approved ClubInfo records (ordered by most recent)
     approved_club_infos_qs = ClubInfo.objects.filter(approved=True).order_by(
         "-created_on"
@@ -165,6 +194,18 @@ def clubs(request):
 
 @club_admin_required
 def club_admin_dashboard(request):
+    """
+    Renders the admin dashboard for a club administrator.
+
+    Displays current club and venue information alongside its status
+    (approved or pending approval).
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered admin dashboard for the user's assigned club.
+    """
     club = request.user.club_admin.club
     club_dict = build_club_context_for_admin(club)
 
@@ -179,6 +220,22 @@ def club_admin_dashboard(request):
 
 @club_admin_required
 def update_club_info(request):
+    """
+    Allows a club admin to update club information by adding a new record.
+
+    If submitted and valid, the new club information record is created,
+    the latest approved record is kept for reference (or retrieval)
+    and other outdated records are removed.
+
+    The form is pre-filled with the most recent club information (if exists).
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered Update Club Info page with form
+        or redirect to dashboard after successful update.
+    """
     club = request.user.club_admin.club
 
     if request.method == "POST":
@@ -232,6 +289,20 @@ def update_club_info(request):
 
 @club_admin_required
 def delete_club_info(request):
+    """
+    Allows a club admin to delete club information records.
+
+    Admins can choose to:
+    - Delete all club info records (with confirmation checkbox).
+    - Delete only unapproved records.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Redirects to the dashboard on successful deletion,
+        or renders a confirmation page with messages.
+    """
     club = request.user.club_admin.club
 
     if request.method == "POST":
@@ -282,6 +353,18 @@ def delete_club_info(request):
 
 @club_admin_required
 def unassign_venue(request, venue_id):
+    """
+    Allows a club admin to unassign a venue from the club admin page.
+
+    Only accepts POST requests. Silently ignores missing venue or assignment.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        venue_id (int): The ID of the venue to unassign.
+
+    Returns:
+        HttpResponse: Renders updated club info section as partial HTML.
+    """
     if request.method != "POST":
         return HttpResponseForbidden("Invalid request method")
 
@@ -308,6 +391,18 @@ def unassign_venue(request, venue_id):
 
 @club_admin_required
 def assign_venue(request):
+    """
+    Allows a club admin to assign an available venue to their club.
+
+    Handles form validation and prevents duplicate assignments.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Renders Assign Venue page with form or redirects to
+        the dashboard on success.
+    """
     # Get Club
     club = request.user.club_admin.club
 
@@ -342,6 +437,22 @@ def assign_venue(request):
 
 @club_admin_required
 def update_venue_info(request, venue_id):
+    """
+    Allows a club admin to update venue information for venues linked to
+    their club by adding a new record.
+
+    Shared venues (used by multiple clubs) are indicated but still editable.
+    Only the latest and one approved VenueInfo record is kept - any outdated
+    records are deleted.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        venue_id (int): The ID of the venue to update.
+
+    Returns:
+        HttpResponse: Renders the Update Venue page with form or redirects
+        to the dashboard on success.
+    """
     # Get club
     club = request.user.club_admin.club
 
@@ -406,6 +517,19 @@ def update_venue_info(request, venue_id):
 
 @club_admin_required
 def create_venue(request):
+    """
+    Allows a club admin to create a new venue along with its initial
+    VenueInfo record.
+
+    Both venue and its info must pass validation. Uses atomic transaction.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Renders Create Venue page with forms or redirects
+        to dashboard on success.
+    """
     if request.method == "POST":
         venue_form = CreateVenueForm(request.POST)
         venue_info_form = UpdateVenueInfoForm(request.POST)
@@ -439,6 +563,20 @@ def create_venue(request):
 
 @club_admin_required
 def delete_venue(request, venue_id):
+    """
+    Allows a club admin to delete a venue or unapproved venue info records.
+
+    Deletes the entire venue only if it is not shared and the admin confirms.
+    Alternatively, can delete only unapproved venue info records.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        venue_id (int): The ID of the venue to delete.
+
+    Returns:
+        HttpResponse: Renders the Confirm Venue Deletion page or redirects
+        to the dashboard on success.
+    """
     # Get Club and Venue
     club = request.user.club_admin.club
     venue = Venue.objects.filter(id=venue_id).first()

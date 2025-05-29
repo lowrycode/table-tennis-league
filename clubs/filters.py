@@ -1,3 +1,10 @@
+"""
+Filters for ClubInfo listings based on club checklist criteria.
+
+Includes custom filtering logic to only apply boolean filters when the box
+is checked.
+"""
+
 from django import forms
 from django_filters import FilterSet, BooleanFilter, ChoiceFilter
 from .models import ClubInfo
@@ -9,6 +16,16 @@ MEMBERSHIP_BOOLEAN_CHOICES = (
 
 
 class BooleanFilterCheckedOnly(BooleanFilter):
+    """
+    Custom BooleanFilter that applies filtering only when the checkbox is
+    checked (value is True).
+
+    If the checkbox is unchecked or not provided (None), the queryset is
+    returned unfiltered.
+
+    Useful for optional boolean filters that should not constrain results
+    when unchecked.
+    """
     def filter(self, qs, value):
         if value is True:
             return super().filter(qs, value)
@@ -17,6 +34,14 @@ class BooleanFilterCheckedOnly(BooleanFilter):
 
 
 class ClubInfoFilter(FilterSet):
+    """
+    FilterSet for filtering ClubInfo objects based on several boolean
+    attributes (represented as checkboxes) and a membership requirement
+    (represented as a select box for more control).
+
+    Includes custom boolean filters where unchecked boxes do not affect
+    the results.
+    """
     # Tick boxes
     beginners = BooleanFilterCheckedOnly(widget=forms.CheckboxInput)
     intermediates = BooleanFilterCheckedOnly(widget=forms.CheckboxInput)

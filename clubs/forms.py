@@ -1,8 +1,23 @@
+"""
+Forms for managing club and venue assignments and details, including creation
+and updates for venues, club information, and associated venue metadata.
+"""
+
 from django import forms
 from .models import ClubInfo, ClubVenue, Venue, VenueInfo
 
 
 class AssignClubVenueForm(forms.ModelForm):
+    """
+    Form for assigning a new venue to a club.
+
+    Filters out venues already assigned to the specified club from the
+    dropdown options.
+
+    Requires a 'club' keyword argument when instantiated for filtering logic
+    to function correctly.
+    """
+
     class Meta:
         model = ClubVenue
         fields = [
@@ -13,6 +28,10 @@ class AssignClubVenueForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialises the form and filters the venue queryset to exclude venues
+        already assigned to the provided 'club'.
+        """
         # Pass custom 'club' argument when form is initialised
         club = kwargs.pop("club", None)
         super().__init__(*args, **kwargs)
@@ -28,6 +47,14 @@ class AssignClubVenueForm(forms.ModelForm):
 
 
 class CreateVenueForm(forms.ModelForm):
+    """
+    Form for creating a new venue.
+
+    This form only includes the venue name and is typically used for
+    the initial venue creation step. Other venue information is submitted
+    via the UpdateVenueInfoForm.
+    """
+
     class Meta:
         model = Venue
         fields = ["name"]
@@ -37,6 +64,13 @@ class CreateVenueForm(forms.ModelForm):
 
 
 class UpdateClubInfoForm(forms.ModelForm):
+    """
+    Form for submitting information about a club.
+
+    Includes fields for contact details, club website, session description,
+    skill levels supported and checklist criteria.
+    """
+
     class Meta:
         model = ClubInfo
         fields = [
@@ -84,6 +118,11 @@ class UpdateClubInfoForm(forms.ModelForm):
 
 
 class UpdateVenueInfoForm(forms.ModelForm):
+    """
+    Form for submitting venue information such as address, number of tables
+    and parking information.
+    """
+
     class Meta:
         model = VenueInfo
         fields = [
