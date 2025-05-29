@@ -7,11 +7,28 @@ from clubs.models import ClubAdmin
 
 @login_required
 def account_settings(request):
+    """
+    Renders the account settings page for the logged-in user.
+
+    Returns:
+        HttpResponse: Rendered account settings template.
+    """
     return render(request, "useraccounts/account_settings.html")
 
 
 @login_required
 def change_email(request):
+    """
+    Allows the logged-in user to change their email address.
+
+    If the request is a POST and the form is valid, the email is updated,
+    and the user is redirected to the account settings page with a success
+    message. Otherwise, the form is rendered prefilled with the current email
+    address.
+
+    Returns:
+        HttpResponse: Rendered change email template or redirect.
+    """
     if request.method == "POST":
         form = ChangeEmailForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -25,6 +42,16 @@ def change_email(request):
 
 @login_required
 def delete_account(request):
+    """
+    Allows the logged-in user to delete their account after confirmation.
+
+    If the request is a POST with confirmation, the user record is deleted
+    and the user is redirected to the home page with a success message.
+    If confirmation is missing, a warning message is shown.
+
+    Returns:
+        HttpResponse: Rendered confirmation page or redirect.
+    """
     if request.method == "POST":
         if request.POST.get("confirm_action"):
             user = request.user
@@ -40,6 +67,17 @@ def delete_account(request):
 
 @login_required
 def drop_club_admin_status(request):
+    """
+    Allows the logged-in user to drop their club admin status after
+    confirmation.
+
+    If the request is a POST with confirmation and the user has club admin
+    status, the ClubAdmin record is deleted and a success message is shown.
+    If not confirmed or user is not a club admin, a warning message is shown.
+
+    Returns:
+        HttpResponse: Rendered confirmation page or redirect.
+    """
     if request.method == "POST":
         if request.POST.get("confirm_action"):
             user = request.user

@@ -5,6 +5,12 @@ User = get_user_model()
 
 
 class ChangeEmailForm(forms.ModelForm):
+    """
+    A form for updating a user's email address.
+
+    The email input is converted to lowercase and validated to ensure
+    uniqueness across all users (excluding the current user).
+    """
     class Meta:
         model = User
         fields = ["email"]
@@ -17,6 +23,16 @@ class ChangeEmailForm(forms.ModelForm):
         self.fields["email"].required = True
 
     def clean_email(self):
+        """
+        Validates the email field to ensure it is unique after converting
+        to lowercase.
+
+        Raises:
+            forms.ValidationError: If email is already in use.
+
+        Returns:
+            str: The cleaned and validated email address.
+        """
         # Force lowercase
         email = self.cleaned_data["email"].lower()
 
