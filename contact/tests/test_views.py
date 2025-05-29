@@ -9,29 +9,49 @@ User = get_user_model()
 
 
 class ContactPageTests(TestCase):
+    """
+    Tests for the Contact page view, covering rendering, form behavior
+    and valid/invalid submission handling.
+    """
+
     @classmethod
     def setUpTestData(cls):
+        """
+        Create a test user for authenticated user-related test cases.
+        """
         cls.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
             password="password123",
         )
 
-    # Page renders correctly for static elements
+    # Test page renders correctly for static elements
     def test_contact_page_returns_correct_status_code(self):
+        """
+        Verify Contact page returns status code 200.
+        """
         response = self.client.get(reverse("contact"))
         self.assertEqual(response.status_code, 200)
 
     def test_contact_page_returns_correct_template(self):
+        """
+        Verify Contact page uses the expected template.
+        """
         response = self.client.get(reverse("contact"))
         self.assertTemplateUsed(response, "contact/contact.html")
 
     def test_contact_page_has_title(self):
+        """
+        Verify page title and heading elements are present.
+        """
         response = self.client.get(reverse("contact"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Contact Us")
 
     def test_contact_page_has_contact_details_section(self):
+        """
+        Verify contact details section and its content are present.
+        """
         response = self.client.get(reverse("contact"))
         self.assertContains(response, 'id="contact-details"')
         self.assertContains(response, "League and Website Administrator:")
@@ -39,6 +59,9 @@ class ContactPageTests(TestCase):
         self.assertContains(response, 'href="tel:')
 
     def test_contact_page_has_enquiries_section(self):
+        """
+        Verify enquiries section and expected categories are present.
+        """
         response = self.client.get(reverse("contact"))
         self.assertContains(response, '<section id="enquiries"')
         self.assertContains(response, "Club Enquiries")
@@ -47,6 +70,9 @@ class ContactPageTests(TestCase):
 
     # Test form rendering for GET request
     def test_contact_page_renders_form(self):
+        """
+        Verify enquiry form renders on GET request.
+        """
         response = self.client.get(reverse("contact"))
         self.assertContains(response, 'id="enquiry-form"')
         self.assertContains(response, '<input type="text"')
@@ -56,10 +82,16 @@ class ContactPageTests(TestCase):
         self.assertIsInstance(response.context["form"], EnquiryForm)
 
     def test_page_contains_csrf(self):
+        """
+        Verify page includes CSRF token for form submission.
+        """
         response = self.client.get(reverse("contact"))
-        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_enquiry_form_prefills_email_for_authenticated_user(self):
+        """
+        Verify form pre-fills the email field for authenticated users.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("contact"))
         self.assertEqual(response.status_code, 200)
@@ -68,11 +100,17 @@ class ContactPageTests(TestCase):
         )
 
     def test_enquiry_form_email_not_prefilled_for_unauthenticated_user(self):
+        """
+        Verify email is not pre-filled for anonymous users.
+        """
         response = self.client.get(reverse("contact"))
         self.assertNotIn("email", response.context["form"].initial)
 
     # Test valid form submissions with POST request
     def test_authenticated_user_can_submit_valid_enquiry_form(self):
+        """
+        Verify authenticated users can submit a valid enquiry.
+        """
         self.client.force_login(self.user)
         form_data = {
             "name": "Test User",
@@ -104,6 +142,9 @@ class ContactPageTests(TestCase):
         self.assertEqual(enquiry.message, form_data["message"])
 
     def test_unauthenticated_user_can_submit_valid_enquiry_form(self):
+        """
+        Verify unauthenticated users can submit a valid enquiry.
+        """
         form_data = {
             "name": "Test User",
             "email": "test@example.com",
@@ -135,6 +176,9 @@ class ContactPageTests(TestCase):
 
     # Test Invalid form submissions
     def test_invalid_form_submission_shows_warning(self):
+        """
+        Check that invalid form submissions return warnings and form errors.
+        """
         form_data = {
             "name": "",  # Missing required field
             "email": "invalid_email_address",

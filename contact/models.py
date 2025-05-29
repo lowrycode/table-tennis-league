@@ -6,6 +6,9 @@ User = get_user_model()
 
 
 class Enquiry(models.Model):
+    """
+    Represents a single contact enquiry submitted from the Contact page.
+    """
     user = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,

@@ -4,6 +4,14 @@ from .forms import EnquiryForm
 
 
 def contact(request):
+    """
+    Render Contact page with enquiry form.
+
+    On GET requests, display the form with email prefilled for authenticated
+    users.
+    On POST requests, validate and save the enquiry (associating it with the
+    user if authenticated) and provide success or warning messages.
+    """
     if request.method == "POST":
         form = EnquiryForm(request.POST)
         if form.is_valid():
