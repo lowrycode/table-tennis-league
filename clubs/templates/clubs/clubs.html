@@ -11,11 +11,12 @@
           <div class="my-5">
             <div class="d-flex justify-content-between">
               <h2 class="text-center flex-grow-1 m-0">Clubs</h2>
-              <button class="btn-toggle btn fs-4" data-target="#filter-clubs">
-                <i
-                  class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"
-                  aria-label="{{ filters_applied|yesno:'Filters active,No filters applied' }}"
-                ></i>
+              <button
+                class="btn-toggle btn fs-4"
+                data-target="#filter-clubs"
+                aria-label="{{ filters_applied|yesno:'Filters active,No filters applied' }}"
+              >
+                <i class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"></i>
               </button>
             </div>
             <!-- Filters Form -->
