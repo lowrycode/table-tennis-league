@@ -8,8 +8,11 @@ User = get_user_model()
 
 
 class SignUpPageTests(TestCase):
+    """Tests for verifying the user registration (signup) page."""
+
     @classmethod
     def setUpTestData(cls):
+        """Create a default user instance for use in tests."""
         cls.current_username = "testuser"
         cls.user = User.objects.create_user(
             username=cls.current_username,
@@ -18,29 +21,40 @@ class SignUpPageTests(TestCase):
         )
 
     def test_page_returns_correct_status_code(self):
+        """
+        Verify that the signup page returns status code 200 for
+        anonymous users.
+        """
         response = self.client.get(reverse("account_signup"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """Verify that the signup page renders the correct HTML template."""
         response = self.client.get(reverse("account_signup"))
         self.assertTemplateUsed(response, "account/signup.html")
 
     def test_page_redirects_authenticated_user(self):
+        """
+        Verify authenticated user is redirected away from the signup page.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_signup"))
         self.assertRedirects(response, reverse("home"))
 
     def test_page_contains_expected_title(self):
+        """Verify signup page contains the expected title."""
         response = self.client.get(reverse("account_signup"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Sign Up")
 
     def test_page_contains_csrf(self):
+        """Verify that the signup form includes the CSRF token."""
         response = self.client.get(reverse("account_signup"))
         self.assertContains(response, "csrfmiddlewaretoken")
 
     # Test invalid form submissions
     def test_invalid_form_missing_required_fields(self):
+        """Verify form validation when required fields are left blank."""
         form_data = {
             "email": "",
             "username": "",
@@ -64,6 +78,7 @@ class SignUpPageTests(TestCase):
         )
 
     def test_invalid_form_non_unique_fields(self):
+        """Verify signup fails if username or email is already in use."""
         form_data = {
             "username": self.current_username,
             "email": "user@example.com",
@@ -88,6 +103,9 @@ class SignUpPageTests(TestCase):
 
     # Test valid form submission
     def test_valid_form(self):
+        """
+        Verify user can successfully sign up with valid and unique credentials.
+        """
         response = self.client.post(
             reverse("account_signup"),
             {
@@ -107,6 +125,7 @@ class SignUpPageTests(TestCase):
         self.assertEqual(user.email, "second@example.com")
 
     def test_authenticated_user_cannot_create_new_user(self):
+        """Verify that an authenticated user cannot register a new account."""
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("account_signup"),
@@ -130,8 +149,15 @@ class SignUpPageTests(TestCase):
 
 
 class LoginPageTests(TestCase):
+    """
+    Tests for verifying the login page functionality and authentication flow.
+    """
+
     @classmethod
     def setUpTestData(cls):
+        """
+        Create a valid user instance used to test login behaviours.
+        """
         cls.current_username = "testuser"
         cls.current_password = "difficulttoguess!"
         cls.user = User.objects.create_user(
@@ -141,29 +167,39 @@ class LoginPageTests(TestCase):
         )
 
     def test_page_returns_correct_status_code(self):
+        """Verify login page returns a 200 status code for anonymous users."""
         response = self.client.get(reverse("account_login"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """Verify login page renders the correct HTML template."""
         response = self.client.get(reverse("account_login"))
         self.assertTemplateUsed(response, "account/login.html")
 
     def test_page_redirects_authenticated_user(self):
+        """
+        Verify that an authenticated user is redirected from the login page.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_login"))
         self.assertRedirects(response, reverse("home"))
 
     def test_page_contains_expected_title(self):
+        """Verify login page contains the expected title content."""
         response = self.client.get(reverse("account_login"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Log in")
 
     def test_page_contains_csrf(self):
+        """Verify login form includes CSRF token."""
         response = self.client.get(reverse("account_login"))
         self.assertContains(response, "csrfmiddlewaretoken")
 
     # Test invalid form submissions
     def test_invalid_form_missing_required_fields(self):
+        """
+        Verify form validation when login and password fields are left blank.
+        """
         form_data = {"login": "", "password": ""}
 
         # Check form errors are raised
@@ -176,6 +212,7 @@ class LoginPageTests(TestCase):
         )
 
     def test_invalid_form_incorrect_password(self):
+        """Verify error message when an incorrect password is provided."""
         form_data = {
             "login": self.current_username,
             "password": "notmypassword!",
@@ -191,6 +228,7 @@ class LoginPageTests(TestCase):
         )
 
     def test_password_case_sensitive(self):
+        """Verify password field is case-sensitive during login."""
         form_data = {
             "login": self.current_username,
             "password": self.current_password.upper(),
@@ -206,6 +244,7 @@ class LoginPageTests(TestCase):
         )
 
     def test_invalid_form_incorrect_username(self):
+        """Verify error message when an unknown username is used."""
         form_data = {
             "login": "notaknownuser",
             "password": "wonthaveappasword!",
@@ -222,6 +261,11 @@ class LoginPageTests(TestCase):
 
     # Test valid form submission
     def test_valid_form(self):
+        """
+        Verify successful login with correct credentials and presence of
+        success message.
+        """
+        ...
         form_data = {
             "login": self.current_username,
             "password": self.current_password,
@@ -247,6 +291,10 @@ class LoginPageTests(TestCase):
         self.assertEqual(msgs[0].level, messages.SUCCESS)
 
     def test_authenticated_user_cannot_log_in(self):
+        """
+        Verify that an already authenticated user cannot log in as a
+        different user.
+        """
         # Create second user for login attempt
         user2 = User.objects.create_user(
             username="seconduser",
@@ -276,8 +324,15 @@ class LoginPageTests(TestCase):
 
 
 class LogoutPageTests(TestCase):
+    """
+    Tests for verifying the logout functionality.
+    """
+
     @classmethod
     def setUpTestData(cls):
+        """
+        Create a valid user instance for testing logout behaviour.
+        """
         cls.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
@@ -285,31 +340,46 @@ class LogoutPageTests(TestCase):
         )
 
     def test_page_returns_correct_status_code(self):
+        """
+        Verify logout page returns a 200 status code when accessed by an
+        authenticated user.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """Verify logout page uses the correct HTML template."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
         self.assertTemplateUsed(response, "account/logout.html")
 
     def test_page_redirects_unauthenticated_user(self):
+        """
+        Verify that unauthenticated users are redirected away from the
+        logout page.
+        """
         response = self.client.get(reverse("account_logout"))
         self.assertRedirects(response, reverse("home"))
 
     def test_page_contains_expected_title(self):
+        """Verify logout page contains the expected title content."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Log Out")
 
     def test_page_contains_csrf(self):
+        """Verify logout form includes the CSRF token."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
         self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_page_contains_go_back_button(self):
+        """
+        Verify that the logout page contains a 'Go Back' button with correct
+        behaviour.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_logout"))
         self.assertContains(response, "<a")
@@ -318,6 +388,10 @@ class LogoutPageTests(TestCase):
         self.assertContains(response, "javascript:history.back()")
 
     def test_user_can_logout(self):
+        """
+        Verify that a user can successfully log out and is shown a
+        confirmation message.
+        """
         self.client.force_login(self.user)
         response = self.client.post(reverse("account_logout"), follow=True)
 
@@ -339,8 +413,15 @@ class LogoutPageTests(TestCase):
 
 
 class ChangePasswordPageTests(TestCase):
+    """
+    Tests for verifying the password change functionality.
+    """
+
     @classmethod
     def setUpTestData(cls):
+        """
+        Create a valid user instance for testing password change behaviour.
+        """
         cls.current_password = "difficulttoguess!"
         cls.user = User.objects.create_user(
             username="testuser",
@@ -349,16 +430,25 @@ class ChangePasswordPageTests(TestCase):
         )
 
     def test_page_returns_correct_status_code(self):
+        """
+        Verify password change page returns a 200 status code when accessed by
+        an authenticated user.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """Verify password change page renders the correct template."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
         self.assertTemplateUsed(response, "account/password_change.html")
 
     def test_page_redirects_unauthenticated_user(self):
+        """
+        Verify that unauthenticated users are redirected to the login page
+        when attempting to access password change.
+        """
         response = self.client.get(reverse("account_change_password"))
         self.assertRedirects(
             response,
@@ -369,17 +459,23 @@ class ChangePasswordPageTests(TestCase):
         )
 
     def test_page_contains_expected_title(self):
+        """Verify password change page displays the expected title."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Change Password")
 
     def test_page_contains_csrf(self):
+        """Verify form includes the CSRF token."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
         self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_page_contains_go_back_button(self):
+        """
+        Verify that the password change page contains a 'Go Back' button
+        linking to the account settings page.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_change_password"))
         self.assertContains(response, "<a")
@@ -387,6 +483,10 @@ class ChangePasswordPageTests(TestCase):
         self.assertContains(response, "Go Back")
 
     def test_invalid_form_missing_required_fields(self):
+        """
+        Verify validation errors are raised when required fields are left
+        blank in the form.
+        """
         form_data = {
             "oldpassword": "",
             "password1": "",
@@ -410,6 +510,7 @@ class ChangePasswordPageTests(TestCase):
         )
 
     def test_invalid_form_incorrect_old_password(self):
+        """Verify error is shown when the current password is incorrect."""
         form_data = {
             "oldpassword": "notmyoldpassword!",
             "password1": "anewandbetterpassword!",
@@ -430,6 +531,7 @@ class ChangePasswordPageTests(TestCase):
         )
 
     def test_invalid_form_non_matching_passwords(self):
+        """Verify validation fails when the new passwords do not match."""
         form_data = {
             "oldpassword": self.current_password,
             "password1": "anewandbetterpassword!",
@@ -450,6 +552,9 @@ class ChangePasswordPageTests(TestCase):
         )
 
     def test_invalid_form_passwords_case_sensitive(self):
+        """
+        Verify that mismatched password casing results in a validation error.
+        """
         form_data = {
             "oldpassword": self.current_password,
             "password1": "anewandbetterpassword!",
@@ -470,6 +575,10 @@ class ChangePasswordPageTests(TestCase):
         )
 
     def test_user_can_change_password(self):
+        """
+        Verify that a user can successfully change their password and is
+        redirected with a success message.
+        """
         form_data = {
             "oldpassword": self.current_password,
             "password1": "anewandbetterpassword!",
@@ -502,8 +611,11 @@ class ChangePasswordPageTests(TestCase):
 
 
 class AccountSettingsPageTests(TestCase):
+    """Tests for Account Settings page."""
+
     @classmethod
     def setUpTestData(cls):
+        """Create a test user ready for use in tests."""
         cls.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
@@ -511,16 +623,25 @@ class AccountSettingsPageTests(TestCase):
         )
 
     def test_page_returns_correct_status_code(self):
+        """
+        Verify that the account settings page returns a 200 status code
+        for authenticated users.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """Verify that the account settings page uses the correct template."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertTemplateUsed(response, "useraccounts/account_settings.html")
 
     def test_page_redirects_unauthenticated_user(self):
+        """
+        Verify unauthenticated users are redirected to login with next
+        parameter.
+        """
         response = self.client.get(reverse("account_settings"))
         self.assertRedirects(
             response,
@@ -528,12 +649,18 @@ class AccountSettingsPageTests(TestCase):
         )
 
     def test_page_contains_expected_title(self):
+        """
+        Verify account settings page contains the expected title.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Account Settings")
 
     def test_page_has_email_address_section(self):
+        """
+        Verify account settings page shows the user's email and a change link.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertContains(response, 'id="user-email"')
@@ -541,11 +668,15 @@ class AccountSettingsPageTests(TestCase):
         self.assertContains(response, "Change</a>")
 
     def test_page_has_password_section(self):
+        """Verify account settings page includes a password section."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertContains(response, "Password</h2>")
 
     def test_page_has_club_admin_section_if_user_has_club_admin_status(self):
+        """
+        Verify club admin section appears if the user has club admin status.
+        """
         # Create Club and Club Admin
         club = Club.objects.create(name="Test Club")
         club_admin = ClubAdmin.objects.create(user=self.user, club=club)
@@ -557,11 +688,18 @@ class AccountSettingsPageTests(TestCase):
         self.assertContains(response, club_admin.club.name)
 
     def test_page_has_no_club_admin_section_if_no_club_admin_status(self):
+        """
+        Verify club admin section does not appear if the user is not a
+        club admin.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertNotContains(response, "Club Admin</h2>")
 
     def test_page_has_delete_account_section(self):
+        """
+        Verify account settings page contains the delete account section.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("account_settings"))
         self.assertContains(response, "Delete Account")
@@ -569,8 +707,11 @@ class AccountSettingsPageTests(TestCase):
 
 
 class ChangeEmailPageTests(TestCase):
+    """Tests for Change Email page."""
+
     @classmethod
     def setUpTestData(cls):
+        """Create user for use in tests"""
         cls.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
@@ -578,16 +719,24 @@ class ChangeEmailPageTests(TestCase):
         )
 
     def test_page_returns_correct_status_code(self):
+        """
+        Verify page returns a 200 status code for authenticated users.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("change_email"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """Verify page uses the correct template."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("change_email"))
         self.assertTemplateUsed(response, "useraccounts/change_email.html")
 
     def test_page_redirects_unauthenticated_user(self):
+        """
+        Verify unauthenticated users are redirected to login page with
+        next parameter when accessing change email page.
+        """
         response = self.client.get(reverse("change_email"))
         self.assertRedirects(
             response,
@@ -595,17 +744,26 @@ class ChangeEmailPageTests(TestCase):
         )
 
     def test_page_contains_expected_title(self):
+        """
+        Verify the change email page contains the expected title.
+        """
+        self.client.force_login(self.user)
         self.client.force_login(self.user)
         response = self.client.get(reverse("change_email"))
         self.assertContains(response, "<h1")
         self.assertContains(response, "Change Email")
 
     def test_page_contains_csrf(self):
+        """Verify the change email page contains the CSRF token."""
         self.client.force_login(self.user)
         response = self.client.get(reverse("change_email"))
         self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_page_contains_go_back_button(self):
+        """
+        Verify change email page contains a go back button linking to
+        account settings.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("change_email"))
         self.assertContains(response, "<a")
@@ -613,6 +771,9 @@ class ChangeEmailPageTests(TestCase):
         self.assertContains(response, "Go Back")
 
     def test_user_can_update_email(self):
+        """
+        Verify authenticated user can successfully update their email address.
+        """
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("change_email"),
@@ -637,6 +798,10 @@ class ChangeEmailPageTests(TestCase):
         self.assertEqual(msgs[0].level, messages.SUCCESS)
 
     def test_invalid_email_does_not_update_user(self):
+        """
+        Verify that submitting an invalid email does not update the user's
+        email and raises form errors.
+        """
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("change_email"),
@@ -652,20 +817,31 @@ class ChangeEmailPageTests(TestCase):
 
 
 class ConfirmAccountDeletePageTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = User.objects.create_user(
+    """
+    Tests for the account deletion confirmation page.
+    """
+
+    def setUp(self):
+        """Create user for testing account deletion."""
+        self.user = User.objects.create_user(
             username="testuser",
             email="user@example.com",
             password="difficulttoguess!",
         )
 
     def test_page_returns_correct_status_code(self):
+        """
+        Verify that the account deletion page returns status code 200
+        for an authenticated user.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_account"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """
+        Verify correct template is used for account deletion confirmation page.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_account"))
         self.assertTemplateUsed(
@@ -673,6 +849,9 @@ class ConfirmAccountDeletePageTests(TestCase):
         )
 
     def test_page_redirects_unauthenticated_user(self):
+        """
+        Verify that unauthenticated users are redirected to the login page.
+        """
         response = self.client.get(reverse("delete_account"))
         self.assertRedirects(
             response,
@@ -680,6 +859,9 @@ class ConfirmAccountDeletePageTests(TestCase):
         )
 
     def test_page_contains_expected_title_and_warnings(self):
+        """
+        Verify page contains the correct title and account deletion warnings.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_account"))
         self.assertContains(response, "<h1")
@@ -694,11 +876,17 @@ class ConfirmAccountDeletePageTests(TestCase):
         self.assertContains(response, "action cannot be undone")
 
     def test_page_contains_csrf(self):
+        """
+        Verify that the CSRF token is present in the form.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_account"))
         self.assertContains(response, "csrfmiddlewaretoken")
 
     def test_page_contains_cancel_button(self):
+        """
+        Verify cancel button linking back to the settings page is present.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_account"))
         self.assertContains(response, "<a")
@@ -706,6 +894,9 @@ class ConfirmAccountDeletePageTests(TestCase):
         self.assertContains(response, "Cancel")
 
     def test_page_contains_confirm_delete_checkbox(self):
+        """
+        Verify that a checkbox for confirming account deletion is present.
+        """
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_account"))
         self.assertContains(response, "input")
@@ -713,6 +904,10 @@ class ConfirmAccountDeletePageTests(TestCase):
         self.assertContains(response, 'id="confirm-account-delete"')
 
     def test_view_requires_confirm_delete_checkbox(self):
+        """
+        Verify that submitting the form without checking the confirmation box
+        does not delete the account.
+        """
         self.client.force_login(self.user)
         response = self.client.post(reverse("delete_account"), {})
 
@@ -731,6 +926,10 @@ class ConfirmAccountDeletePageTests(TestCase):
         self.assertEqual(msgs[0].level, messages.WARNING)
 
     def test_user_can_delete_account(self):
+        """
+        Verify that a user can delete their account by checking the
+        confirmation box and submitting.
+        """
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("delete_account"),
@@ -757,7 +956,14 @@ class ConfirmAccountDeletePageTests(TestCase):
 
 
 class ConfirmDropClubAdminStatusPageTests(TestCase):
+    """
+    Tests for dropping club admin status.
+    """
+
     def setUp(self):
+        """
+        Create test users and club admin relationships for test scenarios.
+        """
         # Create Users
         self.user_with_admin = User.objects.create_user(
             username="adminuser",
@@ -777,11 +983,18 @@ class ConfirmDropClubAdminStatusPageTests(TestCase):
         ClubAdmin.objects.create(user=self.user_with_admin, club=self.club)
 
     def test_page_returns_correct_status_code(self):
+        """
+        Verify drop club admin status page returns status code 200
+        for users with club admin status.
+        """
         self.client.force_login(self.user_with_admin)
         response = self.client.get(reverse("drop_club_admin_status"))
         self.assertEqual(response.status_code, 200)
 
     def test_page_returns_correct_template(self):
+        """
+        Verify correct template is used for the drop club admin status page.
+        """
         self.client.force_login(self.user_with_admin)
         response = self.client.get(reverse("drop_club_admin_status"))
         self.assertTemplateUsed(
@@ -789,6 +1002,9 @@ class ConfirmDropClubAdminStatusPageTests(TestCase):
         )
 
     def test_page_redirects_unauthenticated_user(self):
+        """
+        Verify that unauthenticated users are redirected to the login page.
+        """
         response = self.client.get(reverse("drop_club_admin_status"))
         self.assertRedirects(
             response,
@@ -797,6 +1013,9 @@ class ConfirmDropClubAdminStatusPageTests(TestCase):
         )
 
     def test_page_contains_expected_content(self):
+        """
+        Verify page includes the correct heading and content.
+        """
         self.client.force_login(self.user_with_admin)
         response = self.client.get(reverse("drop_club_admin_status"))
         self.assertContains(response, "<h1")
@@ -806,6 +1025,10 @@ class ConfirmDropClubAdminStatusPageTests(TestCase):
         )
 
     def test_post_without_confirm_delete_shows_warning(self):
+        """
+        Verify that submitting the form without confirming does not remove
+        admin status and shows a warning.
+        """
         self.client.force_login(self.user_with_admin)
         response = self.client.post(reverse("drop_club_admin_status"), {})
 
@@ -824,6 +1047,10 @@ class ConfirmDropClubAdminStatusPageTests(TestCase):
         self.assertEqual(msgs[0].level, messages.WARNING)
 
     def test_post_with_confirm_delete_deletes_club_admin_and_redirects(self):
+        """
+        Verify that submitting the form with confirmation deletes the
+        user's club admin status and redirects correctly.
+        """
         self.client.force_login(self.user_with_admin)
         response = self.client.post(
             reverse("drop_club_admin_status"),
@@ -848,6 +1075,10 @@ class ConfirmDropClubAdminStatusPageTests(TestCase):
         self.assertEqual(msgs[0].level, messages.SUCCESS)
 
     def test_post_with_confirm_delete_for_user_without_club_admin(self):
+        """
+        Verify that a user without club admin status receives a warning when
+        attempting to drop it.
+        """
         self.client.force_login(self.user_without_admin)
         response = self.client.post(
             reverse("drop_club_admin_status"),
