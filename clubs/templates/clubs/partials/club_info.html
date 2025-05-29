@@ -55,10 +55,16 @@
               class="img-fluid"
               src="{% static 'images/placeholder.jpg' %}"
               alt="No club image provided"
+              loading="lazy"
             >
           </picture>
         {% else %}
-          <img class="img-fluid" src="{{ club.info.image.url }}" alt="{{ club.name }} image">
+          <img
+            class="img-fluid"
+            src="{{ club.info.image.url }}"
+            alt="{{ club.name }} image"
+            loading="lazy"
+          >
         {% endif %}
       </div>
       <div class="col-12 col-md-6">
