@@ -75,6 +75,11 @@ h6 {
   font-size: 1.1rem;
 }
 
+.p-style {
+  font-family: "Figtree", sans-serif;
+  font-weight: 400;
+}
+
 /* UTILITIES */
 /* Layout Utilities */
 .bring-to-front {
@@ -265,6 +270,7 @@ a:hover {
 /* Footer */
 footer a {
   color: var(--light-3);
+  font-weight: 400;
 }
 
 footer a:hover {
