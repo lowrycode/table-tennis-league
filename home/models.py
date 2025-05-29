@@ -3,8 +3,11 @@ from django.utils import timezone
 from django.db import models
 
 
-# Create your models here.
 class NewsItem(models.Model):
+    """
+    Represents a single news item with a title and content that is active
+    within a specified date range.
+    """
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=400)
     active_from = models.DateTimeField(default=timezone.now)
