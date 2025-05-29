@@ -12,8 +12,7 @@ def contact(request):
                 enquiry.user = request.user
             enquiry.save()
             messages.success(
-                request,
-                "Your enquiry has been submitted successfully."
+                request, "Your enquiry has been submitted successfully."
             )
             return redirect("contact")
         else:
@@ -22,7 +21,7 @@ def contact(request):
                 (
                     "Form data was invalid - please check the error message(s)"
                     " in the form and try again"
-                )
+                ),
             )
     else:
         initial_data = {}
