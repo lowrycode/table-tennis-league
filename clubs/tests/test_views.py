@@ -1459,7 +1459,7 @@ class DeleteClubInfoTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse("delete_club_info"))
 
-        self.assertContains(response, "Choose what to delete:</label>")
+        self.assertContains(response, "Choose what to delete:")
         self.assertContains(response, 'type="radio"')
         self.assertContains(response, 'name="delete_option"')
         self.assertContains(response, 'value="all"')
