@@ -91,6 +91,41 @@ def build_club_context_for_admin(club):
     return club_dict
 
 
+def build_locations_context(approved_venue_infos_qs):
+    venue_infos = (
+        approved_venue_infos_qs
+        .select_related("venue")
+        .prefetch_related("venue__venue_clubs__club")
+    )
+
+    locations = []
+    seen_venues = set()
+
+    for vi in venue_infos:
+        # Skip if missing venue coordinates (so map won't break)
+        if vi.latitude is None or vi.longitude is None:
+            continue
+
+        # Skip outdated versions
+        venue_id = vi.venue.id
+        if venue_id in seen_venues:
+            continue
+
+        # Add dictionary to locations list
+        seen_venues.add(venue_id)
+        clubs = [cv.club.name for cv in vi.venue.venue_clubs.all()]
+        locations.append(
+            {
+                "name": vi.venue.name,
+                "lat": vi.latitude,
+                "lng": vi.longitude,
+                "clubs": clubs,
+            }
+        )
+
+    return locations
+
+
 # View functions
 def clubs(request):
     """
@@ -178,6 +213,9 @@ def clubs(request):
             # Append club data
             clubs_dict.append(club_dict)
 
+    # Build locations_list for passing to template
+    locations_list = build_locations_context(approved_venue_infos_qs)
+
     # Deduce whether filters are applied by checking for get parameters
     filters_applied = len(request.GET) > 0
 
@@ -188,6 +226,7 @@ def clubs(request):
             "clubs": clubs_dict,
             "filter": club_info_filter,
             "filters_applied": filters_applied,
+            "locations": locations_list,
         },
     )
 
