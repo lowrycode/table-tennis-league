@@ -6,9 +6,11 @@ Includes support for managing both approved and draft (unapproved) versions of
 club and venue details.
 """
 
+import requests
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from cloudinary.models import CloudinaryField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -143,6 +145,9 @@ class VenueInfo(models.Model):
         help_text="This field is autopopulated from the postcode.",
     )
 
+    class Meta:
+        ordering = ["venue", "-created_on"]
+
     def __str__(self):
         created_on_str = (
             self.created_on.strftime("%d/%m/%y at %I:%M %p")
@@ -151,6 +156,16 @@ class VenueInfo(models.Model):
         )
         return f"{self.venue} ({created_on_str})"
 
+    @staticmethod
+    def geocode_postcode(postcode):
+        api_key = settings.GOOGLE_GEOCODE_API_KEY
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={postcode}&key={api_key}"
+        response = requests.get(url).json()
+        if response["status"] == "OK":
+            location = response["results"][0]["geometry"]["location"]
+            return location["lat"], location["lng"]
+        return None, None
+
     def clean(self):
         """Validates character limits on parking information."""
         super().clean()
@@ -158,6 +173,18 @@ class VenueInfo(models.Model):
             raise ValidationError(
                 {"description": "Cannot be more than 500 characters."}
             )
+
+    def save(self, *args, **kwargs):
+        # TO PRESERVE API LIMITS IN TESTING, COMMENT OUT WHOLE IF BLOCK
+        if self.postcode and (self.latitude is None or self.longitude is None):
+            try:
+                lat, lng = self.geocode_postcode(self.postcode)
+                if lat is not None and lng is not None:
+                    self.latitude = lat
+                    self.longitude = lng
+            except requests.RequestException:
+                pass
+        super().save(*args, **kwargs)
 
 
 class ClubVenue(models.Model):
