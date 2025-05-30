@@ -9,40 +9,15 @@
       <div class="row justify-content-center">
         <div class="col-12 col-lg-9 mb-4">
           <h2 class="text-center mb-4">Find a Club</h2>
-          <div id="map"></div>
+          <div id="map" class="d-flex justify-contents-center align-items-center">
+            {% if not locations %}
+              <p class="flex-grow-1 text-center p-3">No locations to display.</p>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
   </section>
-
-  <script>
-    const locations = {{ locations|safe }};
-
-    function initMap() {
-      const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 8, // initial zoom setting is adjusted later
-        center: { lat: 0, lng: 0 }, // temporary center is adjusted later
-        mapTypeControl: false,  // disable Map and Satellite buttons
-      });
-
-      const bounds = new google.maps.LatLngBounds();
-
-      locations.forEach(location => {
-        const position = { lat: location.lat, lng: location.lng };
-        new google.maps.Marker({
-          position: position,
-          map: map,
-          title: `${location.name} (${location.clubs.join(', ')})`,
-        });
-
-        bounds.extend(position); // Add marker to bounds
-      });
-
-      map.fitBounds(bounds); // Auto-center & zoom to fit all markers
-    }
-  </script>
-
-    
 
   <!-- Club Info Section -->
   <section id="club-info" class="w-100 my-4 px-2">
@@ -98,11 +73,19 @@
 {% endblock %}
 
 {% block scripts %}
-  <!-- Load Google Maps JavaScript API -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqt6uiL3FscoFX4urPWQBeKkFv9ON6Pp4&loading=async&callback=initMap">  
-  </script>
-  
-  <!-- Script controlling toggle behaviour for clubs filter -->
-  <script src="{% static 'js/toggle_btn.js' %}"></script>
+  {% if locations %}
+    <!-- Render script tag for passing JSON data to initialise_map.js -->
+    {{ locations|json_script:"locations-data" }}
+
+    <!-- Script for defining initMap before Google Map calls it -->
+    <script src="{% static 'js/clubs/initialise_map.js' %}"></script>
+
+    <!-- Load Google Maps API -->
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqt6uiL3FscoFX4urPWQBeKkFv9ON6Pp4&loading=async&callback=initMap&libraries=marker">  
+    </script>
+  {% endif %}
+    
+    <!-- Script controlling toggle behaviour for clubs filter -->
+    <script src="{% static 'js/toggle_btn.js' %}"></script>
 {% endblock %}

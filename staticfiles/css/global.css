@@ -389,6 +389,7 @@ footer a:hover {
   height: 300px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--light-4);
+  background-color: var(--light-2);
 }
 
 .club {
