@@ -23,6 +23,7 @@ class Club(models.Model):
     Other club information is stored in the related ClubInfo model
     to allow for storing both approved and unapproved versions.
     """
+
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
@@ -39,6 +40,7 @@ class ClubInfo(models.Model):
     Multiple ClubInfo instances can be linked to a club to allow for
     storing both approved and unapproved versions.
     """
+
     club = models.ForeignKey(
         Club, on_delete=models.CASCADE, related_name="club_infos"
     )
@@ -97,6 +99,7 @@ class Venue(models.Model):
 
     Venues can be linked to multiple clubs to allow for shared use.
     """
+
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
@@ -113,6 +116,7 @@ class VenueInfo(models.Model):
     Multiple VenueInfo instances can be linked to a venue to allow for
     storing both approved and unapproved versions.
     """
+
     venue = models.ForeignKey(
         Venue, on_delete=models.CASCADE, related_name="venue_infos"
     )
@@ -128,6 +132,16 @@ class VenueInfo(models.Model):
     meets_league_standards = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)
+    latitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="This field is autopopulated from the postcode.",
+    )
+    longitude = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="This field is autopopulated from the postcode.",
+    )
 
     def __str__(self):
         created_on_str = (
@@ -152,6 +166,7 @@ class ClubVenue(models.Model):
 
     Represents an assignment of a specific venue to a specific club.
     """
+
     club = models.ForeignKey(
         Club, on_delete=models.CASCADE, related_name="club_venues"
     )
@@ -173,6 +188,7 @@ class ClubAdmin(models.Model):
 
     Each user can only be assigned to one club as an admin.
     """
+
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="club_admin"
     )
