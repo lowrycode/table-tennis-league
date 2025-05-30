@@ -225,7 +225,6 @@ def clubs(request):
     }
 
     # If htmx request, return only the club info partial template
-    print(request.headers)
     if request.headers.get("HX-Request") == "true":
         return render(
             request, "clubs/partials/club_info_section.html", context
