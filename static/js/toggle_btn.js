@@ -7,8 +7,12 @@
 
   Only the first element matching the selector is affected.
 */
-document.addEventListener("DOMContentLoaded", () => {
+function attachToggleListeners() {
   document.querySelectorAll(".btn-toggle").forEach((button) => {
+    // Avoid attaching duplicate listeners
+    if (button.dataset.toggleListenerAttached) return;
+
+    // Add event listener
     button.addEventListener("click", () => {
       const targetSelector = button.getAttribute("data-target");
       if (!targetSelector) return;
@@ -18,5 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       targetElem.classList.toggle("d-none");
     });
+
+    // Add dataset to show event listener is assigned to button
+    button.dataset.toggleListenerAttached = "true";
   });
-});
+}
+
+// Attach on initial page load
+document.addEventListener("DOMContentLoaded", attachToggleListeners);
+
+// Reattach after HTMX swaps new content into DOM
+document.body.addEventListener("htmx:afterSettle", attachToggleListeners);
