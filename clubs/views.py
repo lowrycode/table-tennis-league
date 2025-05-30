@@ -185,8 +185,8 @@ def clubs(request):
         approved_club_infos_pf, approved_venue_infos_pf
     )
 
-    # Build clubs dictionary for passing to template
-    clubs_dict = []
+    # Build clubs list for passing to template
+    clubs_list = []
     for club in all_clubs:
         # Build club_dict
         club_dict = {
@@ -211,7 +211,7 @@ def clubs(request):
                     club_dict["venues"].append(venue_dict)
 
             # Append club data
-            clubs_dict.append(club_dict)
+            clubs_list.append(club_dict)
 
     # Build locations_list for passing to template
     locations_list = build_locations_context(approved_venue_infos_qs)
@@ -223,7 +223,7 @@ def clubs(request):
         request,
         "clubs/clubs.html",
         {
-            "clubs": clubs_dict,
+            "clubs": clubs_list,
             "filter": club_info_filter,
             "filters_applied": filters_applied,
             "locations": locations_list,
