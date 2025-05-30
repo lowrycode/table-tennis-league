@@ -14,7 +14,14 @@
             </button>
           </div>
           <!-- Filters Form -->
-          <form id="filter-clubs" class="filter-box mt-2 p-3 d-none" method="get">
+          <form
+            id="filter-clubs"
+            class="filter-box mt-2 p-3 d-none"
+            method="get"
+            hx-get="{% url 'clubs' %}"
+            hx-target="#club-info"
+            hx-swap="innerHTML"
+          >
             <div class="d-flex align-items-center flex-wrap row-gap-3 col-gap-4">
               <!-- Show textbox before label -->
               {% for field in filter.form %}

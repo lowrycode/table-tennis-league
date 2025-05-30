@@ -92,11 +92,9 @@ def build_club_context_for_admin(club):
 
 
 def build_locations_context(approved_venue_infos_qs):
-    venue_infos = (
-        approved_venue_infos_qs
-        .select_related("venue")
-        .prefetch_related("venue__venue_clubs__club")
-    )
+    venue_infos = approved_venue_infos_qs.select_related(
+        "venue"
+    ).prefetch_related("venue__venue_clubs__club")
 
     locations = []
     seen_venues = set()
@@ -219,16 +217,21 @@ def clubs(request):
     # Deduce whether filters are applied by checking for get parameters
     filters_applied = len(request.GET) > 0
 
-    return render(
-        request,
-        "clubs/clubs.html",
-        {
-            "clubs": clubs_list,
-            "filter": club_info_filter,
-            "filters_applied": filters_applied,
-            "locations": locations_list,
-        },
-    )
+    context = {
+        "clubs": clubs_list,
+        "filter": club_info_filter,
+        "filters_applied": filters_applied,
+        "locations": locations_list,
+    }
+
+    # If htmx request, return only the club info partial template
+    print(request.headers)
+    if request.headers.get("HX-Request") == "true":
+        return render(
+            request, "clubs/partials/club_info_section.html", context
+        )
+
+    return render(request, "clubs/clubs.html", context)
 
 
 @club_admin_required
