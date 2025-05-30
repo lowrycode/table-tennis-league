@@ -4,13 +4,54 @@
 {% block content %}
   <h1 class="visually-hidden">Clubs Page</h1>
   <!-- Club Info Section -->
-  <section id="club-info" class="w-100 mt-4 px-2">
+  <section id="venue-locations" class="w-100 pt-5 px-2">
+    <div class="container-lg">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-9 mb-4">
+          <h2 class="text-center mb-4">Find a Club</h2>
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const locations = {{ locations|safe }};
+
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 8, // initial zoom setting is adjusted later
+        center: { lat: 0, lng: 0 }, // temporary center is adjusted later
+        mapTypeControl: false,  // disable Map and Satellite buttons
+      });
+
+      const bounds = new google.maps.LatLngBounds();
+
+      locations.forEach(location => {
+        const position = { lat: location.lat, lng: location.lng };
+        new google.maps.Marker({
+          position: position,
+          map: map,
+          title: `${location.name} (${location.clubs.join(', ')})`,
+        });
+
+        bounds.extend(position); // Add marker to bounds
+      });
+
+      map.fitBounds(bounds); // Auto-center & zoom to fit all markers
+    }
+  </script>
+
+    
+
+  <!-- Club Info Section -->
+  <section id="club-info" class="w-100 my-4 px-2">
     <div class="container-lg">
       <div class="row justify-content-center">
         <div class="col-12 col-lg-9 px-0">
           <div class="my-5">
             <div class="d-flex justify-content-between">
-              <h2 class="text-center flex-grow-1 m-0">Clubs</h2>
+              <h2 class="text-center flex-grow-1 m-0">Club Information</h2>
               <button
                 class="btn-toggle btn fs-4"
                 data-target="#filter-clubs"
@@ -54,6 +95,14 @@
       </div>
     </div>
   </section>
+{% endblock %}
 
+{% block scripts %}
+  <!-- Load Google Maps JavaScript API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqt6uiL3FscoFX4urPWQBeKkFv9ON6Pp4&loading=async&callback=initMap">  
+  </script>
+  
+  <!-- Script controlling toggle behaviour for clubs filter -->
   <script src="{% static 'js/toggle_btn.js' %}"></script>
 {% endblock %}

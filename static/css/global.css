@@ -380,6 +380,17 @@ footer a:hover {
 }
 
 /* CLUBS PAGE */
+#venue-locations {
+  background-color: var(--primary-5);
+}
+
+#map {
+  width: 100%;
+  height: 300px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--light-4);
+}
+
 .club {
   background-color: var(--light-1);
 }
