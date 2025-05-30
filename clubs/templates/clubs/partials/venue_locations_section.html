@@ -1,0 +1,14 @@
+<section id="venue-locations" class="w-100 py-5 px-2">
+  <div class="container-lg">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-9">
+        <h2 class="text-center mb-4">Find a Club</h2>
+        <div id="map" class="d-flex justify-contents-center align-items-center">
+          {% if not locations %}
+            <p class="flex-grow-1 text-center p-3">No locations to display.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
