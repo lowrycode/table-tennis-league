@@ -10,13 +10,30 @@ function initMap() {
   });
 
   const bounds = new google.maps.LatLngBounds();
+  const infoWindow = new google.maps.InfoWindow();
 
   locations.forEach((location) => {
     const position = { lat: location.lat, lng: location.lng };
-    new google.maps.marker.AdvancedMarkerElement({
+    const marker = new google.maps.marker.AdvancedMarkerElement({
       position: position,
       map: map,
       title: `${location.name} (${location.clubs.join(", ")})`,
+    });
+
+    marker.addListener("gmp-click", () => {
+      const content = `
+        <h6 class="fs-6 mb-2">${location.name}</h6>
+        <ul class="lh-lg mb-0 ps-3">
+          ${location.clubs
+            .map(
+              (club) =>
+                `<li><a href="#club-article-${club.id}" aria-label="Jump to club information">${club.name}</a></li>`
+            )
+            .join("")}
+        </ul>`;
+      infoWindow.setContent(content);
+      infoWindow.setPosition(position);
+      infoWindow.open(map);
     });
 
     bounds.extend(position); // Add marker to bounds

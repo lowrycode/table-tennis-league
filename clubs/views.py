@@ -61,6 +61,7 @@ def build_club_context_for_admin(club):
 
     # Build club_dict
     club_dict = {
+        "id": club.id,
         "name": club.name,
         "has_pending_info": False,
         "info": {},
@@ -111,7 +112,10 @@ def build_locations_context(approved_venue_infos_qs):
 
         # Add dictionary to locations list
         seen_venues.add(venue_id)
-        clubs = [cv.club.name for cv in vi.venue.venue_clubs.all()]
+        clubs = [
+            {"id": cv.club.id, "name": cv.club.name}
+            for cv in vi.venue.venue_clubs.all()
+        ]
         locations.append(
             {
                 "name": vi.venue.name,
@@ -188,6 +192,7 @@ def clubs(request):
     for club in all_clubs:
         # Build club_dict
         club_dict = {
+            "id": club.id,
             "name": club.name,
             "info": {},
             "venues": [],

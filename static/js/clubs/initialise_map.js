@@ -14,7 +14,7 @@ function initMap() {
 
   locations.forEach((location) => {
     const position = { lat: location.lat, lng: location.lng };
-    marker = new google.maps.marker.AdvancedMarkerElement({
+    const marker = new google.maps.marker.AdvancedMarkerElement({
       position: position,
       map: map,
       title: `${location.name} (${location.clubs.join(", ")})`,
@@ -24,7 +24,12 @@ function initMap() {
       const content = `
         <h6 class="fs-6 mb-2">${location.name}</h6>
         <ul class="lh-lg mb-0 ps-3">
-          ${location.clubs.map((club) => `<li>${club}</li>`).join("")}
+          ${location.clubs
+            .map(
+              (club) =>
+                `<li><a href="#club-article-${club.id}" aria-label="Jump to club information">${club.name}</a></li>`
+            )
+            .join("")}
         </ul>`;
       infoWindow.setContent(content);
       infoWindow.setPosition(position);
