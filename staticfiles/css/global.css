@@ -381,7 +381,7 @@ footer a:hover {
 
 /* CLUBS PAGE */
 #venue-locations {
-  background-color: var(--primary-5);
+  background-color: var(--light-1);
 }
 
 #map {
@@ -390,6 +390,10 @@ footer a:hover {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--light-4);
   background-color: var(--light-2);
+}
+
+#club-info {
+  background-color: var(--primary-5);
 }
 
 .club {
