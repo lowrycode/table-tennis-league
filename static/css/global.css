@@ -431,6 +431,12 @@ footer a:hover {
 }
 
 /* Media Queries */
+@media (min-width: 520px) {
+  .carousel-item {
+    padding: 0 5rem;
+  }
+}
+
 @media (min-width: 900px) {
   #hero-overlay {
     top: 10%;
