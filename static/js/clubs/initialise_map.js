@@ -17,13 +17,15 @@ function initMap() {
     const marker = new google.maps.marker.AdvancedMarkerElement({
       position: position,
       map: map,
-      title: `${location.name} (${location.clubs.join(", ")})`,
+      title: `${location.name} (click for details)`,
     });
 
     marker.addListener("gmp-click", () => {
       const content = `
-        <h6 class="fs-6 mb-2">${location.name}</h6>
-        <ul class="lh-lg mb-0 ps-3">
+        <h6 class="fs-6 mb-2 px-2">${location.name}</h6>
+        <p class="mb-2 fst-italic fw-semibold px-2">${location.address}</p>
+        <p class="mb-0 px-2">Clubs that use this venue:</p>
+        <ul class="lh-lg mb-0 ps-4 pe-2">
           ${location.clubs
             .map(
               (club) =>

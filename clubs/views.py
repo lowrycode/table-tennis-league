@@ -119,6 +119,7 @@ def build_locations_context(approved_venue_infos_qs):
         locations.append(
             {
                 "name": vi.venue.name,
+                "address": f"{vi.street_address}, {vi.city}, {vi.postcode}",
                 "lat": vi.latitude,
                 "lng": vi.longitude,
                 "clubs": clubs,
