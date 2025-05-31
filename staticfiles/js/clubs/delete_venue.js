@@ -14,7 +14,7 @@
 */
 document.addEventListener("DOMContentLoaded", function () {
   const deleteAllRadio = document.getElementById("delete-venue-and-info");
-  const deleteUnapprovedRadio = document.getElementById("delete_unapproved_info");
+  const deleteUnapprovedRadio = document.getElementById("delete-unapproved-info");
   const warning = document.getElementById("delete-venue-warning");
   const checkbox = document.getElementById("confirm-venue-delete");
   const button = document.getElementById("btn-delete-venue");

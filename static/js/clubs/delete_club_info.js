@@ -13,8 +13,8 @@
     - Enables the delete button regardless of checkbox state.
 */
 document.addEventListener("DOMContentLoaded", function () {
-  const deleteAllRadio = document.getElementById("delete_all");
-  const deleteUnapprovedRadio = document.getElementById("delete_unapproved");
+  const deleteAllRadio = document.getElementById("delete-all");
+  const deleteUnapprovedRadio = document.getElementById("delete-unapproved");
   const warning = document.getElementById("delete-approved-club-info-warning");
   const checkbox = document.getElementById("confirm-club-info-delete");
   const button = document.getElementById("btn-delete-club-info");
