@@ -743,6 +743,221 @@ class ClubsPageFilterTests(TestCase):
         response = self.client.get(self.url, {"beginners": "true"})
         self.assertNotContains(response, club_no_info.name)
 
+    def test_non_htmx_get_request_loads_whole_page(self):
+        """
+        Verify that a normal get request loads full clubs page.
+        """
+        # Simulate an HTMX request filtering by 'beginners'
+        response = self.client.get(self.url)
+
+        # Response should include both club_info section and
+        # venue_locations section
+        self.assertContains(response, 'id="club-info"')
+        self.assertContains(response, 'id="venue-locations"')
+
+    def test_htmx_filter_updates_only_club_info_section(self):
+        """
+        Verify that when the clubs filter is applied via HTMX, only the
+        club_info section is updated, while the venue-locations section (map)
+        remains unchanged.
+        """
+        # Simulate an HTMX request filtering by 'beginners'
+        response = self.client.get(
+            self.url,
+            {"beginners": "true"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        # Response should include club_info section but not
+        # venue_locations section
+        self.assertContains(response, 'id="club-info"')
+        self.assertNotContains(response, 'id="venue-locations"')
+
+
+class ClubsPageLocationsTests(TestCase):
+    def setUp(self):
+        """Create clubs, venues and locations data for the tests."""
+        # Create Club objects
+        self.club_1 = Club.objects.create(name="York Club")
+        self.club_2 = Club.objects.create(name="Durham Club")
+        self.club_3 = Club.objects.create(name="Newcastle Club")
+
+        # Base ClubInfo data
+        self.base_club_info_data = {
+            "club": None,
+            "image": "",
+            "website": "https://www.example.com",
+            "contact_name": "Joe Bloggs",
+            "contact_email": "example@example.com",
+            "contact_phone": "01234556778",
+            "description": "This club is the best!",
+            "session_info": "We do every night of the week.",
+            "approved": True,
+        }
+
+        # Create ClubInfo objects
+        self.club_info_data_1 = self.base_club_info_data.copy()
+        self.club_info_data_1["club"] = self.club_1
+        self.club_info_data_1["contact_name"] = "Club 1 contact"
+        self.club_info_data_1["description"] = "Club 1 is approved"
+        self.club_info_1 = ClubInfo.objects.create(**self.club_info_data_1)
+
+        self.club_info_data_2 = self.base_club_info_data.copy()
+        self.club_info_data_2["club"] = self.club_2
+        self.club_info_data_2["contact_name"] = "Club 2 contact"
+        self.club_info_data_2["description"] = "Club 2 is NOT approved"
+        self.club_info_data_2["approved"] = False
+        self.club_info_2 = ClubInfo.objects.create(**self.club_info_data_2)
+
+        self.club_info_data_3 = self.base_club_info_data.copy()
+        self.club_info_data_3["club"] = self.club_3
+        self.club_info_data_3["contact_name"] = "Club 3 contact"
+        self.club_info_data_3["description"] = "Club 3 is approved"
+        self.club_info_3 = ClubInfo.objects.create(**self.club_info_data_3)
+
+        # Create Venue objects
+        self.venue_1 = Venue.objects.create(name="York Venue 1")
+        self.venue_2 = Venue.objects.create(name="Durham Venue 1")
+        self.venue_3 = Venue.objects.create(name="Newcastle Venue 1")
+
+        # Base VenueInfo data
+        self.base_venue_info_data = {
+            "venue": None,
+            "street_address": "1 Main Street",
+            "address_line_2": "",
+            "city": "York",
+            "county": "Yorkshire",
+            "postcode": "YO1 1HA",
+            "num_tables": 5,
+            "parking_info": "There is a free carpark at the venue",
+            "meets_league_standards": True,
+            "approved": True,
+        }
+
+        # Create VenueInfo objects
+        self.venue_info_data_1 = self.base_venue_info_data.copy()
+        self.venue_info_data_1["venue"] = self.venue_1
+        self.venue_info_1 = VenueInfo.objects.create(**self.venue_info_data_1)
+
+        self.venue_info_data_2 = self.base_venue_info_data.copy()
+        self.venue_info_data_2["venue"] = self.venue_2
+        self.venue_info_data_2["city"] = "Durham"
+        self.venue_info_data_2["county"] = "County Durham"
+        self.venue_info_data_2["postcode"] = "DH1 3SE"
+        self.venue_info_2 = VenueInfo.objects.create(**self.venue_info_data_2)
+
+        self.venue_info_data_3 = self.base_venue_info_data.copy()
+        self.venue_info_data_3["venue"] = self.venue_3
+        self.venue_info_data_3["city"] = "Newcastle"
+        self.venue_info_data_3["county"] = "Tyne and Wear"
+        self.venue_info_data_3["postcode"] = "NE1 7RU"
+        self.venue_info_3 = VenueInfo.objects.create(**self.venue_info_data_3)
+
+        # Create ClubVenue objects
+        self.club_venue_1 = ClubVenue.objects.create(
+            club=self.club_1, venue=self.venue_1
+        )
+        self.club_venue_2 = ClubVenue.objects.create(
+            club=self.club_2, venue=self.venue_2
+        )
+        self.club_venue_3 = ClubVenue.objects.create(
+            club=self.club_3, venue=self.venue_3
+        )
+
+        self.url = reverse("clubs")
+
+    def test_locations_is_in_context(self):
+        """
+        Verify 'locations' is in the template context.
+        """
+        response = self.client.get(self.url)
+        self.assertIn("locations", response.context)
+        self.assertIsInstance(response.context["locations"], list)
+
+    def test_locations_has_correct_structure(self):
+        """
+        Verify 'locations' has the correct data structure.
+        """
+        response = self.client.get(self.url)
+        locations = response.context["locations"]
+
+        for location in locations:
+            self.assertIn("name", location)
+            self.assertIn("address", location)
+            self.assertIn("lat", location)
+            self.assertIn("lng", location)
+            self.assertIn("clubs", location)
+
+    def test_locations_only_includes_venues_for_approved_clubs(self):
+        """
+        Verify 'locations' only includes venues for approved clubs.
+        """
+        response = self.client.get(self.url)
+        locations = response.context["locations"]
+
+        # Extract names from the locations data
+        location_names = [loc["name"] for loc in locations]
+        self.assertIn(self.venue_1.name, location_names)
+        self.assertIn(self.venue_3.name, location_names)
+        self.assertNotIn(
+            self.venue_2.name, location_names
+        )  # Club 2 is unapproved
+        self.assertEqual(len(location_names), 2)
+
+    def test_locations_only_includes_approved_venue_info(self):
+        """
+        Verify 'locations' only includes venues which have approved venue info.
+        """
+        # Unapprove venue 3
+        self.venue_info_3.approved = False
+        self.venue_info_3.save()
+
+        response = self.client.get(self.url)
+        locations = response.context["locations"]
+
+        # Extract names from the locations data
+        location_names = [loc["name"] for loc in locations]
+        self.assertEqual(len(location_names), 1)
+
+        # Club 1 has approved club info and approved venue info
+        self.assertIn(self.venue_1.name, location_names)
+
+        # Club 3 has approved club info but not venue info
+        self.assertNotIn(self.venue_3.name, location_names)
+
+        # Club 2 does not have approved club info
+        self.assertNotIn(self.venue_2.name, location_names)
+
+    def test_map_initialises_when_locations_exist(self):
+        """
+        When 'locations' includes location data
+        - the placeholder text 'No locations to display.' should not show.
+        - the script for initialising the map should show.
+        """
+        response = self.client.get(self.url)
+        locations = response.context["locations"]
+
+        self.assertGreater(len(locations), 0)
+        self.assertNotContains(response, "No locations to display.")
+        self.assertContains(response, "initialise_map.js")
+
+    def test_map_when_locations_empty(self):
+        """
+        When 'locations' is empty
+        - the placeholder text 'No locations to display.' should show.
+        - the script for initialising the map should not show.
+        """
+        self.venue_info_1.delete()
+        self.venue_info_2.delete()
+        self.venue_info_3.delete()
+
+        response = self.client.get(self.url)
+        locations = response.context["locations"]
+
+        self.assertEqual(len(locations), 0)
+        self.assertContains(response, "No locations to display.")
+        self.assertNotContains(response, "initialise_map.js")
+
 
 class ClubAdminDashboardTests(TestCase):
     """
