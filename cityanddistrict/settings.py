@@ -53,9 +53,13 @@ LOGOUT_REDIRECT_URL = "/"
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 
-# Add cloudinary config to ensure HTTPS
+# Seems more reliable than using CLOUDINARY_URL environment variable
+# which broke certain django tests
 cloudinary.config(
-    secure=True
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+    secure=True  # Ensures HTTPS is used
 )
 
 AUTHENTICATION_BACKENDS = [
