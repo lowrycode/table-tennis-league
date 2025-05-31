@@ -92,7 +92,28 @@ def build_club_context_for_admin(club):
     return club_dict
 
 
-def build_locations_context(approved_venue_infos_qs):
+def build_locations_context(approved_venue_infos_qs, approved_club_infos_qs):
+    """
+    Builds a list of location dictionaries for venues associated with clubs
+    that have at least one approved ClubInfo entry.
+
+    Each location dictionary contains venue details and a list of clubs linked
+    to that venue. This information is presented on the website when a user
+    clicks on a Google Map marker.
+
+    Args:
+        approved_venue_infos_qs (QuerySet): QuerySet of approved VenueInfo
+            objects ordered by most recent.
+        approved_club_infos_qs (QuerySet): QuerySet of approved ClubInfo
+            objects used to determine which clubs have approved info.
+
+    Returns:
+        list of dict: A list of location dictionaries.
+    """
+    approved_club_ids = set(
+        approved_club_infos_qs.values_list("club_id", flat=True)
+    )
+
     venue_infos = approved_venue_infos_qs.select_related(
         "venue"
     ).prefetch_related("venue__venue_clubs__club")
@@ -109,13 +130,20 @@ def build_locations_context(approved_venue_infos_qs):
         venue_id = vi.venue.id
         if venue_id in seen_venues:
             continue
-
-        # Add dictionary to locations list
         seen_venues.add(venue_id)
+
+        # Get clubs with approved club infos
         clubs = [
             {"id": cv.club.id, "name": cv.club.name}
             for cv in vi.venue.venue_clubs.all()
+            if cv.club.id in approved_club_ids
         ]
+
+        # Skip if no approved clubs
+        if not clubs:
+            continue
+
+        # Add dictionary to locations list
         locations.append(
             {
                 "name": vi.venue.name,
@@ -218,7 +246,9 @@ def clubs(request):
             clubs_list.append(club_dict)
 
     # Build locations_list for passing to template
-    locations_list = build_locations_context(approved_venue_infos_qs)
+    locations_list = build_locations_context(
+        approved_venue_infos_qs, approved_club_infos_qs
+    )
 
     # Deduce whether filters are applied by checking for get parameters
     filters_applied = len(request.GET) > 0
