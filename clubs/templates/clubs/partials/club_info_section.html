@@ -18,9 +18,9 @@
             id="filter-clubs"
             class="filter-box mt-2 p-3 d-none"
             method="get"
-            hx-get="{% url 'clubs' %}"
-            hx-target="#club-info"
-            hx-swap="outerHTML"
+            data-hx-get="{% url 'clubs' %}"
+            data-hx-target="#club-info"
+            data-hx-swap="outerHTML"
           >
             <div class="d-flex align-items-center flex-wrap row-gap-3 col-gap-4">
               <!-- Show textbox before label -->

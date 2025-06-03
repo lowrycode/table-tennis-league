@@ -102,11 +102,11 @@
                   </div>
                   <div class="flex-shrink-0 d-flex gap-1">
                     <button
-                      hx-post="{% url 'unassign_venue' venue.id %}"
-                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                      hx-confirm="Are you sure you want to unassign this venue?"
-                      hx-target="#club-info-management"
-                      hx-swap="outerHTML"
+                      data-hx-post="{% url 'unassign_venue' venue.id %}"
+                      data-hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                      data-hx-confirm="Are you sure you want to unassign this venue?"
+                      data-hx-target="#club-info-management"
+                      data-hx-swap="outerHTML"
                       class="btn"
                       aria-label="Unassign venue"
                       title="Unassign venue"
@@ -139,11 +139,11 @@
                   </div>
                   <div class="flex-shrink-0 d-flex gap-1">
                     <button
-                      hx-post="{% url 'unassign_venue' venue.id %}"
-                      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                      hx-confirm="Are you sure you want to unassign this venue?"
-                      hx-target="#club-info-management"
-                      hx-swap="outerHTML"
+                      data-hx-post="{% url 'unassign_venue' venue.id %}"
+                      data-hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                      data-hx-confirm="Are you sure you want to unassign this venue?"
+                      data-hx-target="#club-info-management"
+                      data-hx-swap="outerHTML"
                       class="btn"
                       aria-label="Unassign venue"
                       title="Unassign venue"
