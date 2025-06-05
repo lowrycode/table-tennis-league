@@ -82,6 +82,33 @@ class DivisionTests(TestCase):
         with self.assertRaises(IntegrityError):
             Division.objects.create(name="Division 1 South", rank=1)
 
+    def test_cannot_delete_if_linked_to_season(self):
+        """Verify division cannot be deleted if used in a season."""
+        division = Division.objects.create(name="Division 1", rank=1)
+
+        # Create season which links to this division
+        season_data = {
+            "name": "2024-25",
+            "short_name": "24-25",
+            "slug": "24-25",
+            "start_date": date(2024, 9, 1),
+            "end_date": date(2025, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2023, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2023, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+        season = Season.objects.create(**season_data)
+        season.divisions.set([division])
+        with self.assertRaisesMessage(
+            ValidationError,
+            (
+                "This division cannot be deleted because it is linked "
+                "to archived data."
+            ),
+        ):
+            division.delete()
+
 
 class SeasonTests(TestCase):
     """

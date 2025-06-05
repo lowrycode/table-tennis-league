@@ -12,6 +12,14 @@ class Division(models.Model):
     def __str__(self):
         return self.name
 
+    def delete(self, *args, **kwargs):
+        if self.seasons.exists():
+            raise ValidationError(
+                "This division cannot be deleted because it is linked "
+                "to archived data."
+            )
+        super().delete(*args, **kwargs)
+
 
 class Season(models.Model):
     name = models.CharField(max_length=100, unique=True)

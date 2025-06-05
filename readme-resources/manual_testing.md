@@ -61,6 +61,18 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Lattitude and Longitude fields are autopopulated from valid postcode if left blank |
 | ✓ | Invalid postcode does not autopoulate latitude and longitude fields but record is still saved without errors or crashes |
 
+### Division Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows Division model under League app |
+| ✓ | Divisions are listed with name and rank and ordered by rank (low to high) |
+| ✓ | Division model contains all expected fields |
+| ✓ | Fields are correctly assigned as whether they are required or not |
+| ✓ | Error message displayed when missing required fields |
+| ✓ | Error message displayed when non-unique value entered for either field |
+| ✓ | Invalid postcode does not autopoulate latitude and longitude fields but record is still saved without errors or crashes |
+
 ## Common Page Elements
 
 ### Navbar
