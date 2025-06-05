@@ -70,8 +70,26 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Division model contains all expected fields |
 | ✓ | Fields are correctly assigned as whether they are required or not |
 | ✓ | Error message displayed when missing required fields |
+| ✓ | Error message displayed when non-unique value entered for name, short_name and slug fields |
+| ✓ | Error message shows when start date is after end date |
+| ✓ | Error message shows when registration opens is after registration closes |
+| ✓ | Error message shows when registration closes is after start date |
+| ✓ | When 'is current' status is set to true for a season, all other seasons have 'is current' status set to false |
+
+### Season Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows Season model under League app |
+| ✓ | Seasons are listed with name and is_current status |
+| ✓ | Seasons are listed in order of season start_date (desc) |
+| ✓ | Season model contains all expected fields |
+| ✓ | Fields are correctly assigned as whether they are required or not |
+| ✓ | Error message displayed when missing required fields |
 | ✓ | Error message displayed when non-unique value entered for either field |
-| ✓ | Invalid postcode does not autopoulate latitude and longitude fields but record is still saved without errors or crashes |
+| ✓ | Delete button is missing from detail view if club is linked to season but shows for unlinked divisions |
+| ✓ | List view shows custom bulk action 'Delete unlinked divisions' |
+| ✓ | 'Delete unlinked divisions' action deletes unlinked divisions (with success message) but shows warning for linked divisions and does not delete these |
 
 ## Common Page Elements
 
