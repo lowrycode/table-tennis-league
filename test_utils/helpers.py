@@ -79,7 +79,7 @@ def helper_test_max_length(
         ValidationError: If the field value exceeds the defined max_length.
     """
     # Create object
-    test_object = model.objects.create(**info_data)
+    test_object = model(**info_data)
 
     # Check valid at threshold
     setattr(test_object, field_name, "a" * max_length)
