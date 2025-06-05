@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from .models import Division, Season
+from .models import Division, Season, Week
 
 
 @admin.register(Division)
@@ -71,3 +71,10 @@ class DivisionAdmin(admin.ModelAdmin):
 class SeasonAdmin(admin.ModelAdmin):
     list_display = ("name", "is_current")
     prepopulated_fields = {"slug": ("short_name",)}
+
+
+@admin.register(Week)
+class WeekAdmin(admin.ModelAdmin):
+    list_display = ("name", "start_date", "details", "season")
+    list_filter = ("name", "season")
+    ordering = ("-start_date",)

@@ -91,6 +91,17 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | List view shows custom bulk action 'Delete unlinked divisions' |
 | ✓ | 'Delete unlinked divisions' action deletes unlinked divisions (with success message) but shows warning for linked divisions and does not delete these |
 
+### Week Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows Week model under League app |
+| ✓ | Weeks are listed with name, start_date, details and season |
+| ✓ | Weeks are listed in order of start_date (desc in admin, asc in model) |
+| ✓ | Week model contains all expected fields |
+| ✓ | Unique constraint is enforced (season and name together) |
+| ✓ | Fields are correctly assigned as whether they are required or not and missing fields display error messages |
+
 ## Common Page Elements
 
 ### Navbar

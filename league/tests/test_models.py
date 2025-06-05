@@ -7,13 +7,13 @@ from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
 )
-from league.models import Division, Season
+from league.models import Division, Season, Week
 
 
 class DivisionTests(TestCase):
     """
     Unit tests for the Division model to verify field behavior, validation,
-    defaults, string representation and ordering.
+    string representation and ordering.
     """
 
     def test_can_create_division(self):
@@ -104,7 +104,7 @@ class DivisionTests(TestCase):
             ValidationError,
             (
                 "This division cannot be deleted because it is linked "
-                "to archived data."
+                "to season data."
             ),
         ):
             division.delete()
@@ -113,10 +113,13 @@ class DivisionTests(TestCase):
 class SeasonTests(TestCase):
     """
     Unit tests for the Season model to verify field behavior, validation,
-    defaults, string representation and ordering.
+    string representation and ordering.
     """
 
     def setUp(self):
+        """
+        Create divisions, seasons and related data ready for tests.
+        """
         self.division_1 = Division.objects.create(name="Division 1", rank=1)
         self.division_2 = Division.objects.create(name="Division 2", rank=2)
         self.data = {
@@ -304,3 +307,128 @@ class SeasonTests(TestCase):
         # Assert only new season is current
         self.assertFalse(self.season.is_current)
         self.assertTrue(new_season.is_current)
+
+
+class WeekTests(TestCase):
+    """
+    Unit tests for the Week model to verify field behavior, validation,
+    string representation and ordering.
+    """
+
+    def setUp(self):
+        """Create Division, Season and Week objects ready for tests"""
+        # Division needed for season
+        self.division = Division.objects.create(name="Division 1", rank=1)
+        self.data = {
+            "name": "2024-25",
+            "short_name": "24-25",
+            "slug": "24-25",
+            "start_date": date(2024, 9, 1),
+            "end_date": date(2025, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2023, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2023, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+
+        # Season needed for week
+        self.season = Season.objects.create(**self.data)
+        self.season.divisions.set([self.division])
+        self.season.save()
+
+        # Create week
+        self.week_data = {
+            "season": self.season,
+            "name": "Week 1",
+            "details": "",
+            "start_date": date(2024, 9, 1),
+        }
+        self.week = Week.objects.create(**self.week_data)
+
+    def test_can_create_week(self):
+        """Verify week can be saved and retrieved correctly."""
+        # Should pass without errors
+        self.week.full_clean()
+        self.week.save()
+        self.assertTrue(Week.objects.filter(id=self.week.id).exists())
+
+    def test_string_representation(self):
+        """Verify string representation returns the week name."""
+        self.assertEqual(str(self.week), self.week.name)
+
+    def test_weeks_are_ordered_by_start_date_asc(self):
+        """
+        Verify weeks are ordered by start_date starting with earliest.
+        """
+        self.week.delete()
+        now = timezone.now().date()
+
+        week1_data = self.week_data.copy()
+        week1_data["name"] = "A"
+        week1_data["start_date"] = now + timezone.timedelta(weeks=1)
+        week1 = Week.objects.create(**week1_data)
+
+        week3_data = self.week_data.copy()
+        week3_data["name"] = "B"
+        week3_data["start_date"] = now + timezone.timedelta(weeks=3)
+        week3 = Week.objects.create(**week3_data)
+
+        week2_data = self.week_data.copy()
+        week2_data["name"] = "C"
+        week2_data["start_date"] = now + timezone.timedelta(weeks=2)
+        week2 = Week.objects.create(**week2_data)
+
+        weeks = list(Week.objects.all())
+        self.assertEqual(weeks[0].name, week1.name)
+        self.assertEqual(weeks[1].name, week2.name)
+        self.assertEqual(weeks[2].name, week3.name)
+
+    # Multi-field tests
+    def test_required_fields(self):
+        """
+        Verify that both fields are required using helper function.
+        """
+        required_fields = {
+            "season": True,
+            "name": True,
+            "details": False,
+            "start_date": True,
+        }
+
+        test_object = Week()
+
+        # Check each field
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    def test_max_lengths(self):
+        """
+        Verify fields with max length constraints are properly enforced
+        using helper function.
+        """
+        fields = {
+            "name": 50,
+            "details": 100,
+        }
+
+        # Check each field
+        valid_data = self.week_data
+        for field, max_length in fields.items():
+            helper_test_max_length(self, Week, valid_data, field, max_length)
+
+    # Field constraints
+    # def test_cannot_delete_if_linked_to_fixture(self):
+    #     """Verify week cannot be deleted if linked to a fixture."""
+    #     # Create fixture which links to this week
+    #     fixture_data = {
+    #         "something": "ADD THIS WHEN FIXTURE CREATED!!"
+    #     }
+    #     fixture = Fixture.objects.create(**fixture_data)
+    #     with self.assertRaisesMessage(
+    #         ValidationError,
+    #         (
+    #             "This week cannot be deleted because it is linked "
+    #             "to league data."
+    #         ),
+    #     ):
+    #         self.week.delete()

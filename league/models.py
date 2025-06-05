@@ -16,7 +16,7 @@ class Division(models.Model):
         if self.seasons.exists():
             raise ValidationError(
                 "This division cannot be deleted because it is linked "
-                "to archived data."
+                "to season data."
             )
         super().delete(*args, **kwargs)
 
@@ -95,3 +95,31 @@ class Season(models.Model):
                 is_current=False
             )
         super().save(*args, **kwargs)
+
+
+class Week(models.Model):
+    season = models.ForeignKey(
+        Season, on_delete=models.CASCADE, related_name="season_weeks"
+    )
+    name = models.CharField(max_length=50)
+    details = models.CharField(max_length=100, null=True, blank=True)
+    start_date = models.DateField()
+
+    class Meta:
+        ordering = ["start_date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["season", "name"], name="unique_season_and_name"
+            )
+        ]
+
+    def __str__(self):
+        return self.name
+
+    # def delete(self, *args, **kwargs):
+    #     if self.week_fixtures.exists():
+    #         raise ValidationError(
+    #             "This division cannot be deleted because it is linked "
+    #             "to season data."
+    #         )
+    #     super().delete(*args, **kwargs)
