@@ -148,7 +148,7 @@ class Player(models.Model):
     )
 
     class Meta:
-        ordering = ["surname"]
+        ordering = ["surname", "forename"]
         constraints = [
             models.UniqueConstraint(
                 fields=["forename", "surname", "date_of_birth"],
@@ -175,7 +175,7 @@ class Player(models.Model):
     # def delete(self, *args, **kwargs):
     #     if self.player_seasons.exists():
     #         raise ValidationError(
-    #             "This player cannot be deleted because it is linked "
+    #             "This player cannot be deleted because they are linked "
     #             "to season data."
     #         )
     #     super().delete(*args, **kwargs)
