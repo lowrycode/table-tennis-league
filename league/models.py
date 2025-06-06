@@ -157,7 +157,10 @@ class Player(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.surname}, {self.forename}"
+        return (
+            f"{self.surname}, {self.forename} "
+            f"({self.date_of_birth.strftime('%d %b %Y')})"
+        )
 
     @property
     def full_name(self):

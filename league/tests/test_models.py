@@ -481,7 +481,7 @@ class PlayerTests(TestCase):
         Verify string representation returns 'Surname, Forename' with
         title case.
         """
-        self.assertEqual(str(self.player), "Doe, John")
+        self.assertEqual(str(self.player), "Doe, John (01 Jan 1990)")
 
     def test_full_name_property(self):
         """
