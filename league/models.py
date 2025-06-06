@@ -172,10 +172,57 @@ class Player(models.Model):
         self.surname = self.surname.title()
         super().save(*args, **kwargs)
 
-    # def delete(self, *args, **kwargs):
-    #     if self.player_seasons.exists():
-    #         raise ValidationError(
-    #             "This player cannot be deleted because they are linked "
-    #             "to season data."
-    #         )
-    #     super().delete(*args, **kwargs)
+
+class SeasonPlayer(models.Model):
+    player = models.ForeignKey(
+        Player,
+        on_delete=models.PROTECT,
+        related_name="player_seasons",
+    )
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.PROTECT,
+        related_name="season_players",
+    )
+    club = models.ForeignKey(
+        Club,
+        on_delete=models.PROTECT,
+        related_name="club_season_players",
+    )
+    paid_fees = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "Season players"
+        ordering = ["player__surname", "player__forename"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["player", "season"],
+                name="unique_player_and_season",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.season.short_name} - {self.player.full_name} - {self.club}"
+        )
+
+    def clean(self):
+        """
+        Ensures the player has a confirmed club association
+        and that it matches the club on this SeasonPlayer record.
+        """
+        super().clean()
+
+        # Ensure the player has confirmed club status
+        if self.player.club_status != "confirmed":
+            raise ValidationError(
+                "Club Admin must confirm that the player is associated "
+                "with their club before proceeding."
+            )
+
+        # Ensure the player's club matches the SeasonPlayer's club
+        if self.player.current_club != self.club:
+            raise ValidationError(
+                "The player's profile states that they are not associated "
+                "with this club."
+            )

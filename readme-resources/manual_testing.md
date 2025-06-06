@@ -113,6 +113,21 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Unique constraint is enforced (surname, forename and DOB together) |
 | ✓ | Fields are correctly assigned as whether they are required or not and missing fields display error messages |
 | ✓ | Default club_status is 'pending' |
+| ✓ | Deletion restricted if player is linked to a PlayerSeason record |
+
+### SeasonPlayer Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows SeasonPlayer model under League app |
+| ✓ | SeasonPlayers are listed with season, player, and club |
+| ✓ | SeasonPlayers are listed in order of season (most recent first) then player (asc) |
+| ✓ | SeasonPlayer model contains all expected fields |
+| ✓ | Unique constraint is enforced (player and season together) |
+| ✓ | Cannot add record if club on player profile does not have 'confirmed' status and related error message shows |
+| ✓ | Cannot add record if club on player profile does not match club stated in the form and related error message shows |
+| ✓ | All fields are required and missing fields display error messages |
+| ✓ | Default paid_fees is False |
 
 ## Common Page Elements
 

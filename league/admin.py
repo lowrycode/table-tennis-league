@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from .models import Division, Season, Week, Player
+from .models import Division, Season, Week, Player, SeasonPlayer
 
 
 @admin.register(Division)
@@ -91,3 +91,10 @@ class PlayerAdmin(admin.ModelAdmin):
     )
     list_filter = ("current_club", "club_status")
     ordering = ("surname", "forename")
+
+
+@admin.register(SeasonPlayer)
+class SeasonPlayerAdmin(admin.ModelAdmin):
+    list_display = ("season", "player", "club", "paid_fees")
+    list_filter = ("paid_fees", "season", "club")
+    ordering = ("season", "player")

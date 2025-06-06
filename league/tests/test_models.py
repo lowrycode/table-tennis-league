@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from django.db import IntegrityError
+from django.db.models.deletion import ProtectedError
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
@@ -7,7 +8,7 @@ from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
 )
-from league.models import Division, Season, Week, Player
+from league.models import Division, Season, Week, Player, SeasonPlayer
 from clubs.models import Club
 
 
@@ -562,25 +563,218 @@ class PlayerTests(TestCase):
         player = Player.objects.create(**data)
         self.assertTrue(Player.objects.filter(id=player.id).exists())
 
-    # def test_cannot_delete_if_linked_to_player_seasons(self):
-    #     """Verify player cannot be deleted if linked to player_seasons."""
+    def test_cannot_delete_if_linked_to_player_seasons(self):
+        """Verify player cannot be deleted if linked to player_seasons."""
 
-    #     # WRITE THIS
+        # Create Season and SeasonPlayer
+        division = Division.objects.create(name="Division 1", rank=1)
+        season_data = {
+            "name": "2024/25",
+            "short_name": "24-25",
+            "slug": "24-25",
+            "start_date": date(2024, 9, 1),
+            "end_date": date(2025, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2023, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2023, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+        season = Season.objects.create(**season_data)
+        season.divisions.set([division])
+        season.save()
+        SeasonPlayer.objects.create(
+            player=self.player,
+            season=season,
+            club=self.player.current_club,
+            paid_fees=True,
+        )
 
-    #     with self.assertRaisesMessage(
-    #         ValidationError,
-    #         (
-    #             "This player cannot be deleted because it is linked "
-    #             "to season data."
-    #         ),
-    #     ):
-    #         self.player.delete()
+        # Test deletion
+        with self.assertRaises(ProtectedError):
+            self.player.delete()
 
-    # def test_can_delete_player_if_not_linked(self):
-    #     """Verify player can be deleted if not linked to any player_seasons."""
-    #     try:
-    #         self.player.delete()
-    #     except ValidationError:
-    #         self.fail("Player deletion raised ValidationError unexpectedly.")
+    def test_can_delete_player_if_not_linked(self):
+        """Verify player can be deleted if not linked to any player_seasons."""
+        self.player.delete()
+        self.assertFalse(Player.objects.filter(id=self.player.id).exists())
 
-    #     self.assertFalse(Player.objects.filter(id=self.player.id).exists())
+
+class SeasonPlayerTests(TestCase):
+    """
+    Unit tests for the SeasonPlayer model to verify field behavior,
+    validation logic, string representation, ordering and uniqueness
+    constraints.
+    """
+
+    def setUp(self):
+        # Create clubs
+        self.club1 = Club.objects.create(name="Test Club 1")
+        self.club2 = Club.objects.create(name="Test Club 2")
+
+        # Create a player with confirmed club_status and club1 as current_club
+        self.player = Player.objects.create(
+            forename="Jane",
+            surname="Smith",
+            date_of_birth=date(1990, 1, 1),
+            current_club=self.club1,
+            club_status="confirmed",
+        )
+
+        # Create another player with pending club_status
+        self.player_pending = Player.objects.create(
+            forename="John",
+            surname="Doe",
+            date_of_birth=date(1991, 2, 2),
+            current_club=self.club1,
+            club_status="pending",
+        )
+
+        # Division needed for season
+        self.division = Division.objects.create(name="Division 1", rank=1)
+
+        # Season data
+        self.season_data_1 = {
+            "name": "2024/25",
+            "short_name": "24-25",
+            "slug": "24-25",
+            "start_date": date(2024, 9, 1),
+            "end_date": date(2025, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2023, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2023, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+        self.season_data_2 = {
+            "name": "2025/26",
+            "short_name": "25-26",
+            "slug": "25-26",
+            "start_date": date(2025, 9, 1),
+            "end_date": date(2026, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2024, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2024, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+
+        # Create seasons
+        self.season1 = Season.objects.create(**self.season_data_1)
+        self.season1.divisions.set([self.division])
+        self.season1.save()
+        self.season2 = Season.objects.create(**self.season_data_2)
+        self.season2.divisions.set([self.division])
+        self.season2.save()
+
+    def test_can_create_valid_season_player(self):
+        """Verify SeasonPlayer can be saved with valid data."""
+        sp = SeasonPlayer(
+            player=self.player,
+            season=self.season1,
+            club=self.club1,
+            paid_fees=True,
+        )
+        sp.full_clean()  # Should not raise error
+        sp.save()
+        self.assertTrue(SeasonPlayer.objects.filter(id=sp.id).exists())
+
+    def test_string_representation(self):
+        sp = SeasonPlayer.objects.create(
+            player=self.player,
+            season=self.season1,
+            club=self.club1,
+        )
+        expected_str = (
+            f"{self.season1.short_name} - {self.player.full_name} "
+            f"- {self.club1.name}"
+        )
+        self.assertEqual(str(sp), expected_str)
+
+    def test_ordering_by_player_surname_then_forename(self):
+        # Create players in no particular order
+        player_b = Player.objects.create(
+            forename="Bob",
+            surname="Anderson",
+            date_of_birth=date(1992, 3, 3),
+            current_club=self.club1,
+            club_status="confirmed",
+        )
+        player_c = Player.objects.create(
+            forename="Alice",
+            surname="Smith",
+            date_of_birth=date(1993, 4, 4),
+            current_club=self.club1,
+            club_status="confirmed",
+        )
+        # Create SeasonPlayers
+        sp_a = SeasonPlayer.objects.create(
+            player=self.player, season=self.season1, club=self.club1
+        )
+        sp_b = SeasonPlayer.objects.create(
+            player=player_b, season=self.season1, club=self.club1
+        )
+        sp_c = SeasonPlayer.objects.create(
+            player=player_c, season=self.season1, club=self.club1
+        )
+
+        players_ordered = list(SeasonPlayer.objects.all())
+
+        self.assertEqual(players_ordered[0], sp_b)
+        self.assertEqual(players_ordered[1], sp_c)
+        self.assertEqual(players_ordered[2], sp_a)
+
+    def test_unique_player_and_season_constraint(self):
+        """Verify that the same player and season cannot be duplicated."""
+        SeasonPlayer.objects.create(
+            player=self.player, season=self.season1, club=self.club1
+        )
+
+        with self.assertRaises(IntegrityError):
+            SeasonPlayer.objects.create(
+                player=self.player, season=self.season1, club=self.club1
+            )
+
+    def test_clean_raises_if_club_status_not_confirmed(self):
+        """
+        clean() should raise ValidationError if player's club_status is
+        not confirmed.
+        """
+        sp = SeasonPlayer(
+            player=self.player_pending, season=self.season1, club=self.club1
+        )
+        with self.assertRaisesMessage(
+            ValidationError,
+            (
+                "Club Admin must confirm that the player is associated with "
+                "their club before proceeding."
+            ),
+        ):
+            sp.full_clean()
+
+    def test_clean_raises_if_clubs_do_not_match(self):
+        """
+        clean() should raise ValidationError if player's current_club
+        doesn't match SeasonPlayer club.
+        """
+        sp = SeasonPlayer(
+            player=self.player, season=self.season1, club=self.club2
+        )
+        with self.assertRaisesMessage(
+            ValidationError,
+            (
+                "The player's profile states that they are not associated "
+                "with this club."
+            ),
+        ):
+            sp.full_clean()
+
+    def test_clean_passes_if_club_status_confirmed_and_clubs_match(self):
+        """
+        clean() should pass without errors if club_status is confirmed and
+        clubs match.
+        """
+        sp = SeasonPlayer(
+            player=self.player, season=self.season1, club=self.club1
+        )
+        try:
+            sp.full_clean()
+        except ValidationError:
+            self.fail("clean() raised ValidationError unexpectedly.")
