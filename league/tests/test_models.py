@@ -7,7 +7,8 @@ from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
 )
-from league.models import Division, Season, Week
+from league.models import Division, Season, Week, Player
+from clubs.models import Club
 
 
 class DivisionTests(TestCase):
@@ -64,9 +65,10 @@ class DivisionTests(TestCase):
 
         # Check each field
         valid_data = {"name": "Division 1", "rank": 1}
+        test_model = Division
         for field, max_length in fields.items():
             helper_test_max_length(
-                self, Division, valid_data, field, max_length
+                self, test_model, valid_data, field, max_length
             )
 
     # Field constraints
@@ -194,8 +196,11 @@ class SeasonTests(TestCase):
 
         # Check each field
         valid_data = self.unsaved_data.copy()
+        test_model = Season
         for field, max_length in fields.items():
-            helper_test_max_length(self, Season, valid_data, field, max_length)
+            helper_test_max_length(
+                self, test_model, valid_data, field, max_length
+            )
 
     # Field constraints
     def test_name_must_be_unique(self):
@@ -412,9 +417,13 @@ class WeekTests(TestCase):
         }
 
         # Check each field
-        valid_data = self.week_data
+        self.week.delete()
+        valid_data = self.week_data.copy()
+        test_model = Week
         for field, max_length in fields.items():
-            helper_test_max_length(self, Week, valid_data, field, max_length)
+            helper_test_max_length(
+                self, test_model, valid_data, field, max_length
+            )
 
     # Field constraints
     # def test_cannot_delete_if_linked_to_fixture(self):
@@ -432,3 +441,146 @@ class WeekTests(TestCase):
     #         ),
     #     ):
     #         self.week.delete()
+
+
+class PlayerTests(TestCase):
+    """
+    Unit tests for the Player model to verify field behavior, validation,
+    string representation, ordering, uniqueness, and deletion constraints.
+    """
+
+    def setUp(self):
+        # Create a Club
+        self.club = Club.objects.create(name="Test Club")
+
+        # Base player data
+        self.player_data = {
+            "forename": "john",
+            "surname": "doe",
+            "date_of_birth": date(1990, 1, 1),
+            "current_club": self.club,
+            "club_status": "confirmed",
+        }
+
+        # Create Player
+        self.player = Player.objects.create(**self.player_data)
+
+    def test_can_create_player(self):
+        """Verify player can be saved and retrieved correctly."""
+        self.player.full_clean()
+        self.player.save()
+        self.assertTrue(Player.objects.filter(id=self.player.id).exists())
+
+    def test_name_fields_are_title_cased_on_save(self):
+        """Verify forename and surname are title cased on save."""
+        self.assertEqual(self.player.forename, "John")
+        self.assertEqual(self.player.surname, "Doe")
+
+    def test_string_representation(self):
+        """
+        Verify string representation returns 'Surname, Forename' with
+        title case.
+        """
+        self.assertEqual(str(self.player), "Doe, John")
+
+    def test_full_name_property(self):
+        """
+        Verify full_name property returns 'Forename Surname' with title case.
+        """
+        self.assertEqual(self.player.full_name, "John Doe")
+
+    def test_ordering_by_surname(self):
+        """Verify players are ordered by surname ascending."""
+        self.player.delete()
+        Player.objects.create(
+            forename="Alice", surname="Smith", date_of_birth=date(1991, 2, 2)
+        )
+        Player.objects.create(
+            forename="Bob", surname="Anderson", date_of_birth=date(1989, 3, 3)
+        )
+        Player.objects.create(
+            forename="Charlie", surname="Brown", date_of_birth=date(1992, 4, 4)
+        )
+
+        players = list(Player.objects.all())
+        surnames = [p.surname for p in players]
+        self.assertEqual(surnames, sorted(surnames))
+
+    # Multi-field tests
+    def test_required_fields(self):
+        """Verify required fields: forename, surname, date_of_birth."""
+        required_fields = {
+            "forename": True,
+            "surname": True,
+            "date_of_birth": True,
+        }
+
+        test_object = Player()
+
+        # Check each field
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    def test_max_lengths(self):
+        """Verify max length for forename and surname fields."""
+        fields = {
+            "forename": 50,
+            "surname": 50,
+        }
+
+        # Check each field
+        valid_data = self.player_data.copy()
+        test_model = Player
+        for field, max_length in fields.items():
+            helper_test_max_length(
+                self, test_model, valid_data, field, max_length
+            )
+
+    # Single-field tests
+    def test_club_status_choices_default(self):
+        """Verify club_status defaults to 'pending' if not provided and only allows valid choices."""
+        player = Player.objects.create(
+            forename="Test",
+            surname="Player",
+            date_of_birth=date(2000, 1, 1),
+            current_club=None,
+        )
+        self.assertEqual(player.club_status, "pending")
+
+    def test_unique_forename_surname_date_of_birth(self):
+        """Verify combination of forename, surname, and date_of_birth must be unique."""
+        with self.assertRaises(IntegrityError):
+            Player.objects.create(**self.player_data)
+
+    def test_can_create_players_with_same_name_but_different_dob(self):
+        """
+        Verify players with same forename and surname but different DOB
+        are allowed.
+        """
+        data = self.player_data.copy()
+        data["date_of_birth"] = date(1991, 1, 1)
+        player = Player.objects.create(**data)
+        self.assertTrue(Player.objects.filter(id=player.id).exists())
+
+    # def test_cannot_delete_if_linked_to_player_seasons(self):
+    #     """Verify player cannot be deleted if linked to player_seasons."""
+
+    #     # WRITE THIS
+
+    #     with self.assertRaisesMessage(
+    #         ValidationError,
+    #         (
+    #             "This player cannot be deleted because it is linked "
+    #             "to season data."
+    #         ),
+    #     ):
+    #         self.player.delete()
+
+    # def test_can_delete_player_if_not_linked(self):
+    #     """Verify player can be deleted if not linked to any player_seasons."""
+    #     try:
+    #         self.player.delete()
+    #     except ValidationError:
+    #         self.fail("Player deletion raised ValidationError unexpectedly.")
+
+    #     self.assertFalse(Player.objects.filter(id=self.player.id).exists())
