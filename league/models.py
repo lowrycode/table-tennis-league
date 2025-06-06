@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from clubs.models import Club
 
 
 class Division(models.Model):
@@ -120,6 +121,58 @@ class Week(models.Model):
     #     if self.week_fixtures.exists():
     #         raise ValidationError(
     #             "This division cannot be deleted because it is linked "
+    #             "to season data."
+    #         )
+    #     super().delete(*args, **kwargs)
+
+
+class Player(models.Model):
+    STATUS_CHOICES = [
+        ("confirmed", "Confirmed"),
+        ("pending", "Pending"),
+        ("rejected", "Rejected"),
+    ]
+
+    forename = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    current_club = models.ForeignKey(
+        Club,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="club_players",
+    )
+    club_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="pending"
+    )
+
+    class Meta:
+        ordering = ["surname"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["forename", "surname", "date_of_birth"],
+                name="unique_forename_surname_dob",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.surname}, {self.forename}"
+
+    @property
+    def full_name(self):
+        return f"{self.forename} {self.surname}"
+
+    def save(self, *args, **kwargs):
+        # Using title rather than capitalize so works on multi-word names
+        self.forename = self.forename.title()
+        self.surname = self.surname.title()
+        super().save(*args, **kwargs)
+
+    # def delete(self, *args, **kwargs):
+    #     if self.player_seasons.exists():
+    #         raise ValidationError(
+    #             "This player cannot be deleted because it is linked "
     #             "to season data."
     #         )
     #     super().delete(*args, **kwargs)
