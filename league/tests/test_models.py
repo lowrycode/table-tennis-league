@@ -8,7 +8,7 @@ from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
 )
-from league.models import Division, Season, Week, Player, SeasonPlayer, Team
+from league.models import Division, Season, Week, Player, TeamPlayer, Team
 from clubs.models import Club, Venue
 
 
@@ -597,11 +597,9 @@ class PlayerTests(TestCase):
         }
         team = Team.objects.create(**team_data)
         
-        # Create SeasonPlayer
-        SeasonPlayer.objects.create(
+        # Create TeamPlayer
+        TeamPlayer.objects.create(
             player=self.player,
-            season=season,
-            club=self.player.current_club,
             team=team,
             paid_fees=True,
         )
@@ -616,9 +614,9 @@ class PlayerTests(TestCase):
         self.assertFalse(Player.objects.filter(id=self.player.id).exists())
 
 
-class SeasonPlayerTests(TestCase):
+class TeamPlayerTests(TestCase):
     """
-    Unit tests for the SeasonPlayer model to verify field behavior,
+    Unit tests for the TeamPlayer model to verify field behavior,
     validation logic, string representation, ordering and uniqueness
     constraints.
     """
@@ -628,7 +626,7 @@ class SeasonPlayerTests(TestCase):
         self.club1 = Club.objects.create(name="Test Club 1")
         self.club2 = Club.objects.create(name="Test Club 2")
 
-        # Create a player with confirmed club_status and club1 as current_club
+        # Create a player
         self.player = Player.objects.create(
             forename="Jane",
             surname="Smith",
@@ -637,16 +635,7 @@ class SeasonPlayerTests(TestCase):
             club_status="confirmed",
         )
 
-        # Create another player with pending club_status
-        self.player_pending = Player.objects.create(
-            forename="John",
-            surname="Doe",
-            date_of_birth=date(1991, 2, 2),
-            current_club=self.club1,
-            club_status="pending",
-        )
-
-        # Division needed for season and team
+        # Create division - needed for season and team
         self.division = Division.objects.create(name="Division 1", rank=1)
 
         # Season data
@@ -661,27 +650,13 @@ class SeasonPlayerTests(TestCase):
             "is_visible": True,
             "is_current": True,
         }
-        self.season_data_2 = {
-            "name": "2025/26",
-            "short_name": "25-26",
-            "slug": "25-26",
-            "start_date": date(2025, 9, 1),
-            "end_date": date(2026, 5, 1),
-            "registration_opens": timezone.make_aware(datetime(2024, 6, 1)),
-            "registration_closes": timezone.make_aware(datetime(2024, 8, 1)),
-            "is_visible": True,
-            "is_current": True,
-        }
 
-        # Create seasons
+        # Create season - needed for team
         self.season1 = Season.objects.create(**self.season_data_1)
         self.season1.divisions.set([self.division])
         self.season1.save()
-        self.season2 = Season.objects.create(**self.season_data_2)
-        self.season2.divisions.set([self.division])
-        self.season2.save()
 
-        # Create Venue
+        # Create venue - needed for team
         self.venue = Venue.objects.create(name="Test Venue 1")
 
         # Create Team
@@ -698,30 +673,25 @@ class SeasonPlayerTests(TestCase):
         self.team = Team.objects.create(**self.team_data)
 
     def test_can_create_valid_season_player(self):
-        """Verify SeasonPlayer can be saved with valid data."""
-        sp = SeasonPlayer(
+        """Verify TeamPlayer can be saved with valid data."""
+        tp = TeamPlayer(
             player=self.player,
-            season=self.season1,
-            club=self.club1,
             team=self.team,
             paid_fees=True,
         )
-        sp.full_clean()  # Should not raise error
-        sp.save()
-        self.assertTrue(SeasonPlayer.objects.filter(id=sp.id).exists())
+        tp.full_clean()  # Should not raise error
+        tp.save()
+        self.assertTrue(TeamPlayer.objects.filter(id=tp.id).exists())
 
     def test_string_representation(self):
-        sp = SeasonPlayer.objects.create(
+        tp = TeamPlayer.objects.create(
             player=self.player,
-            season=self.season1,
-            club=self.club1,
             team=self.team
         )
         expected_str = (
-            f"{self.season1.short_name} - {self.player.full_name} "
-            f"- {self.team.team_name} - {self.club1.name}"
+            f"{self.player.full_name} ({self.team.team_name})"
         )
-        self.assertEqual(str(sp), expected_str)
+        self.assertEqual(str(tp), expected_str)
 
     def test_ordering_by_player_surname_then_forename(self):
         # Create players in no particular order
@@ -739,33 +709,39 @@ class SeasonPlayerTests(TestCase):
             current_club=self.club1,
             club_status="confirmed",
         )
-        # Create SeasonPlayers
-        sp_a = SeasonPlayer.objects.create(
-            player=self.player, season=self.season1, club=self.club1, team=self.team
+        # Create TeamPlayers
+        tp_a = TeamPlayer.objects.create(
+            player=self.player, team=self.team
         )
-        sp_b = SeasonPlayer.objects.create(
-            player=player_b, season=self.season1, club=self.club1, team=self.team
+        tp_b = TeamPlayer.objects.create(
+            player=player_b, team=self.team
         )
-        sp_c = SeasonPlayer.objects.create(
-            player=player_c, season=self.season1, club=self.club1, team=self.team
+        tp_c = TeamPlayer.objects.create(
+            player=player_c, team=self.team
         )
 
-        players_ordered = list(SeasonPlayer.objects.all())
+        players_ordered = list(TeamPlayer.objects.all())
 
-        self.assertEqual(players_ordered[0], sp_b)
-        self.assertEqual(players_ordered[1], sp_c)
-        self.assertEqual(players_ordered[2], sp_a)
+        self.assertEqual(players_ordered[0], tp_b)
+        self.assertEqual(players_ordered[1], tp_c)
+        self.assertEqual(players_ordered[2], tp_a)
 
     def test_unique_player_and_season_constraint(self):
         """Verify that the same player and season cannot be duplicated."""
-        SeasonPlayer.objects.create(
-            player=self.player, season=self.season1, club=self.club1, team=self.team
+        # Create TeamPlayer
+        TeamPlayer.objects.create(
+            player=self.player, team=self.team
         )
 
-        with self.assertRaises(IntegrityError):
-            SeasonPlayer.objects.create(
-                player=self.player, season=self.season1, club=self.club1, team=self.team
+        # Create TeamPlayer for same player in a different team
+        different_team_data = self.team_data.copy()
+        different_team_data["team_name"] = "A different team"
+        different_team = Team.objects.create(**different_team_data)
+        with self.assertRaises(ValidationError):
+            tp = TeamPlayer.objects.create(
+                player=self.player, team=different_team
             )
+            tp.full_clean()
 
     # Validation tests
     def test_clean_raises_if_club_status_not_confirmed(self):
@@ -773,8 +749,15 @@ class SeasonPlayerTests(TestCase):
         clean() should raise ValidationError if player's club_status is
         not confirmed.
         """
-        sp = SeasonPlayer(
-            player=self.player_pending, season=self.season1, club=self.club1
+        player_pending = Player.objects.create(
+            forename="John",
+            surname="Snow",
+            date_of_birth=date(1990, 1, 1),
+            current_club=self.club1,
+            club_status="pending",
+        )
+        tp = TeamPlayer(
+            player=player_pending, team=self.team
         )
         with self.assertRaisesMessage(
             ValidationError,
@@ -783,35 +766,37 @@ class SeasonPlayerTests(TestCase):
                 "their club before proceeding."
             ),
         ):
-            sp.full_clean()
+            tp.full_clean()
 
     def test_clean_raises_if_clubs_do_not_match(self):
         """
         clean() should raise ValidationError if player's current_club
-        doesn't match SeasonPlayer club.
+        doesn't match TeamPlayer club.
         """
-        sp = SeasonPlayer(
-            player=self.player, season=self.season1, club=self.club2
+        self.team.club = self.club2
+        self.team.save()
+        tp = TeamPlayer(
+            player=self.player, team=self.team
         )
         with self.assertRaisesMessage(
             ValidationError,
             (
                 "The player's profile states that they are not associated "
-                "with this club."
+                "with the team club."
             ),
         ):
-            sp.full_clean()
+            tp.full_clean()
 
     def test_clean_passes_if_club_status_confirmed_and_clubs_match(self):
         """
         clean() should pass without errors if club_status is confirmed and
         clubs match.
         """
-        sp = SeasonPlayer(
-            player=self.player, season=self.season1, club=self.club1, team=self.team
+        tp = TeamPlayer(
+            player=self.player, team=self.team
         )
         try:
-            sp.full_clean()
+            tp.full_clean()
         except ValidationError:
             self.fail("clean() raised ValidationError unexpectedly.")
 

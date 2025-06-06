@@ -115,15 +115,15 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Default club_status is 'pending' |
 | ✓ | Deletion restricted if player is linked to a PlayerSeason record |
 
-### SeasonPlayer Model
+### TeamPlayer Model
 
 | Status  | Test Description |
 | ---     | ---              |
-| ✓ | Admin Panel shows SeasonPlayer model under League app |
-| ✓ | SeasonPlayers are listed with season, player, and club |
-| ✓ | SeasonPlayers are listed in order of season (most recent first) then player (asc) |
-| ✓ | SeasonPlayer model contains all expected fields |
-| ✓ | Unique constraint is enforced (player and season together) |
+| ✓ | Admin Panel shows TeamPlayer model under League app |
+| ✓ | TeamPlayers are listed with player, team and paid fees status |
+| ✓ | TeamPlayers are listed in order of player (asc by surname) then team |
+| ✓ | TeamPlayer model contains all expected fields |
+| ✓ | Unique constraint is enforced (players cannot register with more than one team in the same season but can be registered in multiple seasons) |
 | ✓ | Cannot add record if club on player profile does not have 'confirmed' status and related error message shows |
 | ✓ | Cannot add record if club on player profile does not match club stated in the form and related error message shows |
 | ✓ | All fields are required and missing fields display error messages |
