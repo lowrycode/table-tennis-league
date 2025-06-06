@@ -102,6 +102,18 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Unique constraint is enforced (season and name together) |
 | ✓ | Fields are correctly assigned as whether they are required or not and missing fields display error messages |
 
+### Player Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows Player model under League app |
+| ✓ | Players are listed with surname, forename, DOB, current_club and club_status |
+| ✓ | Players are listed in order of surname then forename (asc) |
+| ✓ | Player model contains all expected fields |
+| ✓ | Unique constraint is enforced (surname, forename and DOB together) |
+| ✓ | Fields are correctly assigned as whether they are required or not and missing fields display error messages |
+| ✓ | Default club_status is 'pending' |
+
 ## Common Page Elements
 
 ### Navbar
