@@ -566,7 +566,7 @@ class PlayerTests(TestCase):
     def test_cannot_delete_if_linked_to_player_seasons(self):
         """Verify player cannot be deleted if linked to player_seasons."""
 
-        # Create Season and SeasonPlayer
+        # Create division and season
         division = Division.objects.create(name="Division 1", rank=1)
         season_data = {
             "name": "2024/25",
@@ -582,10 +582,27 @@ class PlayerTests(TestCase):
         season = Season.objects.create(**season_data)
         season.divisions.set([division])
         season.save()
+
+        # Create venue and team
+        venue = Venue.objects.create(name="Test Venue 1")
+        team_data = {
+            "season": season,
+            "division": division,
+            "club": self.club,
+            "home_venue": venue,
+            "team_name": "team awesome",
+            "home_day": "monday",
+            "home_time": time(19, 0),
+            "approved": True,
+        }
+        team = Team.objects.create(**team_data)
+        
+        # Create SeasonPlayer
         SeasonPlayer.objects.create(
             player=self.player,
             season=season,
             club=self.player.current_club,
+            team=team,
             paid_fees=True,
         )
 
@@ -629,7 +646,7 @@ class SeasonPlayerTests(TestCase):
             club_status="pending",
         )
 
-        # Division needed for season
+        # Division needed for season and team
         self.division = Division.objects.create(name="Division 1", rank=1)
 
         # Season data
@@ -664,12 +681,29 @@ class SeasonPlayerTests(TestCase):
         self.season2.divisions.set([self.division])
         self.season2.save()
 
+        # Create Venue
+        self.venue = Venue.objects.create(name="Test Venue 1")
+
+        # Create Team
+        self.team_data = {
+            "season": self.season1,
+            "division": self.division,
+            "club": self.club1,
+            "home_venue": self.venue,
+            "team_name": "team awesome",
+            "home_day": "monday",
+            "home_time": time(19, 0),
+            "approved": True,
+        }
+        self.team = Team.objects.create(**self.team_data)
+
     def test_can_create_valid_season_player(self):
         """Verify SeasonPlayer can be saved with valid data."""
         sp = SeasonPlayer(
             player=self.player,
             season=self.season1,
             club=self.club1,
+            team=self.team,
             paid_fees=True,
         )
         sp.full_clean()  # Should not raise error
@@ -681,10 +715,11 @@ class SeasonPlayerTests(TestCase):
             player=self.player,
             season=self.season1,
             club=self.club1,
+            team=self.team
         )
         expected_str = (
             f"{self.season1.short_name} - {self.player.full_name} "
-            f"- {self.club1.name}"
+            f"- {self.team.team_name} - {self.club1.name}"
         )
         self.assertEqual(str(sp), expected_str)
 
@@ -706,13 +741,13 @@ class SeasonPlayerTests(TestCase):
         )
         # Create SeasonPlayers
         sp_a = SeasonPlayer.objects.create(
-            player=self.player, season=self.season1, club=self.club1
+            player=self.player, season=self.season1, club=self.club1, team=self.team
         )
         sp_b = SeasonPlayer.objects.create(
-            player=player_b, season=self.season1, club=self.club1
+            player=player_b, season=self.season1, club=self.club1, team=self.team
         )
         sp_c = SeasonPlayer.objects.create(
-            player=player_c, season=self.season1, club=self.club1
+            player=player_c, season=self.season1, club=self.club1, team=self.team
         )
 
         players_ordered = list(SeasonPlayer.objects.all())
@@ -724,12 +759,12 @@ class SeasonPlayerTests(TestCase):
     def test_unique_player_and_season_constraint(self):
         """Verify that the same player and season cannot be duplicated."""
         SeasonPlayer.objects.create(
-            player=self.player, season=self.season1, club=self.club1
+            player=self.player, season=self.season1, club=self.club1, team=self.team
         )
 
         with self.assertRaises(IntegrityError):
             SeasonPlayer.objects.create(
-                player=self.player, season=self.season1, club=self.club1
+                player=self.player, season=self.season1, club=self.club1, team=self.team
             )
 
     # Validation tests
@@ -773,7 +808,7 @@ class SeasonPlayerTests(TestCase):
         clubs match.
         """
         sp = SeasonPlayer(
-            player=self.player, season=self.season1, club=self.club1
+            player=self.player, season=self.season1, club=self.club1, team=self.team
         )
         try:
             sp.full_clean()

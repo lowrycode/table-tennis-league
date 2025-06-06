@@ -176,61 +176,6 @@ class Player(models.Model):
         super().save(*args, **kwargs)
 
 
-class SeasonPlayer(models.Model):
-    player = models.ForeignKey(
-        Player,
-        on_delete=models.PROTECT,
-        related_name="player_seasons",
-    )
-    season = models.ForeignKey(
-        Season,
-        on_delete=models.PROTECT,
-        related_name="season_players",
-    )
-    club = models.ForeignKey(
-        Club,
-        on_delete=models.PROTECT,
-        related_name="club_season_players",
-    )
-    paid_fees = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name_plural = "Season players"
-        ordering = ["player__surname", "player__forename"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["player", "season"],
-                name="unique_player_and_season",
-            )
-        ]
-
-    def __str__(self):
-        return (
-            f"{self.season.short_name} - {self.player.full_name} - {self.club}"
-        )
-
-    def clean(self):
-        """
-        Ensures the player has a confirmed club association
-        and that it matches the club on this SeasonPlayer record.
-        """
-        super().clean()
-
-        # Ensure the player has confirmed club status
-        if self.player.club_status != "confirmed":
-            raise ValidationError(
-                "Club Admin must confirm that the player is associated "
-                "with their club before proceeding."
-            )
-
-        # Ensure the player's club matches the SeasonPlayer's club
-        if self.player.current_club != self.club:
-            raise ValidationError(
-                "The player's profile states that they are not associated "
-                "with this club."
-            )
-
-
 class Team(models.Model):
     DAY_CHOICES = [
         ("monday", "Monday"),
@@ -309,3 +254,64 @@ class Team(models.Model):
                         )
                     }
                 )
+
+
+class SeasonPlayer(models.Model):
+    player = models.ForeignKey(
+        Player,
+        on_delete=models.PROTECT,
+        related_name="player_seasons",
+    )
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.PROTECT,
+        related_name="season_players",
+    )
+    club = models.ForeignKey(
+        Club,
+        on_delete=models.PROTECT,
+        related_name="club_season_players",
+    )
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.PROTECT,
+        related_name="team_season_players",
+    )
+    paid_fees = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "Season players"
+        ordering = ["player__surname", "player__forename"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["player", "season"],
+                name="unique_player_and_season",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.season.short_name} - {self.player.full_name} - {self.team.team_name} - {self.club}"
+        )
+
+    def clean(self):
+        """
+        Ensures the player has a confirmed club association
+        and that it matches the club on this SeasonPlayer record.
+        """
+        super().clean()
+
+        # Ensure the player has confirmed club status
+        if self.player.club_status != "confirmed":
+            raise ValidationError(
+                "Club Admin must confirm that the player is associated "
+                "with their club before proceeding."
+            )
+
+        # Ensure the player's club matches the SeasonPlayer's club
+        if self.player.current_club != self.club:
+            raise ValidationError(
+                "The player's profile states that they are not associated "
+                "with this club."
+            )
+
