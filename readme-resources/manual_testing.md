@@ -129,6 +129,20 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | All fields are required and missing fields display error messages |
 | ✓ | Default paid_fees is False |
 
+### Team Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows Team model under League app |
+| ✓ | Teams are listed with team name, club division and season |
+| ✓ | Teams are listed in order of team name (asc) then season (most recent first) |
+| ✓ | Team model contains all expected fields |
+| ✓ | All fields are required and missing fields display error messages |
+| ✓ | Unique constraint is enforced (team name and season together) |
+| ✓ | Home day defaults to Monday and home time defaults to 7pm |
+| ✓ | Home time can only be within range 6pm to 8pm and field error message shows correctly |
+| ✓ | Division cannot be changed after season start_date but can before |
+
 ## Common Page Elements
 
 ### Navbar

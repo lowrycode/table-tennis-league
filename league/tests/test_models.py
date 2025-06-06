@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time
 from django.db import IntegrityError
 from django.db.models.deletion import ProtectedError
 from django.core.exceptions import ValidationError
@@ -8,8 +8,8 @@ from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
 )
-from league.models import Division, Season, Week, Player, SeasonPlayer
-from clubs.models import Club
+from league.models import Division, Season, Week, Player, SeasonPlayer, Team
+from clubs.models import Club, Venue
 
 
 class DivisionTests(TestCase):
@@ -732,6 +732,7 @@ class SeasonPlayerTests(TestCase):
                 player=self.player, season=self.season1, club=self.club1
             )
 
+    # Validation tests
     def test_clean_raises_if_club_status_not_confirmed(self):
         """
         clean() should raise ValidationError if player's club_status is
@@ -778,3 +779,260 @@ class SeasonPlayerTests(TestCase):
             sp.full_clean()
         except ValidationError:
             self.fail("clean() raised ValidationError unexpectedly.")
+
+
+class TeamTests(TestCase):
+    """
+    Unit tests for the Team model to verify field behavior, validation,
+    string representation, ordering, uniqueness, and deletion constraints.
+    """
+
+    def setUp(self):
+        # Create clubs
+        self.club = Club.objects.create(name="Test Club 1")
+
+        # Create a player with confirmed club_status and club as current_club
+        self.player = Player.objects.create(
+            forename="John",
+            surname="Doe",
+            date_of_birth=date(1990, 1, 1),
+            current_club=self.club,
+            club_status="confirmed",
+        )
+
+        # Create Division - needed for season
+        self.division = Division.objects.create(name="Division 1", rank=1)
+
+        # Season data
+        self.season_data_1 = {
+            "name": "2024/25",
+            "short_name": "24-25",
+            "slug": "24-25",
+            "start_date": date(2024, 9, 1),
+            "end_date": date(2025, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2023, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2023, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+        self.season_data_2 = {
+            "name": "2025/26",
+            "short_name": "25-26",
+            "slug": "25-26",
+            "start_date": date(2025, 9, 1),
+            "end_date": date(2026, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2024, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2024, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+
+        # Create seasons
+        self.season1 = Season.objects.create(**self.season_data_1)
+        self.season1.divisions.set([self.division])
+        self.season1.save()
+        self.season2 = Season.objects.create(**self.season_data_2)
+        self.season2.divisions.set([self.division])
+        self.season2.save()
+
+        # Create Venue
+        self.venue = Venue.objects.create(name="Test Venue 1")
+
+        # Create Team
+        self.team_data = {
+            "season": self.season1,
+            "division": self.division,
+            "club": self.club,
+            "home_venue": self.venue,
+            "team_name": "team awesome",
+            "home_day": "monday",
+            "home_time": time(19, 0),
+            "approved": True,
+        }
+        self.team = Team.objects.create(**self.team_data)
+
+    def test_can_create_team(self):
+        """Verify team can be saved and retrieved correctly."""
+        self.team.full_clean()
+        self.team.save()
+        self.assertTrue(Team.objects.filter(id=self.team.id).exists())
+
+    def test_string_representation(self):
+        """
+        Verify string representation returns 'team_name (season_short_name)'
+        with title case.
+        """
+        self.team.save()
+        self.assertEqual(str(self.team), "Team Awesome (24-25)")
+
+    def test_ordering_by_team_name(self):
+        """Verify teams are ordered by team name ascending."""
+        Team.objects.all().delete()
+
+        team1 = Team.objects.create(**self.team_data)
+        team1.team_name = "C"
+        team1.save()
+        team2 = Team.objects.create(**self.team_data)
+        team2.team_name = "A"
+        team2.save()
+        team3 = Team.objects.create(**self.team_data)
+        team3.team_name = "B"
+        team3.save()
+
+        ordered_teams = list(Team.objects.all())
+        self.assertEqual(ordered_teams[0], team2)
+        self.assertEqual(ordered_teams[1], team3)
+        self.assertEqual(ordered_teams[2], team1)
+
+    # Multi-field tests
+    def test_required_fields(self):
+        """Verify whether each field is required or not"""
+        required_fields = {
+            "season": True,
+            "division": True,
+            "club": True,
+            "home_venue": True,
+            "team_name": True,
+        }
+
+        test_object = Team()
+
+        # Check each field
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    def test_max_lengths(self):
+        """Verify max length for team_name."""
+        fields = {
+            "team_name": 30,
+        }
+
+        # Check each field
+        valid_data = self.team_data.copy()
+        test_model = Team
+        for field, max_length in fields.items():
+            helper_test_max_length(
+                self, test_model, valid_data, field, max_length
+            )
+
+    def test_unique_team_name_season(self):
+        """Verify combination of team_name and season must be unique."""
+        other_team_data = self.team_data.copy()
+        other_team_data = {
+            "season": self.season1,
+            "division": self.division,
+            "club": self.club,
+            "home_venue": self.venue,
+            "team_name": "team awesome",
+            "home_day": "Another day",
+            "home_time": time(19, 30),
+            "approved": True,
+        }
+        with self.assertRaises(IntegrityError):
+            Team.objects.create(**other_team_data)
+
+    def test_can_create_teams_with_same_name_but_different_seasons(self):
+        """
+        Verify teams with same name but different season are allowed.
+        """
+        other_team_data = self.team_data.copy()
+        other_team_data = {
+            "season": self.season2,
+            "division": self.division,
+            "club": self.club,
+            "home_venue": self.venue,
+            "team_name": "team awesome",
+            "home_day": "Another day",
+            "home_time": time(19, 30),
+            "approved": True,
+        }
+        other_team = Team.objects.create(**other_team_data)
+        self.assertTrue(Team.objects.filter(id=other_team.id).exists())
+
+    # Single-field tests
+    def test_home_day_defaults_to_monday(self):
+        """
+        Verify home_day defaults to 'monday' if not provided.
+        """
+        Team.objects.all().delete()
+        team_data = self.team_data.copy()
+        del team_data["home_day"]
+        team = Team.objects.create(**team_data)
+        self.assertEqual(team.home_day, "monday")
+
+    def test_home_time_defaults_to_7pm(self):
+        """
+        Verify home_time defaults to 7PM if not provided.
+        """
+        Team.objects.all().delete()
+        team_data = self.team_data.copy()
+        del team_data["home_time"]
+        team = Team.objects.create(**team_data)
+        self.assertEqual(team.home_time, time(19, 0))
+
+    def test_home_time_validation_contraints(self):
+        """Verify home_time must be between 6PM and 8PM."""
+        # Too early - should raise validation error
+        self.team.home_time = time(17, 59)
+        with self.assertRaisesMessage(
+            ValidationError, "Match must start between 6:00 PM and 8:00 PM."
+        ):
+            self.team.full_clean()
+
+        # Earliest allowed start time - should pass without errors
+        self.team.home_time = time(18, 0)
+        self.team.full_clean()
+
+        # Latest allowed start time - should pass without errors
+        self.team.home_time = time(20, 0)
+        self.team.full_clean()
+
+        # Too late - should raise validation error
+        self.team.home_time = time(20, 1)
+        with self.assertRaisesMessage(
+            ValidationError, "Match must start between 6:00 PM and 8:00 PM."
+        ):
+            self.team.full_clean()
+
+    def test_division_can_not_be_changed_after_season_has_started(self):
+        """Verify division cannot be changed after season start_date."""
+        # Verify season start date for team is in the past
+        now = timezone.now().date()
+        self.assertTrue(self.team.season.start_date < now)
+
+        # Changing division should raise validation error
+        division2 = Division.objects.create(name="Division 2", rank=2)
+        self.team.division = division2
+        with self.assertRaises(ValidationError):
+            self.team.full_clean()
+
+    def test_division_can_be_changed_before_season_has_started(self):
+        """Verify division can be changed before season start_date."""
+        Team.objects.all().delete()
+
+        # Create season with start date in the future
+        now = timezone.now().date()
+        season_data = {
+            "name": "In the future",
+            "short_name": "future",
+            "slug": "future",
+            "start_date": now + timezone.timedelta(days=10),
+            "end_date": now + timezone.timedelta(days=50),
+            "registration_opens": timezone.make_aware(datetime(2023, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2023, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+        season = Season.objects.create(**season_data)
+        season.divisions.set([self.division])
+        season.save()
+
+        # Create team for this season
+        team_data = self.team_data.copy()
+        team_data["season"] = season
+        team = Team.objects.create(**team_data)
+
+        # Changing division should not raise validation error
+        division2 = Division.objects.create(name="Division 2", rank=2)
+        team.division = division2
+        team.full_clean()

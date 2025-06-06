@@ -1,6 +1,9 @@
+from datetime import time
+from django.utils.timezone import now
 from django.db import models
 from django.core.exceptions import ValidationError
-from clubs.models import Club
+from clubs.models import Club, Venue
+from .validators import validate_match_time
 
 
 class Division(models.Model):
@@ -226,3 +229,83 @@ class SeasonPlayer(models.Model):
                 "The player's profile states that they are not associated "
                 "with this club."
             )
+
+
+class Team(models.Model):
+    DAY_CHOICES = [
+        ("monday", "Monday"),
+        ("tuesday", "Tuesday"),
+        ("wednesday", "Wednesday"),
+        ("thursday", "Thursday"),
+        ("friday", "Friday"),
+    ]
+
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.PROTECT,
+        related_name="season_teams",
+    )
+    division = models.ForeignKey(
+        Division,
+        on_delete=models.PROTECT,
+        related_name="division_teams",
+    )
+    club = models.ForeignKey(
+        Club,
+        on_delete=models.PROTECT,
+        related_name="club_teams",
+    )
+    home_venue = models.ForeignKey(
+        Venue,
+        on_delete=models.PROTECT,
+        related_name="venue_teams",
+    )
+    team_name = models.CharField(max_length=30)
+    home_day = models.CharField(
+        max_length=10,
+        choices=DAY_CHOICES,
+        default="monday",
+        verbose_name="Home match day",
+    )
+    home_time = models.TimeField(
+        validators=[validate_match_time],
+        default=time(19, 0),
+        verbose_name="Home match start time",
+    )
+    approved = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["team_name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["team_name", "season"],
+                name="team_name_and_season",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.team_name} ({self.season.short_name})"
+
+    def save(self, *args, **kwargs):
+        """Ensure team_name has title case"""
+        self.team_name = self.team_name.title()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        super().clean()
+
+        # Prevent changing division after season start date
+        if self.pk:
+            existing = Team.objects.get(pk=self.pk)
+            if (
+                existing.division != self.division
+                and self.season.start_date <= now().date()
+            ):
+                raise ValidationError(
+                    {
+                        "division": (
+                            "Division cannot be changed after the "
+                            "season has started."
+                        )
+                    }
+                )
