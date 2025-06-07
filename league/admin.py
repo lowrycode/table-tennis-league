@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from .models import Division, Season, Week, Player, TeamPlayer, Team
+from .models import Division, Season, Week, Player, TeamPlayer, Team, Fixture
 
 
 @admin.register(Division)
@@ -105,3 +105,9 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ("team_name", "club", "division", "season")
     list_filter = ("season", "division", "club")
     ordering = ("team_name", "season")
+
+
+@admin.register(Fixture)
+class FixtureAdmin(admin.ModelAdmin):
+    list_filter = ("season", "division", "week")
+    ordering = ("-datetime", )

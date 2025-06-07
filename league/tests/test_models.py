@@ -8,13 +8,21 @@ from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
 )
-from league.models import Division, Season, Week, Player, TeamPlayer, Team
+from league.models import (
+    Division,
+    Season,
+    Week,
+    Player,
+    TeamPlayer,
+    Team,
+    Fixture,
+)
 from clubs.models import Club, Venue
 
 
 class DivisionTests(TestCase):
     """
-    Unit tests for the Division model to verify field behavior, validation,
+    Unit tests for the Division model to verify field behaviour, validation,
     string representation and ordering.
     """
 
@@ -115,7 +123,7 @@ class DivisionTests(TestCase):
 
 class SeasonTests(TestCase):
     """
-    Unit tests for the Season model to verify field behavior, validation,
+    Unit tests for the Season model to verify field behaviour, validation,
     string representation and ordering.
     """
 
@@ -317,7 +325,7 @@ class SeasonTests(TestCase):
 
 class WeekTests(TestCase):
     """
-    Unit tests for the Week model to verify field behavior, validation,
+    Unit tests for the Week model to verify field behaviour, validation,
     string representation and ordering.
     """
 
@@ -446,7 +454,7 @@ class WeekTests(TestCase):
 
 class PlayerTests(TestCase):
     """
-    Unit tests for the Player model to verify field behavior, validation,
+    Unit tests for the Player model to verify field behaviour, validation,
     string representation, ordering, uniqueness, and deletion constraints.
     """
 
@@ -596,7 +604,7 @@ class PlayerTests(TestCase):
             "approved": True,
         }
         team = Team.objects.create(**team_data)
-        
+
         # Create TeamPlayer
         TeamPlayer.objects.create(
             player=self.player,
@@ -616,7 +624,7 @@ class PlayerTests(TestCase):
 
 class TeamPlayerTests(TestCase):
     """
-    Unit tests for the TeamPlayer model to verify field behavior,
+    Unit tests for the TeamPlayer model to verify field behaviour,
     validation logic, string representation, ordering and uniqueness
     constraints.
     """
@@ -684,13 +692,8 @@ class TeamPlayerTests(TestCase):
         self.assertTrue(TeamPlayer.objects.filter(id=tp.id).exists())
 
     def test_string_representation(self):
-        tp = TeamPlayer.objects.create(
-            player=self.player,
-            team=self.team
-        )
-        expected_str = (
-            f"{self.player.full_name} ({self.team.team_name})"
-        )
+        tp = TeamPlayer.objects.create(player=self.player, team=self.team)
+        expected_str = f"{self.player.full_name} ({self.team.team_name})"
         self.assertEqual(str(tp), expected_str)
 
     def test_ordering_by_player_surname_then_forename(self):
@@ -710,15 +713,9 @@ class TeamPlayerTests(TestCase):
             club_status="confirmed",
         )
         # Create TeamPlayers
-        tp_a = TeamPlayer.objects.create(
-            player=self.player, team=self.team
-        )
-        tp_b = TeamPlayer.objects.create(
-            player=player_b, team=self.team
-        )
-        tp_c = TeamPlayer.objects.create(
-            player=player_c, team=self.team
-        )
+        tp_a = TeamPlayer.objects.create(player=self.player, team=self.team)
+        tp_b = TeamPlayer.objects.create(player=player_b, team=self.team)
+        tp_c = TeamPlayer.objects.create(player=player_c, team=self.team)
 
         players_ordered = list(TeamPlayer.objects.all())
 
@@ -729,9 +726,7 @@ class TeamPlayerTests(TestCase):
     def test_unique_player_and_season_constraint(self):
         """Verify that the same player and season cannot be duplicated."""
         # Create TeamPlayer
-        TeamPlayer.objects.create(
-            player=self.player, team=self.team
-        )
+        TeamPlayer.objects.create(player=self.player, team=self.team)
 
         # Create TeamPlayer for same player in a different team
         different_team_data = self.team_data.copy()
@@ -756,9 +751,7 @@ class TeamPlayerTests(TestCase):
             current_club=self.club1,
             club_status="pending",
         )
-        tp = TeamPlayer(
-            player=player_pending, team=self.team
-        )
+        tp = TeamPlayer(player=player_pending, team=self.team)
         with self.assertRaisesMessage(
             ValidationError,
             (
@@ -775,9 +768,7 @@ class TeamPlayerTests(TestCase):
         """
         self.team.club = self.club2
         self.team.save()
-        tp = TeamPlayer(
-            player=self.player, team=self.team
-        )
+        tp = TeamPlayer(player=self.player, team=self.team)
         with self.assertRaisesMessage(
             ValidationError,
             (
@@ -792,9 +783,7 @@ class TeamPlayerTests(TestCase):
         clean() should pass without errors if club_status is confirmed and
         clubs match.
         """
-        tp = TeamPlayer(
-            player=self.player, team=self.team
-        )
+        tp = TeamPlayer(player=self.player, team=self.team)
         try:
             tp.full_clean()
         except ValidationError:
@@ -803,7 +792,7 @@ class TeamPlayerTests(TestCase):
 
 class TeamTests(TestCase):
     """
-    Unit tests for the Team model to verify field behavior, validation,
+    Unit tests for the Team model to verify field behaviour, validation,
     string representation, ordering, uniqueness, and deletion constraints.
     """
 
@@ -1056,3 +1045,294 @@ class TeamTests(TestCase):
         division2 = Division.objects.create(name="Division 2", rank=2)
         team.division = division2
         team.full_clean()
+
+
+class FixtureTests(TestCase):
+    """
+    Unit tests for the Fixture model covering field behaviour, string
+    representation, ordering, validation, and uniqueness constraints.
+    """
+
+    def setUp(self):
+        # Create clubs
+        self.club = Club.objects.create(name="Test Club 1")
+
+        # Create Divisions - needed for season
+        self.division1 = Division.objects.create(name="Division 1", rank=1)
+        self.division2 = Division.objects.create(name="Division 2", rank=2)
+
+        # Season data
+        self.season_data_1 = {
+            "name": "2024/25",
+            "short_name": "24-25",
+            "slug": "24-25",
+            "start_date": date(2024, 9, 1),
+            "end_date": date(2025, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2023, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2023, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+        self.season_data_2 = {
+            "name": "2025/26",
+            "short_name": "25-26",
+            "slug": "25-26",
+            "start_date": date(2025, 9, 1),
+            "end_date": date(2026, 5, 1),
+            "registration_opens": timezone.make_aware(datetime(2024, 6, 1)),
+            "registration_closes": timezone.make_aware(datetime(2024, 8, 1)),
+            "is_visible": True,
+            "is_current": True,
+        }
+
+        # Create seasons
+        self.season1 = Season.objects.create(**self.season_data_1)
+        self.season1.divisions.set([self.division1])
+        self.season1.divisions.set([self.division1])
+        self.season1.save()
+        self.season2 = Season.objects.create(**self.season_data_2)
+        self.season2.divisions.set([self.division1])
+        self.season2.divisions.set([self.division1])
+        self.season2.save()
+
+        # Create Venue
+        self.venue = Venue.objects.create(name="Test Venue 1")
+
+        # Team data
+        self.team_data1 = {
+            "season": self.season1,
+            "division": self.division1,
+            "club": self.club,
+            "home_venue": self.venue,
+            "team_name": "Team A",
+            "home_day": "monday",
+            "home_time": time(19, 0),
+            "approved": True,
+        }
+        self.team_data2 = {
+            "season": self.season1,
+            "division": self.division1,
+            "club": self.club,
+            "home_venue": self.venue,
+            "team_name": "Team B",
+            "home_day": "tuesday",
+            "home_time": time(19, 0),
+            "approved": True,
+        }
+
+        # Create teams
+        self.team1 = Team.objects.create(**self.team_data1)
+        self.team2 = Team.objects.create(**self.team_data2)
+
+        # Create weeks
+        self.week_season_1 = Week.objects.create(
+            season=self.season1,
+            name="Week 1 Season 1",
+            details="",
+            start_date=self.season1.start_date,
+        )
+        self.week_season_2 = Week.objects.create(
+            season=self.season2,
+            name="Week 1 Season 2",
+            details="",
+            start_date=self.season2.start_date,
+        )
+
+        # Fixture data
+        self.fixture_data = {
+            "season": self.season1,
+            "division": self.division1,
+            "week": self.week_season_1,
+            "datetime": timezone.make_aware(datetime(2024, 9, 1, 19, 0)),
+            "home_team": self.team1,
+            "away_team": self.team2,
+            "venue": self.venue,
+            "status": "scheduled",
+        }
+
+    def test_can_create_fixture(self):
+        """Verify a fixture can be saved and retrieved correctly."""
+        fixture = Fixture.objects.create(**self.fixture_data)
+        fixture.full_clean()
+        fixture.save()
+        self.assertTrue(Fixture.objects.filter(id=fixture.id).exists())
+
+    def test_string_representation(self):
+        """Verify string representation returns expected format."""
+        fixture = Fixture.objects.create(**self.fixture_data)
+        expected = (
+            f"{fixture.season.short_name} {fixture.week.name} - "
+            f"{fixture.home_team.team_name} vs {fixture.away_team.team_name}"
+        )
+        self.assertEqual(str(fixture), expected)
+
+    def test_ordering_by_datetime(self):
+        """Verify fixtures are ordered by datetime ascending."""
+        # Create earlier fixture
+        earlier_fixture = Fixture.objects.create(**self.fixture_data)
+
+        # Create data for later fixture
+        # Swap home / away team to avoid uniqueness constraint
+        later_fixture_data = self.fixture_data.copy()
+        later_fixture_data["home_team"] = self.team2
+        later_fixture_data["away_team"] = self.team1
+
+        later_fixture = Fixture.objects.create(**later_fixture_data)
+        later_fixture.datetime = later_fixture.datetime + timezone.timedelta(
+            days=1
+        )
+        later_fixture.save()
+
+        ordered = list(Fixture.objects.all())
+        self.assertEqual(ordered[0], earlier_fixture)
+        self.assertEqual(ordered[1], later_fixture)
+
+    # Multi-field tests
+    def test_required_fields(self):
+        """Verify whether each field is required or not"""
+        required_fields = {
+            "season": True,
+            "division": True,
+            "week": True,
+            "datetime": True,
+            "home_team": True,
+            "away_team": True,
+            "venue": False,
+        }
+
+        test_object = Fixture()
+
+        # Check each field
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    def test_unique_constraint_same_season_and_teams(self):
+        """Ensure uniqueness constraint for season + home_team + away_team."""
+
+        # Create fixture
+        Fixture.objects.create(**self.fixture_data)
+
+        # Create duplicate fixture - should raise error
+        with self.assertRaises(IntegrityError):
+            Fixture.objects.create(**self.fixture_data)
+
+    def test_can_have_same_teams_in_different_season(self):
+        """Verify can have same team pairing in a different season."""
+        Fixture.objects.create(**self.fixture_data)
+
+        # Create same teams in other season
+        data_other_season_team1 = self.team_data1.copy()
+        data_other_season_team1["season"] = self.season2
+        other_season_team1 = Team.objects.create(**data_other_season_team1)
+
+        data_other_season_team2 = self.team_data2.copy()
+        data_other_season_team2["season"] = self.season2
+        other_season_team2 = Team.objects.create(**data_other_season_team2)
+
+        # Data for fixture in other season
+        fixture_data2 = self.fixture_data.copy()
+        fixture_data2["season"] = self.season2
+        fixture_data2["week"] = self.week_season_2
+        fixture_data2["datetime"] = timezone.make_aware(
+            datetime(2025, 9, 1, 19, 0)
+        )
+        fixture_data2["home_team"] = other_season_team1
+        fixture_data2["away_team"] = other_season_team2
+
+        # Create fixture in other season - should not raise error
+        fixture2 = Fixture.objects.create(**fixture_data2)
+        fixture2.full_clean()
+        self.assertTrue(Fixture.objects.filter(id=fixture2.id).exists())
+
+    def test_clean_datetime_time_between_6pm_and_8pm(self):
+        """
+        Raise error if time part of datetime is outside of 6pm to 8pm range.
+        """
+        # Create fixture
+        fixture = Fixture(**self.fixture_data)
+
+        # Test a minute earlier than low end of range raises error
+        fixture.datetime = timezone.make_aware(datetime(2024, 9, 1, 17, 59))
+        with self.assertRaisesMessage(
+            ValidationError, "Match must start between 6:00 PM and 8:00 PM."
+        ):
+            fixture.full_clean()
+
+        # Test equal to low end of range is allowed
+        fixture.datetime = timezone.make_aware(datetime(2024, 9, 1, 18, 00))
+        fixture.full_clean()
+
+        # Test equal to high end of range is allowed
+        fixture.datetime = timezone.make_aware(datetime(2024, 9, 1, 20, 00))
+        fixture.full_clean()
+
+        # Test a minute after high end of range raises error
+        fixture.datetime = timezone.make_aware(datetime(2024, 9, 1, 20, 1))
+        with self.assertRaisesMessage(
+            ValidationError, "Match must start between 6:00 PM and 8:00 PM."
+        ):
+            fixture.full_clean()
+
+    def test_clean_datetime_date_within_week(self):
+        """
+        Raise error if time part of datetime is outside of 6pm to 8pm range.
+        """
+        # Create fixture
+        fixture = Fixture(**self.fixture_data)
+
+        # Test a minute earlier than low end of range raises error
+        fixture.datetime = timezone.make_aware(datetime(2024, 9, 1, 17, 59))
+        with self.assertRaisesMessage(
+            ValidationError, "Match must start between 6:00 PM and 8:00 PM."
+        ):
+            fixture.full_clean()
+
+        # Test equal to low end of range is allowed
+        fixture.datetime = timezone.make_aware(datetime(2024, 9, 1, 18, 00))
+        fixture.full_clean()
+
+        # Test equal to high end of range is allowed
+        fixture.datetime = timezone.make_aware(datetime(2024, 9, 1, 20, 00))
+        fixture.full_clean()
+
+        # Test a minute after high end of range raises error
+        fixture.datetime = timezone.make_aware(datetime(2024, 10, 1, 20, 1))
+        with self.assertRaisesMessage(
+            ValidationError, "Match must start between 6:00 PM and 8:00 PM."
+        ):
+            fixture.full_clean()
+
+    def test_clean_home_and_away_must_differ(self):
+        """Raise error if a team is scheduled to play itself."""
+        self.fixture_data["away_team"] = self.team1
+        fixture = Fixture(**self.fixture_data)
+        with self.assertRaisesMessage(
+            ValidationError, "A team cannot play against itself."
+        ):
+            fixture.full_clean()
+
+    def test_clean_teams_must_be_in_correct_division(self):
+        """
+        Verify validation error is raised if a team is in the wrong division.
+        """
+        self.team2.division = self.division2
+        self.team2.save()
+
+        fixture = Fixture(**self.fixture_data)
+        with self.assertRaisesMessage(
+            ValidationError, "Away team is not in the selected division."
+        ):
+            fixture.full_clean()
+
+    def test_clean_teams_must_be_in_correct_season(self):
+        """
+        Verify validation error is raised if a team is in the wrong season.
+        """
+        self.team2.season = self.season2
+        self.team2.save()
+
+        fixture = Fixture(**self.fixture_data)
+        with self.assertRaisesMessage(
+            ValidationError, "Away team is not in the selected season."
+        ):
+            fixture.full_clean()

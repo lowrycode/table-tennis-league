@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import time, timedelta
 from django.utils.timezone import now
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -310,3 +310,127 @@ class TeamPlayer(models.Model):
                 f"{self.player} is already registered with another team "
                 f"in {season}."
             )
+
+
+class Fixture(models.Model):
+    STATUS_CHOICES = [
+        ("scheduled", "Scheduled"),
+        ("postponed", "Postponed"),
+        ("cancelled", "Cancelled"),
+        ("completed", "Completed"),
+    ]
+
+    season = models.ForeignKey(
+        Season,
+        on_delete=models.PROTECT,
+        related_name="season_fixtures",
+    )
+    division = models.ForeignKey(
+        Division,
+        on_delete=models.PROTECT,
+        related_name="division_fixtures",
+    )
+    week = models.ForeignKey(
+        Week,
+        on_delete=models.PROTECT,
+        related_name="week_fixtures",
+    )
+    datetime = models.DateTimeField()
+    home_team = models.ForeignKey(
+        Team,
+        on_delete=models.PROTECT,
+        related_name="home_fixtures",
+    )
+    away_team = models.ForeignKey(
+        Team,
+        on_delete=models.PROTECT,
+        related_name="away_fixtures",
+    )
+    venue = models.ForeignKey(
+        Venue,
+        on_delete=models.SET_NULL,
+        related_name="venue_fixtures",
+        null=True,
+        blank=True,
+        help_text="Leave blank to auto-assign the home team's venue",
+    )
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="scheduled"
+    )
+
+    class Meta:
+        ordering = ["datetime"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["season", "home_team", "away_team"],
+                name="season_with_home_and_away_team_unique",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.season.short_name} {self.week.name} - "
+            f"{self.home_team.team_name} vs {self.away_team.team_name}"
+        )
+
+    def clean(self):
+        """
+        Enforce custom constraints.
+
+        These include
+        1. home team must be different to away team
+        2. both teams must be in the specified division
+        3. both teams must be in the specified season
+        """
+        super().clean()
+
+        # Validate time part of datetime - must be between 6pm and 8pm
+        if self.datetime:
+            match_time = self.datetime.time()
+            validate_match_time(match_time)
+
+        # Validate date part of datetime
+        # must be within 6 days of week.start_date
+        if self.datetime and self.week:
+            start = self.week.start_date
+            end = start + timedelta(days=6)
+            if not (start <= self.datetime.date() <= end):
+                raise ValidationError(
+                    {
+                        "datetime": (
+                            "Date must be within the same week "
+                            f"({start} to {end})."
+                        )
+                    }
+                )
+
+        # Enforce home team and away team are different
+        if self.home_team_id and self.away_team_id:
+            if self.home_team == self.away_team:
+                raise ValidationError("A team cannot play against itself.")
+
+        # Enforce division
+        if self.home_team_id and self.division:
+            if self.home_team.division != self.division:
+                raise ValidationError(
+                    {"home_team": "Home team is not in the selected division."}
+                )
+
+        if self.away_team_id and self.division:
+            if self.away_team.division != self.division:
+                raise ValidationError(
+                    {"away_team": "Away team is not in the selected division."}
+                )
+
+        # Enforce season
+        if self.home_team_id and self.season:
+            if self.home_team.season != self.season:
+                raise ValidationError(
+                    {"home_team": "Home team is not in the selected season."}
+                )
+
+        if self.away_team_id and self.season:
+            if self.away_team.season != self.season:
+                raise ValidationError(
+                    {"away_team": "Away team is not in the selected season."}
+                )

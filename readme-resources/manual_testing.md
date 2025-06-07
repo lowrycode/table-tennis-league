@@ -143,6 +143,22 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Home time can only be within range 6pm to 8pm and field error message shows correctly |
 | ✓ | Division cannot be changed after season start_date but can before |
 
+### Fixture Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows Fixture model under League app |
+| ✓ | Fixtures are listed with expected str representation (Season Week - Home vs Away) |
+| ✓ | Fixtures are listed by date (desc) |
+| ✓ | Fixture model contains all expected fields |
+| ✓ | All fields are required and missing fields display error messages |
+| ✓ | Unique constraint is enforced (same season/home/away together) but home/away can be swapped |
+| ✓ | Time constraint enforced (must be between 6pm and 8pm) |
+| ✓ | Date constraint enforced (must be within same week) |
+| ✓ | Duplicate team constraint enforced (can't have same home and away team) |
+| ✓ | Division constraint enforced (both teams must be in stated division) |
+| ✓ | Season constraint enforced (both teams must be assigned to stated season) |
+
 ## Common Page Elements
 
 ### Navbar
