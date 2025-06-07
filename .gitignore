@@ -3,3 +3,4 @@ env.py
 __pycache__/
 pyproject.toml
 clubs/fixtures/
+league/fixtures/
