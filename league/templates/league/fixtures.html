@@ -2,6 +2,26 @@
 {% load static %}
 
 {% block content %}
+  <!-- Venue Modal -->
+  <div class="modal fade" id="venue-modal" tabindex="-1" aria-labelledby="venue-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="venue-modal-label">Venue Information</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="modal-fixture-info" class="fw-semibold fst-italic">
+            <!-- Initialised using JS -->
+          </div>
+          <div id="modal-venue-info" role="status">
+            <!-- Initialised using JS - populated using HTMX -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fixtures Content -->
   <div class="container-max-8 w-100 px-3">
     <div class="row">
       <div class="col-12 my-5">
@@ -20,7 +40,23 @@
                     <div class="col-12 col-sm-2 d-flex flex-sm-column justify-content-center align-items-center px-2 col-gap-4">
                       <div class="fixture-date">{{ fixture.datetime|date:"D jS M" }}</div>
                       <div class="fs-4">{{ fixture.datetime|date:"H:i" }}</div>
-                      <div class="fixture-venue"><a href="#">venue</a></div>
+                      <div class="fixture-venue">
+                        <button
+                          type="button"
+                          class="btn a-style venue-btn p-0"
+                          data-home="{{ fixture.home_team.team_name }}"
+                          data-away="{{ fixture.away_team.team_name }}"
+                          data-hx-get="{% url 'venue_modal' fixture.venue.id %}" 
+                          data-hx-target="#modal-venue-info" 
+                          data-hx-trigger="click"
+                          data-bs-toggle="modal"
+                          data-bs-target="#venue-modal"
+                          aria-label="Click to view venue information for this fixture"
+                          title="View venue info"
+                        >
+                          Venue
+                        </button>
+                      </div>
                     </div>
                     <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-start align-items-center fs-5">
                       {{ fixture.away_team.team_name }}  
@@ -41,4 +77,9 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script src="{% static 'js/league/init_venue_modal.js' %}"></script>
 {% endblock %}

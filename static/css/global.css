@@ -189,13 +189,13 @@ h6 {
 }
 
 /* Links */
-a {
+a, .a-style {
   text-decoration: none;
   color: var(--primary-2);
   font-weight: 600;
 }
 
-a:hover {
+a:hover, .a-style:hover {
   color: var(--primary-3);
 }
 

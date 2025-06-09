@@ -1,7 +1,11 @@
 from django.db import transaction
 from django.db.models import Prefetch
-from django.shortcuts import render, redirect
-from django.http import HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import (
+    HttpResponseForbidden,
+    HttpResponse,
+    HttpResponseBadRequest,
+)
 from django.forms.models import model_to_dict
 from django.contrib import messages
 from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
@@ -267,6 +271,49 @@ def clubs(request):
         )
 
     return render(request, "clubs/clubs.html", context)
+
+
+def venue_modal(request, venue_id):
+    """
+    Handles HTMX request for venue information modal.
+
+    Returns a rendered HTML partial if the venue and approved info exist.
+    Otherwise, returns an informative message.
+    """
+    # If not HTMX request, return error 400
+    if not request.headers.get("HX-Request") == "true":
+        return HttpResponseBadRequest(
+            "This endpoint is for HTMX requests only."
+        )
+
+    # Get venue
+    venue = Venue.objects.filter(id=venue_id).first()
+
+    # If venue not found
+    if not venue:
+        return HttpResponse('<p class="mt-2 fw-semibold">Venue not found</p>')
+
+    # Get latest approved venue info
+    latest_venue_info = (
+        VenueInfo.objects.filter(venue=venue, approved=True)
+        .order_by("-created_on")
+        .first()
+    )
+
+    # If no approved venue info found
+    if not latest_venue_info:
+        return HttpResponse(
+            '<p class="mt-2 fw-semibold">No venue info available</p>'
+        )
+
+    # Build venue_dict
+    venue_dict = model_to_dict(latest_venue_info)
+    venue_dict["name"] = venue.name
+    venue_dict["id"] = venue.id
+
+    return render(
+        request, "clubs/partials/club_venue.html", {"venue": venue_dict}
+    )
 
 
 @club_admin_required

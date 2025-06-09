@@ -44,4 +44,9 @@ urlpatterns = [
         views.update_venue_info,
         name="update_venue_info",
     ),
+    path(
+        "venue/<int:venue_id>/modal/",
+        views.venue_modal,
+        name="venue_modal",
+    ),
 ]
