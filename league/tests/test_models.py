@@ -1088,10 +1088,8 @@ class FixtureTests(TestCase):
         # Create seasons
         self.season1 = Season.objects.create(**self.season_data_1)
         self.season1.divisions.set([self.division1])
-        self.season1.divisions.set([self.division1])
         self.season1.save()
         self.season2 = Season.objects.create(**self.season_data_2)
-        self.season2.divisions.set([self.division1])
         self.season2.divisions.set([self.division1])
         self.season2.save()
 
