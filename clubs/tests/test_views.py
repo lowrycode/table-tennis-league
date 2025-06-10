@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
 from clubs.forms import UpdateClubInfoForm
+from test_utils.helpers import create_venue, create_venue_info, delete_objects
 
 User = get_user_model()
 
@@ -2661,3 +2662,63 @@ class DeleteVenueTests(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
         self.assertIn("Unable to delete venue.", messages_list[0].message)
+
+
+class VenueModalTests(TestCase):
+    """
+    Tests for venue_modal view.
+
+    This view is used to render a partial template with venue information
+    to populate the body of a modal in the league app (e.g. Fixtures page).
+    """
+
+    def setUp(self):
+        """
+        Create venue and venue info objects using helper functions.
+        """
+        # Create venue
+        self.venue = create_venue("Test Venue")
+
+        # Create approved venue_info
+        self.venue_info = create_venue_info(venue=self.venue)
+
+        # Create unapproved venue_info
+        create_venue_info(venue=self.venue, approved=False)
+
+        self.url = reverse("venue_modal", args=[self.venue.id])
+
+    def test_htmx_header_required(self):
+        """Verify Bad Request status 400 returned for non-HTMX requests"""
+        # No HTMX header
+        response = self.client.get(self.url)
+        self.assertContains(response, "HTMX requests only", status_code=400)
+
+    def test_htmx_request_returns_partial_with_venue_info(self):
+        """
+        Verify HTMX request renders correct partial and context
+        """
+        response = self.client.get(self.url, HTTP_HX_REQUEST="true")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/partials/club_venue.html")
+        self.assertIn("venue", response.context)
+        self.assertEqual(response.context["venue"]["id"], self.venue.id)
+        self.assertEqual(response.context["venue"]["name"], self.venue.name)
+        self.assertEqual(
+            response.context["venue"]["street_address"],
+            self.venue_info.street_address,
+        )
+
+    def test_venue_not_found(self):
+        """Verify placeholder shows for non-existent venue"""
+        url = reverse("venue_modal", args=[9999])  # Nonexistent id
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Venue not found")
+
+    def test_no_approved_venue_info(self):
+        """Verify placeholder shows when venue has no approved venue info."""
+        # Delete approved venue info using helper
+        delete_objects(VenueInfo, venue=self.venue, approved=True)
+
+        response = self.client.get(self.url, HTTP_HX_REQUEST="true")
+        self.assertContains(response, "No venue info available")
