@@ -3,9 +3,10 @@ from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from league.models import Division, Season, Week, Team, Fixture
-from clubs.models import Club, Venue
+from clubs.models import Club, Venue, VenueInfo
 
 
+# --- Helpers for field validation ---
 def helper_test_boolean_default(field_name, default_value, model, info_data):
     """
     Test that a boolean field has the correct default value.
@@ -96,6 +97,45 @@ def helper_test_max_length(
         test_object.full_clean()
 
 
+# --- Helpers for debugging tests ---
+def debug_response_as_file(response, file_path="debug_response.html"):
+    """
+    Write the response content bytes or string to a normal HTML file
+    and automatically open browser for viewing.
+
+    Args:
+        response_content (bytes or str): The content to write.
+        file_path (str): The path where the file will be written.
+
+    Usage:
+        debug_response_as_file(response)  # Creates file in project root dir
+
+    Returns:
+        str: The path to the file written.
+    """
+
+    # Import webbrowser inside function since only used when debugging
+    # and reduces overhead when not in use
+    import webbrowser
+
+    # Decode bytes to string if needed
+    if isinstance(response.content, bytes):
+        content_str = response.content.decode("utf-8")
+    else:
+        content_str = response.content
+
+    # Write to file
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(content_str)
+
+    # Open in browser for inspection
+    webbrowser.open(f"{file_path}")
+
+    return file_path
+
+
+# --- Helpers for object creation and deletion ---
+# Clubs app
 def create_club(name):
     return Club.objects.create(name=name)
 
@@ -104,8 +144,79 @@ def create_venue(name):
     return Venue.objects.create(name=name)
 
 
+def create_venue_info(
+    venue,
+    street_address="1 Main Street",
+    address_line_2="",
+    city="York",
+    county="Yorkshire",
+    postcode="YO19 5NG",
+    num_tables=2,
+    parking_info="Car park at the front of the venue",
+    meets_league_standards=True,
+    created_on=datetime.now(),
+    approved=True,
+    latitude=53.96423,
+    longitude=-0.97813,
+):
+    venue_info = VenueInfo.objects.create(
+        venue=venue,
+        street_address=street_address,
+        address_line_2=address_line_2,
+        city=city,
+        county=county,
+        postcode=postcode,
+        num_tables=num_tables,
+        parking_info=parking_info,
+        meets_league_standards=meets_league_standards,
+        created_on=created_on,
+        approved=approved,
+        latitude=latitude,
+        longitude=longitude,
+    )
+    return venue_info
+
+
+# League app
 def create_division(name, rank):
     return Division.objects.create(name=name, rank=rank)
+
+
+def create_fixture(season, division, week, home_team, away_team):
+    # Get weekday integer (0=Monday)
+    home_weekday = list(calendar.day_name).index(
+        home_team.home_day.capitalize()
+    )
+
+    # Get fixture date for start of week
+    fixture_date = week.start_date
+
+    # Offset fixture date by weekday integer
+    fixture_date += timedelta(
+        days=(home_weekday - week.start_date.weekday()) % 7
+    )
+
+    # Get fixture datetime
+    fixture_datetime = timezone.make_aware(
+        datetime(
+            fixture_date.year,
+            fixture_date.month,
+            fixture_date.day,
+            home_team.home_time.hour,
+            home_team.home_time.minute,
+        )
+    )
+
+    return Fixture.objects.create(
+        season=season,
+        division=division,
+        week=week,
+        datetime=fixture_datetime,
+        home_team=home_team,
+        away_team=away_team,
+        venue=home_team.home_venue,
+        status="scheduled",
+    )
 
 
 def create_season(
@@ -148,43 +259,6 @@ def create_week(season, week_num):
     )
 
 
-def create_fixture(season, division, week, home_team, away_team):
-    # Get weekday integer (0=Monday)
-    home_weekday = list(calendar.day_name).index(
-        home_team.home_day.capitalize()
-    )
-
-    # Get fixture date for start of week
-    fixture_date = week.start_date
-
-    # Offset fixture date by weekday integer
-    fixture_date += timedelta(
-        days=(home_weekday - week.start_date.weekday()) % 7
-    )
-
-    # Get fixture datetime
-    fixture_datetime = timezone.make_aware(
-        datetime(
-            fixture_date.year,
-            fixture_date.month,
-            fixture_date.day,
-            home_team.home_time.hour,
-            home_team.home_time.minute,
-        )
-    )
-
-    return Fixture.objects.create(
-        season=season,
-        division=division,
-        week=week,
-        datetime=fixture_datetime,
-        home_team=home_team,
-        away_team=away_team,
-        venue=home_team.home_venue,
-        status="scheduled",
-    )
-
-
 def delete_fixtures(**filters):
     """
     Helper to delete objects from Fixture model with optional filters.
@@ -218,39 +292,3 @@ def delete_weeks(**filters):
         **filters: Optional keyword arguments for filtering.
     """
     delete_objects(Week, **filters)
-
-
-def debug_response_as_file(response, file_path="debug_response.html"):
-    """
-    Write the response content bytes or string to a normal HTML file
-    and automatically open browser for viewing.
-
-    Args:
-        response_content (bytes or str): The content to write.
-        file_path (str): The path where the file will be written.
-
-    Usage:
-        debug_response_as_file(response)  # Creates file in project root dir
-
-    Returns:
-        str: The path to the file written.
-    """
-
-    # Import webbrowser inside function since only used when debugging
-    # and reduces overhead when not in use
-    import webbrowser
-
-    # Decode bytes to string if needed
-    if isinstance(response.content, bytes):
-        content_str = response.content.decode("utf-8")
-    else:
-        content_str = response.content
-
-    # Write to file
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(content_str)
-
-    # Open in browser for inspection
-    webbrowser.open(f"{file_path}")
-
-    return file_path
