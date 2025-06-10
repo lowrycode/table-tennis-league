@@ -190,6 +190,12 @@ class FixturesPageTests(TestCase):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "league/fixtures.html")
 
+    def test_page_contains_title_and_fixture_status_key(self):
+        """Verify page contains title and fixture status colour key"""
+        response = self.client.get(self.url)
+        self.assertContains(response, "Fixtures</h1>")
+        self.assertContains(response, 'id="fixture-status-key"')
+
     def test_context_contains_season_and_weeks(self):
         """Verify context contains current season and correct weeks."""
         response = self.client.get(self.url)
@@ -224,6 +230,39 @@ class FixturesPageTests(TestCase):
         self.assertContains(response, self.fixture5.away_team.team_name)
         self.assertContains(response, "Mon 2nd Sep")
         self.assertContains(response, "19:00")
+
+    def test_fixtures_status_class_for_cancelled_fixture(self):
+        """
+        Verify .fixture-cancelled class is used when a fixture is cancelled.
+        """
+        # Cancel a fixture
+        self.fixture5.status = "cancelled"
+        self.fixture5.save()
+
+        response = self.client.get(self.url)
+        self.assertContains(response, '<li class="row fixture-cancelled">')
+
+    def test_fixtures_status_class_for_postponed_fixture(self):
+        """
+        Verify .fixture-postponed class is used when a fixture is postponed.
+        """
+        # Postpone a fixture
+        self.fixture5.status = "postponed"
+        self.fixture5.save()
+
+        response = self.client.get(self.url)
+        self.assertContains(response, '<li class="row fixture-postponed">')
+
+    def test_fixtures_status_class_for_completed_fixture(self):
+        """
+        Verify .fixture-completed class is used when a fixture is completed.
+        """
+        # Mark fixture as completed
+        self.fixture5.status = "completed"
+        self.fixture5.save()
+
+        response = self.client.get(self.url)
+        self.assertContains(response, '<li class="row fixture-completed">')
 
     def test_placeholder_displayed_when_no_current_season(self):
         """Verify placeholder is displayed when season is not found."""

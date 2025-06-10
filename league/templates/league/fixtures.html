@@ -25,7 +25,24 @@
   <div class="container-max-8 w-100 px-3">
     <div class="row">
       <div class="col-12 my-5">
-        <h1 class="h2-style my-4 text-center">Fixtures</h1>
+        <!-- Title -->
+        <h1 class="h2-style mt-4 text-center">Fixtures</h1>
+        <!-- Fixture Status Key -->
+        {% if fixture_status_key %}
+          <div
+            id="fixture-status-key"
+            class="d-flex justify-content-center flex-wrap col-gap-4 row-gap-2 my-2"
+            aria-label="Fixture status colour key"
+          >
+            {% for status_class, label in fixture_status_key %}
+              <div class="d-flex align-items-center gap-2">
+                <span class="fixture-status-box {{ status_class }}"></span>
+                <span class="small text-muted">{{ label }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <!-- Main Content -->
         {% if not season %}
           <p class="text-center py-3">Season not found.</p>
         {% elif not weeks %}

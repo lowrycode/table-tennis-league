@@ -546,3 +546,34 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | The page is responsive across devices and themed consistently with the rest of the website |
 | ✓ | No console errors or warnings were caused by interacting with page elements |
 
+### Fixtures Page - Fixture Listings
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | The League nav item is highlighted when the fixtures page is active  |
+| ✓ | A list of Fixtures (grouped by week) is seen |
+| ✓ | Weeks are listed in chronological order (earilest first) with week name, start date and details (if provided) |
+| ✓ | Fixtures are listed within each week in chronological order (earliest first), by date and time |
+| ✓ | Each fixture includes required information (home team, away team, date and time of fixture, a button for showing venue information) |
+| ✓ | Fixtures are colour coded according to status and a key displays what the colours mean (when fixtures are present) |
+| ✓ | If a week has no fixtures, a placeholder "No fixtures this week." is shown |
+| ✓ | If no weeks are found, a placeholder "No weeks to display." is shown |
+| ✓ | If season not found, a placeholder "Season not found." is shown |
+| ✓ | Venue buttons are styled to look like links used elsewhere on the website and show tooltip when hovered |
+| ✓ | Login not required to view the fixtures page |
+| ✓ | Page is responsive on different screen sizes |
+| ✓ | No console errors or warnings were caused by interacting with page elements |
+
+### Fixtures Page - Venue Modal
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Clicking on venue opens the venue modal with venue information |
+| ✓ | A loading spinner shows when retrieving venue information |
+| ✓ | If venue not found, a placeholder "Venue not found" is shown |
+| ✓ | If no approved venue information, a placeholder "No venue info available" is shown |
+| ✓ | If venue info is available it displays correctly alongside the fixture description (Home vs Away) |
+| ✓ | Login not required to view the venue-modal |
+| ✓ | Modal is responsive on different screen sizes |
+| ✓ | No console errors or warnings were caused by interacting with the modal |
+

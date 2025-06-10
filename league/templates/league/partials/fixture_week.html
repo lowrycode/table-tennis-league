@@ -1,10 +1,12 @@
+{% load fixture_tags %}
 <section class="week-fixtures my-5">
   <h2 class="fs-5 text-center mb-0">{{ week.name }}: <span class="p-style">Begins {{ week.start_date|date:"jS M" }}</span></h2>
   {% if week.details %}<p class="mt-1 mb-0 text-center">{{ week.details }}</p>{% endif %}
   {% if week.week_fixtures.all %}
     <ul>
       {% for fixture in week.week_fixtures.all %}
-        <li class="row">
+        <li class="row {{ fixture.status|status_class }}">
+          <span class="visually-hidden">Status: {{ fixture.status }}</span>
           <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-end align-items-center fs-5">
             {{ fixture.home_team.team_name }}  
           </div>
@@ -38,7 +40,7 @@
     </ul>
   {% else %}
     <ul>
-      <li>
+      <li class="fixture-status-none">
         <div class="py-1 text-center">No fixtures this week.</div>
       </li>
     </ul>  
