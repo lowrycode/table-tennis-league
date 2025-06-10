@@ -419,13 +419,13 @@ footer a:hover {
 }
 
 /* FIXTURES PAGE */
-#fixtures ul {
+.week-fixtures ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-#fixtures li {
+.week-fixtures li {
   background-color: var(--light-2);
   margin: 0.5rem 0;
   padding: 0.4rem 1rem;
