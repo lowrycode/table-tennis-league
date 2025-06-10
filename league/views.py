@@ -1,9 +1,18 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from .models import Season, Week
 
 
 def fixtures(request):
-    season = get_object_or_404(Season, is_current=True)
+    season = (
+        Season.objects.filter(is_current=True)
+        .order_by("-start_date")
+        .first()
+    )
+    if not season:
+        return render(
+            request, "league/fixtures.html", {"season": None, "weeks": None}
+        )
+
     weeks = (
         Week.objects.filter(season=season)
         .prefetch_related(
