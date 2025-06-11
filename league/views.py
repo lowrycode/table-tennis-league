@@ -1,25 +1,37 @@
+from django.db.models import Prefetch
 from django.shortcuts import render
-from .models import Season, Week
+from .models import Week, Fixture
+from .filters import FixtureFilter
 
 
 def fixtures(request):
-    season = (
-        Season.objects.filter(is_current=True).order_by("-start_date").first()
-    )
-    if not season:
-        return render(
-            request, "league/fixtures.html", {"season": None, "weeks": None}
+    # Get fixtures with attached data
+    all_fixtures = Fixture.objects.select_related("season", "division").all()
+
+    # Apply filter
+    fixture_filter = FixtureFilter(request.GET, queryset=all_fixtures)
+    filtered_fixtures_qs = fixture_filter.qs
+
+    # Get season from bound form - defaults to current season or None
+    season = fixture_filter.form.cleaned_data.get("season")
+
+    # Get season_weeks
+    if season:
+        season_week_ids = (
+            Week.objects.filter(season=season)
+            .order_by("start_date")
+            .values_list("id", flat=True)
         )
 
-    weeks = (
-        Week.objects.filter(season=season)
-        .prefetch_related(
-            "week_fixtures__home_team",
-            "week_fixtures__away_team",
-            "week_fixtures__venue",
+        season_weeks = (
+            Week.objects.filter(id__in=season_week_ids)
+            .prefetch_related(
+                Prefetch("week_fixtures", queryset=filtered_fixtures_qs)
+            )
+            .order_by("start_date")
         )
-        .order_by("start_date")
-    )
+    else:
+        season_weeks = None
 
     # Used for the fixture status colour key (format: CSS class, label)
     fixture_status_key = [
@@ -29,12 +41,22 @@ def fixtures(request):
         ("fixture-cancelled", "Cancelled"),
     ]
 
-    return render(
-        request,
-        "league/fixtures.html",
-        {
-            "season": season,
-            "weeks": weeks,
-            "fixture_status_key": fixture_status_key,
-        },
-    )
+    # Deduce whether filters are applied by checking for get parameters
+    filters_applied = len(request.GET) > 0
+
+    # Build context
+    context = {
+        "season": season,
+        "weeks": season_weeks,
+        "fixture_status_key": fixture_status_key,
+        "filter": fixture_filter,
+        "filters_applied": filters_applied,
+    }
+
+    # If htmx request, return only the fixtures_section partial template
+    if request.headers.get("HX-Request") == "true":
+        return render(
+            request, "league/partials/fixtures_section.html", context
+        )
+
+    return render(request, "league/fixtures.html", context)

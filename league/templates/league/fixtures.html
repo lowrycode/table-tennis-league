@@ -3,61 +3,18 @@
 
 {% block content %}
   <!-- Venue Modal -->
-  <div class="modal fade" id="venue-modal" tabindex="-1" aria-labelledby="venue-modal-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="venue-modal-label">Venue Information</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="modal-fixture-info" class="fw-semibold fst-italic">
-            <!-- Initialised using JS -->
-          </div>
-          <div id="modal-venue-info" role="status">
-            <!-- Initialised using JS - populated using HTMX -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% include 'league/partials/venue_modal.html' %}
   <!-- Fixtures Content -->
-  <div class="container-max-8 w-100 px-3">
-    <div class="row">
-      <div class="col-12 my-5">
-        <!-- Title -->
-        <h1 class="h2-style mt-4 text-center">Fixtures</h1>
-        <!-- Fixture Status Key -->
-        {% if fixture_status_key %}
-          <div
-            id="fixture-status-key"
-            class="d-flex justify-content-center flex-wrap col-gap-4 row-gap-2 my-2"
-            aria-label="Fixture status colour key"
-          >
-            {% for status_class, label in fixture_status_key %}
-              <div class="d-flex align-items-center gap-2">
-                <span class="fixture-status-box {{ status_class }}"></span>
-                <span class="small text-muted">{{ label }}</span>
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-        <!-- Main Content -->
-        {% if not season %}
-          <p class="text-center py-3">Season not found.</p>
-        {% elif not weeks %}
-          <p class="text-center py-3">No weeks to display.</p>
-        {% else %}
-          {% for week in weeks %}
-            {% include 'league/partials/fixture_week.html' %}
-          {% endfor %}
-        {% endif %}
-      </div>
-    </div>
-  </div>
+  {% include 'league/partials/fixtures_section.html' %}
 {% endblock %}
 
 {% block scripts %}
+  <!-- Load HTMX -->
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  
+  <!-- Script for initialising modal -->
   <script src="{% static 'js/league/init_venue_modal.js' %}"></script>
+  
+  <!-- Script controlling toggle behaviour for clubs filter -->
+    <script src="{% static 'js/toggle_btn.js' %}"></script>
 {% endblock %}

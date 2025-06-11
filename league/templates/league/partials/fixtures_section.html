@@ -1,0 +1,55 @@
+<section id="fixtures-section" class="container-max-8 w-100 px-3">
+  <div class="row">
+    <div class="col-12 my-5"> 
+      <div class="my-5">
+        <!-- Title and Filter Button -->
+        <div class="d-flex justify-content-between">
+          <h1 class="h2-style text-center flex-grow-1 m-0">Fixtures</h1>
+          <button
+            class="btn-toggle btn fs-4"
+            data-target="#filter-fixtures"
+            aria-label="{{ filters_applied|yesno:'Filters active,No filters applied' }}"
+          >
+            <i class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"></i>
+          </button>
+        </div>
+                <!-- Fixture Status Key -->
+        {% if fixture_status_key %}
+          <div
+            id="fixture-status-key"
+            class="d-flex justify-content-center flex-wrap col-gap-4 row-gap-2 my-2"
+            aria-label="Fixture status colour key"
+          >
+            {% for status_class, label in fixture_status_key %}
+              <div class="d-flex align-items-center gap-2">
+                <span class="fixture-status-box {{ status_class }}"></span>
+                <span class="small text-muted">{{ label }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <!-- Filters Form -->
+        <form
+          id="filter-fixtures"
+          class="filter-box mt-2 p-3 d-none"
+          method="get"
+          data-hx-get="{% url 'fixtures' %}"
+          data-hx-target="#fixtures-section"
+          data-hx-swap="outerHTML"
+        >
+          {% include 'league/partials/fixtures_filter_panel_inner.html' %}
+        </form>
+      </div>
+      <!-- Main Content -->
+      {% if not season %}
+        <p class="text-center py-3">Season not found.</p>
+      {% elif not weeks %}
+        <p class="text-center py-3">No weeks to display.</p>
+      {% else %}
+        {% for week in weeks %}
+          {% include 'league/partials/fixture_week.html' %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>

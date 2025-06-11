@@ -577,3 +577,20 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Modal is responsive on different screen sizes |
 | ✓ | No console errors or warnings were caused by interacting with the modal |
 
+
+### Fixtures Page - Filters Panel
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Clicking on filter button opens a filter panel |
+| ✓ | Filter panel includes select boxes for season and division |
+| ✓ | Filter panel includes buttons "Clear Filters" and "Apply Filters"  |
+| ✓ | Only seasons with is_visible display in seasons dropdown |
+| ✓ | Seasons are listed in reverse chronological order |
+| ✓ | Current season is chosen as the default option |
+| ✓ | The divisions dropdown shows divisions in rank order |
+| ✓ | The divisions dropdown has a default value of "All Divisions" |
+| ✓ | The fixtures list updates correctly according to the selected filters when the "Apply Filters" button is pressed |
+| ✓ | The fixtures list updates correctly when the "Clear Filters" button is pressed |
+| ✓ | No console errors or warnings were caused by interacting with the modal |
+
