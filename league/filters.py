@@ -5,6 +5,15 @@ from clubs.models import Club
 
 
 class FixtureFilter(django_filters.FilterSet):
+    """
+    A dynamic filter for the Fixture model based on season, division, and club.
+
+    - Season is required and defaults to the current season.
+    - Division options are populated based on the selected season.
+    - Club options are populated based on the selected season and division.
+    - HTMX used to dynamically update filter options without full page reload.
+    """
+
     season = django_filters.ModelChoiceFilter(
         queryset=Season.objects.filter(is_visible=True),
         to_field_name="slug",
@@ -54,9 +63,7 @@ class FixtureFilter(django_filters.FilterSet):
         if season_slug:
             try:
                 season = Season.objects.get(slug=season_slug)
-                self.form.fields["division"].queryset = (
-                    season.divisions.all()
-                )
+                self.form.fields["division"].queryset = season.divisions.all()
             except Season.DoesNotExist:
                 self.form.fields["division"].queryset = Division.objects.none()
 
@@ -81,6 +88,10 @@ class FixtureFilter(django_filters.FilterSet):
         fields = ["season", "division", "club"]
 
     def filter_by_club(self, queryset, name, value):
+        """
+        Filters the queryset to include fixtures where the selected club is
+        either the home or away team.
+        """
         return queryset.filter(home_team__club=value) | queryset.filter(
             away_team__club=value
         )

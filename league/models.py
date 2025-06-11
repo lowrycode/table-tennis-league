@@ -7,6 +7,11 @@ from .validators import validate_match_time
 
 
 class Division(models.Model):
+    """
+    Represents a competitive division, ordered by rank.
+    Divisions are shared across multiple seasons.
+    """
+
     name = models.CharField(max_length=50, unique=True)
     rank = models.PositiveSmallIntegerField(unique=True)
 
@@ -17,6 +22,7 @@ class Division(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
+        # Prevent deletion if the division is linked to any seasons
         if self.seasons.exists():
             raise ValidationError(
                 "This division cannot be deleted because it is linked "
@@ -26,6 +32,10 @@ class Division(models.Model):
 
 
 class Season(models.Model):
+    """
+    Represents a single season in the league.
+    """
+
     name = models.CharField(max_length=100, unique=True)
     short_name = models.CharField(max_length=20, unique=True)
     slug = models.SlugField(max_length=20, unique=True)
@@ -102,6 +112,12 @@ class Season(models.Model):
 
 
 class Week(models.Model):
+    """
+    Represents a named week within a season.
+
+    Used to group fixtures by date.
+    """
+
     season = models.ForeignKey(
         Season, on_delete=models.CASCADE, related_name="season_weeks"
     )
@@ -111,6 +127,7 @@ class Week(models.Model):
 
     class Meta:
         ordering = ["start_date"]
+        # Ensure week names are unique within a season
         constraints = [
             models.UniqueConstraint(
                 fields=["season", "name"], name="unique_season_and_name"
@@ -120,16 +137,14 @@ class Week(models.Model):
     def __str__(self):
         return self.name
 
-    # def delete(self, *args, **kwargs):
-    #     if self.week_fixtures.exists():
-    #         raise ValidationError(
-    #             "This division cannot be deleted because it is linked "
-    #             "to season data."
-    #         )
-    #     super().delete(*args, **kwargs)
-
 
 class Player(models.Model):
+    """
+    Represents an individual player, optionally linked to a club.
+
+    Uniqueness is enforced by name and date of birth.
+    """
+
     STATUS_CHOICES = [
         ("confirmed", "Confirmed"),
         ("pending", "Pending"),
@@ -177,6 +192,12 @@ class Player(models.Model):
 
 
 class Team(models.Model):
+    """
+    Represents a club team competing in a division during a season.
+
+    Includes default details for home venue, match day and match time.
+    """
+
     DAY_CHOICES = [
         ("monday", "Monday"),
         ("tuesday", "Tuesday"),
@@ -257,6 +278,12 @@ class Team(models.Model):
 
 
 class TeamPlayer(models.Model):
+    """
+    Links a player to a team for a given season.
+
+    Enforces eligibility and club association constraints.
+    """
+
     player = models.ForeignKey(
         Player,
         on_delete=models.PROTECT,
@@ -313,6 +340,11 @@ class TeamPlayer(models.Model):
 
 
 class Fixture(models.Model):
+    """
+    Represents a scheduled match between two teams in a season.
+    Includes timing, venue and match status.
+    """
+
     STATUS_CHOICES = [
         ("scheduled", "Scheduled"),
         ("postponed", "Postponed"),
