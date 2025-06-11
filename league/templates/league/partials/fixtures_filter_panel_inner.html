@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center align-items-center flex-wrap row-gap-3 col-gap-4">
   {% for field in filter.form %}              
-    <div class="form-check p-0">
+    <div>
       <label class="visually-hidden" for="{{ field.id_for_label }}">{{ field.label }}</label>
       {{ field }}
     </div>
