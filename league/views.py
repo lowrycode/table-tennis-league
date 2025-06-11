@@ -6,26 +6,33 @@ from .filters import FixtureFilter
 
 
 def fixtures(request):
-    # Get fixtures with attached data
-    all_fixtures = Fixture.objects.select_related("season", "division").all()
+    """
+    Displays the fixture list, filtered by season and optionally division
+    and club.
 
-    # Apply filter
+    Supports both full-page rendering and partial updates via HTMX.
+    Filters are applied using FixtureFilter, and results are grouped by weeks.
+    """
+
+    # Prefetch related data for efficiency
+    all_fixtures = Fixture.objects.select_related(
+        "season", "division", "home_team__club", "away_team__club"
+    )
+
+    # Apply filters from GET params using FixtureFilter
     fixture_filter = FixtureFilter(request.GET, queryset=all_fixtures)
     filtered_fixtures_qs = fixture_filter.qs
 
     # Get season from bound form - defaults to current season or None
-    season = fixture_filter.form.cleaned_data.get("season")
+    if fixture_filter.is_valid():
+        season = fixture_filter.form.cleaned_data.get("season")
+    else:
+        season = None
 
     # Get season_weeks
     if season:
-        season_week_ids = (
-            Week.objects.filter(season=season)
-            .order_by("start_date")
-            .values_list("id", flat=True)
-        )
-
         season_weeks = (
-            Week.objects.filter(id__in=season_week_ids)
+            Week.objects.filter(season=season)
             .prefetch_related(
                 Prefetch("week_fixtures", queryset=filtered_fixtures_qs)
             )
