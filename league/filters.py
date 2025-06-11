@@ -52,7 +52,7 @@ class FixtureFilter(django_filters.FilterSet):
                         "data-hx-target": "#filter-fixtures",
                         "data-hx-trigger": "change",
                         "data-hx-swap": "innerHTML",
-                        "data-hx-include": "closest form",  # to send all fields
+                        "data-hx-include": "closest form",  # send all field
                     }
                 )
 
