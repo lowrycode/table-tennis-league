@@ -37,7 +37,13 @@ class FixturesPageTests(TestCase):
             [self.division1, self.division2],
         )
         self.season2 = create_season(
-            "2024/25", "24-25", "24-25", 2024, 2025, True, [self.division1]
+            "2024/25",
+            "24-25",
+            "24-25",
+            2024,
+            2025,
+            True,
+            [self.division1, self.division2],
         )
 
         # Venues
@@ -372,12 +378,14 @@ class FixturesPageTests(TestCase):
             HTTP_HX_REQUEST="true",
         )
 
-        # Should include fixture from division2
+        # Should include fixture from division2 season 2
         self.assertContains(response, div2_fixture.home_team.team_name)
         self.assertContains(response, div2_fixture.away_team.team_name)
 
-        # Should not contain fixtures from division1
+        # Should not contain fixtures from division1 season1
         self.assertNotContains(response, self.fixture1.home_team.team_name)
+
+        # Should not contain fixtures from division1 season2
         self.assertNotContains(response, self.fixture5.home_team.team_name)
 
     def test_htmx_season_and_division_filters_together(self):
@@ -461,3 +469,25 @@ class FixturesPageTests(TestCase):
 
         # Should not contain fixtures from division1 season 2
         self.assertNotContains(response, self.fixture5.home_team.team_name)
+
+
+class FixturesFilterView(TestCase):
+    def setUp(self):
+        """Define url for tests"""
+        self.url = reverse("fixtures_filter")
+
+    def test_valid_htmx_requests_renders_correct_partial(self):
+        """Verify correct template is rendered for HTMX request"""
+        response = self.client.get(
+            self.url,
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "league/partials/fixtures_filter_panel_inner.html"
+        )
+
+    def test_non_htmx_requests_return_bad_request(self):
+        """Verify Bad Request status 400 returned for non-HTMX requests"""
+        response = self.client.get(self.url)
+        self.assertContains(response, "HTMX requests only", status_code=400)

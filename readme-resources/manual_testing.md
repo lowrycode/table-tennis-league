@@ -592,5 +592,6 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | The divisions dropdown has a default value of "All Divisions" |
 | ✓ | The fixtures list updates correctly according to the selected filters when the "Apply Filters" button is pressed |
 | ✓ | The fixtures list updates correctly when the "Clear Filters" button is pressed |
+| ✓ | Changing the season updates the divisions dropdown options but changing the division does not reset the season |
 | ✓ | No console errors or warnings were caused by interacting with the modal |
 

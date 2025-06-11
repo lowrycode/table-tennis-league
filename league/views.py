@@ -1,3 +1,4 @@
+from django.http import HttpResponseBadRequest
 from django.db.models import Prefetch
 from django.shortcuts import render
 from .models import Week, Fixture
@@ -60,3 +61,22 @@ def fixtures(request):
         )
 
     return render(request, "league/fixtures.html", context)
+
+
+def fixtures_filter(request):
+    """
+    Render the fixtures_filter_panel_inner partial with filter form contents.
+
+    This allows for dynamically updating dropdown options via HTMX.
+    """
+    # If not HTMX request, return error 400
+    if not request.headers.get("HX-Request") == "true":
+        return HttpResponseBadRequest(
+            "This endpoint is for HTMX requests only."
+        )
+    fixture_filter = FixtureFilter(request.GET or None)
+    return render(
+        request,
+        "league/partials/fixtures_filter_panel_inner.html",
+        {"filter": fixture_filter},
+    )
