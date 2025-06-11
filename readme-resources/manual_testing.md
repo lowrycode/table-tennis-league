@@ -593,5 +593,6 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | The fixtures list updates correctly according to the selected filters when the "Apply Filters" button is pressed |
 | ✓ | The fixtures list updates correctly when the "Clear Filters" button is pressed |
 | ✓ | Changing the season updates the divisions dropdown options but changing the division does not reset the season |
+| ✓ | Changing the season and / or division updates the clubs dropdown options but changing the club does not reset the season or division |
 | ✓ | No console errors or warnings were caused by interacting with the modal |
 

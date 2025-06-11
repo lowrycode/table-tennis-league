@@ -470,6 +470,96 @@ class FixturesPageTests(TestCase):
         # Should not contain fixtures from division1 season 2
         self.assertNotContains(response, self.fixture5.home_team.team_name)
 
+    def test_htmx_club_filter_returns_club_home_fixtures(self):
+        """
+        Verify HTMX request with club filter includes fixtures where
+        club team is playing at home
+        """
+
+        # Delete fixtures
+        delete_fixtures()
+
+        # Create fixture where neither home or away team in club
+        fixture_neither_in_club = create_fixture(
+            self.season2,
+            self.division1,
+            self.week1_season2,
+            self.team7,
+            self.team8,
+        )
+
+        # Create fixture where home team in club but not away team
+        fixture_home_in_club = create_fixture(
+            self.season2,
+            self.division1,
+            self.week2_season2,
+            self.team5,
+            self.team7,
+        )
+
+        response = self.client.get(
+            self.url,
+            {
+                "season": self.season2.slug,
+                "club": self.club1.id,
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        # Should include teams in fixtures where home team is in specified club
+        self.assertContains(response, fixture_home_in_club.home_team.team_name)
+        self.assertContains(response, fixture_home_in_club.away_team.team_name)
+
+        # Should not include teams which do not play against club teams
+        self.assertNotContains(
+            response, fixture_neither_in_club.away_team.team_name
+        )
+
+    def test_htmx_club_filter_returns_club_away_fixtures(self):
+        """
+        Verify HTMX request with club filter includes fixtures where
+        club team is playing away
+        """
+
+        # Delete fixtures
+        delete_fixtures()
+
+        # Create fixture where neither home or away team in club
+        fixture_neither_in_club = create_fixture(
+            self.season2,
+            self.division1,
+            self.week1_season2,
+            self.team7,
+            self.team8,
+        )
+
+        # Create fixture where away team in club but not home team
+        fixture_home_in_club = create_fixture(
+            self.season2,
+            self.division1,
+            self.week2_season2,
+            self.team7,
+            self.team5,
+        )
+
+        response = self.client.get(
+            self.url,
+            {
+                "season": self.season2.slug,
+                "club": self.club1.id,
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        # Should include teams in fixtures where away team is in specified club
+        self.assertContains(response, fixture_home_in_club.home_team.team_name)
+        self.assertContains(response, fixture_home_in_club.away_team.team_name)
+
+        # Should not include teams which do not play against club teams
+        self.assertNotContains(
+            response, fixture_neither_in_club.away_team.team_name
+        )
+
 
 class FixturesFilterView(TestCase):
     def setUp(self):
