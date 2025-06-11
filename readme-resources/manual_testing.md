@@ -590,9 +590,12 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Current season is chosen as the default option |
 | ✓ | The divisions dropdown shows divisions in rank order |
 | ✓ | The divisions dropdown has a default value of "All Divisions" |
+| ✓ | The Club dropdown shows clubs in alphabetical order and each club only appears once |
+| ✓ | The Club dropdown has a default value of "All Clubs" |
 | ✓ | The fixtures list updates correctly according to the selected filters when the "Apply Filters" button is pressed |
 | ✓ | The fixtures list updates correctly when the "Clear Filters" button is pressed |
 | ✓ | Changing the season updates the divisions dropdown options but changing the division does not reset the season |
-| ✓ | Changing the season and / or division updates the clubs dropdown options but changing the club does not reset the season or division |
+| ✓ | Changing the season and/or division updates the clubs dropdown options but changing the club does not reset the season or division |
+| ✓ | All filters work across devices and the layout is fully responsive |
 | ✓ | No console errors or warnings were caused by interacting with the modal |
 
