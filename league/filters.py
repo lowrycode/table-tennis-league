@@ -48,11 +48,11 @@ class FixtureFilter(django_filters.FilterSet):
             if field:
                 field.widget.attrs.update(
                     {
-                        "hx-get": reverse("fixtures_filter"),
-                        "hx-target": "#filter-fixtures",
-                        "hx-trigger": "change",
-                        "hx-swap": "innerHTML",
-                        "hx-include": "closest form",  # to send all fields
+                        "data-hx-get": reverse("fixtures_filter"),
+                        "data-hx-target": "#filter-fixtures",
+                        "data-hx-trigger": "change",
+                        "data-hx-swap": "innerHTML",
+                        "data-hx-include": "closest form",  # to send all fields
                     }
                 )
 
