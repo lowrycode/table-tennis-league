@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from league.models import Division, Season, Week, Team, Fixture
-from clubs.models import Club, Venue, VenueInfo
+from clubs.models import Club, Venue, VenueInfo, ClubReview
 
 
 # --- Helpers for field validation ---
@@ -216,6 +216,24 @@ def create_fixture(season, division, week, home_team, away_team):
         away_team=away_team,
         venue=home_team.home_venue,
         status="scheduled",
+    )
+
+
+def create_club_review(
+    club,
+    user,
+    score,
+    headline,
+    review_text,
+    approved=True
+):
+    return ClubReview.objects.create(
+        club=club,
+        user=user,
+        score=score,
+        headline=headline,
+        review_text=review_text,
+        approved=approved,
     )
 
 

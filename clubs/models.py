@@ -228,3 +228,30 @@ class ClubAdmin(models.Model):
 
     def __str__(self):
         return f"{self.user.username} for {self.club.name}"
+
+
+class ClubReview(models.Model):
+    club = models.ForeignKey(
+        "Club", on_delete=models.CASCADE, related_name="reviews"
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="club_reviews"
+    )
+    score = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    headline = models.CharField(max_length=100)
+    review_text = models.TextField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    approved = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("club", "user")  # One review per club per user
+        ordering = ["-updated_on"]
+
+    def __str__(self):
+        return (
+            f"Review by {self.user.username} for {self.club.name} "
+            f"({self.score}★)"
+        )
