@@ -1,0 +1,7 @@
+{% for i in "12345" %}
+  {% if forloop.counter <= star_rating %}
+    <i class="fa-solid fa-star amber"></i>
+  {% else %}
+    <i class="fa-regular fa-star amber"></i>
+  {% endif %}
+{% endfor %}

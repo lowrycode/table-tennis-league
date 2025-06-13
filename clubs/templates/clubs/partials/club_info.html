@@ -1,10 +1,41 @@
 {% load static %}
 
 <article id="club-article-{{ club.id }}" class="border club my-5 p-3">
-  <!-- Club Name and Website -->
+  <!-- Club Header  -->
   <div class="d-flex justify-content-between flex-wrap">
-    <h3>{{club.name}}</h3>
+    <div>
+      <!-- Club Name -->
+      <h3>{{club.name}}</h3>
+      <!-- Reviews -->
+      <a
+        href="#"
+        class="d-flex flex-wrap align-items-center gap-2 mb-2"
+        aria-label="Visit the review page for {{ club.name }}"
+        title="Go to reviews page"
+      >
+        {% if club.review_average_score %}
+          <div aria-hidden="true">
+            {% with club.review_average_score_int as star_rating%}
+              {% include "clubs/partials/star_rating.html" %}
+            {% endwith %}
+          </div>
+          <div aria-label="{{ club.review_average_score }} out of 5 stars">
+            {{ club.review_average_score }} Stars
+          </div>
+          <div>
+            ({{ club.review_count }} review{{ club.review_count|pluralize }})
+          </div>
+        
+        {% else %}
+          <div aria-hidden="true">
+            {% include "clubs/partials/star_rating_empty.html" %}
+          </div>
+          <div>(no reviews yet)</div>
+        {% endif %}
+      </a>
+    </div>
     {% if club.info.website %}
+      <!-- Website -->
       <a
         href="{{club.info.website}}"
         target="_blank"

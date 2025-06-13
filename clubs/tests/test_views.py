@@ -5,7 +5,12 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
 from clubs.forms import UpdateClubInfoForm
-from test_utils.helpers import create_venue, create_venue_info, delete_objects
+from test_utils.helpers import (
+    create_venue,
+    create_venue_info,
+    delete_objects,
+    create_club_review,
+)
 
 User = get_user_model()
 
@@ -146,6 +151,50 @@ class ClubsPageDynamicTests(TestCase):
         Club.objects.all().delete()
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, "No clubs found.")
+
+    def test_page_displays_placeholder_for_no_reviews(self):
+        """Verify placeholder is shown if no club reviews exist"""
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, "(no reviews yet)")
+        self.assertContains(
+            response, '<i class="fa-regular fa-star text-muted"></i>'
+        )
+
+    def test_page_displays_average_review_score_and_review_count(self):
+        """
+        Verify average review score and review count is shown and based
+        on approved reviews only.
+        """
+        # Create users
+        user1 = User.objects.create_user(
+            username="user1",
+            email="user1@example.com",
+            password="password123",
+        )
+        user2 = User.objects.create_user(
+            username="user2",
+            email="user2@example.com",
+            password="password123",
+        )
+        user3 = User.objects.create_user(
+            username="user3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Create approved reviews
+        create_club_review(self.club_1, user1, 4, "Headline", "Review text.")
+        create_club_review(self.club_1, user2, 5, "Headline", "Review text.")
+
+        # Create an unapproved review
+        create_club_review(
+            self.club_1, user3, 3, "Headline", "Review text.", False
+        )
+
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, '<i class="fa-solid fa-star amber"></i>')
+        self.assertContains(response, "4.5 Stars")
+        self.assertContains(response, "(2 reviews)")
 
     def test_page_displays_contact_names(self):
         """Verify that contact name is shown for approved club."""

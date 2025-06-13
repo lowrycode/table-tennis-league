@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Avg, Count, Q
 from django.shortcuts import render, redirect
 from django.http import (
     HttpResponseForbidden,
@@ -215,9 +215,17 @@ def clubs(request):
         to_attr="approved_club_venues",
     )
 
-    # Get all Clubs and attach approved ClubInfos and ClubVenues
-    all_clubs = Club.objects.prefetch_related(
-        approved_club_infos_pf, approved_venue_infos_pf
+    # Get all Clubs with annotated review data and prefetch approved
+    # ClubInfos and ClubVenues
+    all_clubs = (
+        Club.objects.annotate(
+            review_average_score=Avg(
+                "reviews__score", filter=Q(reviews__approved=True)
+            ),
+            review_count=Count("reviews", filter=Q(reviews__approved=True)),
+        )
+        .prefetch_related(approved_club_infos_pf, approved_venue_infos_pf)
+        .order_by("name")
     )
 
     # Build clubs list for passing to template
@@ -229,6 +237,17 @@ def clubs(request):
             "name": club.name,
             "info": {},
             "venues": [],
+            "review_average_score": (
+                round(club.review_average_score, 1)
+                if club.review_average_score
+                else None
+            ),
+            "review_average_score_int": (
+                int(club.review_average_score + 0.5)
+                if club.review_average_score
+                else None
+            ),
+            "review_count": club.review_count,
         }
 
         if club.approved_club_infos:

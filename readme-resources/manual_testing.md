@@ -377,12 +377,15 @@ These tests cover all of the implemented User Stories and were carried out at va
 | Status  | Test Description |
 | ---     | ---              |
 | ✓ | The Clubs nav item is highlighted to indicate that it is the active page  |
-| ✓ | A list of clubs is seen including Name, Website Link (if given), Contact Name, Phone (if given), Email, Description, User Image (or placeholder image), Session information, Checkboxes for various features |
+| ✓ | A list of clubs is seen including Name, Review Data, Website Link (if given), Contact Name, Phone (if given), Email, Description, User Image (or placeholder image), Session information, Checkboxes for various features |
 | ✓ | Clubs are listed in alphabetical order by name |
 | ✓ | Only approved club information is shown on the page |
 | ✓ | Clubs with no club information submitted do not show on the Clubs page |
 | ✓ | Where there are multiple versions of the Club Information, only the most recently approved version is displayed |
 | ✓ | If there are no approved clubs, a placeholder ("No clubs found.") is shown instead |
+| ✓ | If the club does not have any approved reviews, a placeholder shows |
+| ✓ | If the club does have approved reviews, the average star rating score and review count is shown, based on approved reviews only |
+| ✓ | Clicking on the review information links to the club's dedicated reviews page |
 | ✓ | If no website for the club is provided, no link to the website shows |
 | ✓ | Clicking on a website link correctly navigates to the external webpage (if it exists) and it opens in a new browser tab |
 | ✓ | Website links are styled consistently with other links on the website |
