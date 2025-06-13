@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-center flex-wrap flex-sm-nowrap col-gap-4">
     <h2 class="fs-5 w-100">{{ review.headline }}</h2>
     <!-- Stars -->
-    <div class="flex-shrink-0 mb-1">
+    <div class="flex-shrink-0 mb-1" aria-label="Rated {{ review.score }} out of 5 stars">
       {% with review.score as star_rating%}
         {% include "clubs/partials/star_rating.html" %}
       {% endwith %}
