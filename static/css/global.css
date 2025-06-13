@@ -421,6 +421,19 @@ footer a:hover {
   background-color: var(--primary-1);
 }
 
+/* CLUB REVIEWS PAGE  */
+#club-reviews-header {
+  background-color: var(--primary-5);
+}
+
+#user-review {
+  background-color: var(--light-2);
+}
+
+.club-review {
+  background-color: var(--light-1);
+}
+
 /* FIXTURES PAGE */
 .fixture-status-box {
   width: 15px;

@@ -9,7 +9,9 @@ from test_utils.helpers import (
     create_venue,
     create_venue_info,
     delete_objects,
+    create_club,
     create_club_review,
+    delete_club_reviews,
 )
 
 User = get_user_model()
@@ -1007,6 +1009,177 @@ class ClubsPageLocationsTests(TestCase):
         self.assertEqual(len(locations), 0)
         self.assertContains(response, "No locations to display.")
         self.assertNotContains(response, "initialise_map.js")
+
+
+class ClubReviewsPageTests(TestCase):
+    """
+    Tests for club reviews page.
+    """
+
+    def setUp(self):
+        """
+        Create users, clubs and related club reviews for use in tests.
+        """
+        # Create club
+        self.club = create_club("Test Club")
+
+        # Create users
+        self.user1 = User.objects.create_user(
+            username="user1",
+            email="user1@example.com",
+            password="password123",
+        )
+        self.user2 = User.objects.create_user(
+            username="user2",
+            email="user2@example.com",
+            password="password123",
+        )
+        self.user3 = User.objects.create_user(
+            username="user3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Create approved reviews
+        create_club_review(
+            self.club, self.user1, 4, "Approved Review 1", "Review text."
+        )
+        create_club_review(
+            self.club, self.user2, 5, "Approved Review 2", "Review text."
+        )
+
+        # Create an unapproved review
+        create_club_review(
+            self.club,
+            self.user3,
+            3,
+            "Unapproved Review 1",
+            "Review text.",
+            False,
+        )
+
+        self.url = reverse("club_reviews", args=[self.club.id])
+
+    def test_club_reviews_renders_successfully(self):
+        """
+        Verify the club reviews page renders successfully with status 200
+        and includes the club name in the response.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/club_reviews.html")
+        self.assertContains(response, "Test Club")
+
+    def test_club_reviews_returns_404_for_invalid_club(self):
+        """
+        Verify the view returns a 404 error when the club does not exist.
+        """
+        invalid_url = reverse("club_reviews", args=[999])
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_review_summary_display_is_correct(self):
+        """
+        Verify the review summary displays the correct average score and
+        review count.
+        """
+        response = self.client.get(self.url)
+        self.assertContains(response, "4.5 Average")
+        self.assertContains(response, "(2 reviews)")
+
+    def test_no_reviews_displays_empty_star_rating(self):
+        """
+        Verify that when no approved reviews exist, the empty star rating
+        is shown.
+        """
+        delete_club_reviews()
+        response = self.client.get(self.url)
+        self.assertContains(response, "no reviews")
+        self.assertTemplateUsed(
+            response, "clubs/partials/star_rating_empty.html"
+        )
+
+    def test_only_approved_reviews_displayed_for_unauthenticated_user(self):
+        """
+        Verify only approved club reviews are shown on the page.
+        """
+        response = self.client.get(self.url)
+
+        # Approved reviews
+        self.assertContains(response, "Approved Review 1")
+        self.assertContains(response, "Approved Review 2")
+
+        # Unapproved reviews
+        self.assertNotContains(response, "Unapproved Review 1")
+
+    def test_club_review_buttons_do_not_display_for_unauthenticated_user(self):
+        """
+        Verify that review action buttons do not display for unauthenticated
+        users.
+        """
+        response = self.client.get(self.url)
+
+        # Approved reviews
+        self.assertNotContains(response, "Edit Review</a>")
+        self.assertNotContains(response, "Delete Review</a>")
+        self.assertNotContains(response, "Write a review</a>")
+
+        # Unapproved reviews
+        self.assertNotContains(response, "Unapproved Review 1")
+
+    def test_authenticated_user_without_review_sees_write_review_button(self):
+        """
+        Verify 'Write a review' button displays for an authenticated user who
+        has not yet written a review.
+        """
+        user = User.objects.create_user(
+            username="new_user",
+            email="new_user@example.com",
+            password="password123",
+        )
+        self.client.force_login(user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Write a review</a>")
+        self.assertContains(response, "Have you visited this club?")
+
+    def test_authenticated_user_sees_own_unapproved_review(self):
+        """
+        Verify authenticated user sees their own review (even if unapproved)
+        with correct message and buttons.
+        """
+        self.client.force_login(self.user3)  # wrote the unapproved review
+        response = self.client.get(self.url)
+        self.assertContains(response, "Your review has not yet been approved")
+        self.assertContains(response, "Unapproved Review 1")
+        self.assertContains(response, "Edit review")
+        self.assertContains(response, "Delete review")
+
+    def test_authenticated_user_does_not_see_other_unapproved_reviews(self):
+        """
+        Verify authenticated users cannot see unapproved reviews from other
+        users.
+        """
+        self.client.force_login(self.user1)
+        response = self.client.get(self.url)
+        self.assertContains(response, "Approved Review 1")
+        self.assertNotContains(response, "Unapproved Review 1")
+
+    def test_authenticated_user_with_approved_review_sees_correct_content(
+        self,
+    ):
+        """
+        Verify authenticated user with an approved review sees the correct
+        message and that edit/delete buttons are present.
+        """
+        self.client.force_login(self.user1)  # user1 has an approved review
+        response = self.client.get(self.url)
+
+        self.assertContains(
+            response, "You have already written a review for this club"
+        )
+        self.assertContains(response, "Edit review")
+        self.assertContains(response, "Delete review")
 
 
 class ClubAdminDashboardTests(TestCase):

@@ -428,6 +428,18 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Map is responsive on different screen sizes |
 | ✓ | No console errors or warnings were caused by interacting with the map |
 
+### Club Review Page
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | The Reviews page shows the name of the club, the average review score and number of reviews in the page header and data is based on approved reviews only |
+| ✓ | The Reviews page lists all approved reviews for that club, showing star rating, headline, review text, the date it was last modified and the username for the user who posted it. |
+| ✓ | Reviews are sorted by most recent first. |
+| ✓ | Authenticated users who have not made a review see a button for creating a review |
+| ✓ | Authenticated users who have made a review see their review above the others with buttons for editing or deleting their review |
+| ✓ | If the authenticated user's review has not yet been approved, a message states this |
+| ✓ | Unauthenticated users do not see buttons for creating, editing or deleting reviews |
+| ✓ | No console errors or warnings were caused by interacting with the page |
 
 ### Club Admin Page - Managing Club and Venue Info
 

@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.db.models import Prefetch, Avg, Count, Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import (
     HttpResponseForbidden,
     HttpResponse,
@@ -8,7 +8,7 @@ from django.http import (
 )
 from django.forms.models import model_to_dict
 from django.contrib import messages
-from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
+from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubReview
 from .forms import (
     UpdateClubInfoForm,
     AssignClubVenueForm,
@@ -290,6 +290,65 @@ def clubs(request):
         )
 
     return render(request, "clubs/clubs.html", context)
+
+
+def club_reviews(request, club_id):
+    """
+    Display reviews for a specific club.
+
+    Retrieves the club by ID and gathers all associated reviews.
+    If the user is authenticated, their own review (if it exists) is
+    separated from the rest. Only approved reviews are included
+    in the average score and review count calculations.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with review details for the club.
+    """
+
+    club = get_object_or_404(Club, id=club_id)
+
+    # Query sets
+    all_club_reviews = ClubReview.objects.filter(club=club)
+    approved_club_reviews = all_club_reviews.filter(approved=True)
+
+    # Get review count and average score
+    aggregate_data = approved_club_reviews.aggregate(
+        avg_score=Avg("score"), count=Count("id")
+    )
+    review_count = aggregate_data["count"]
+    average_score = aggregate_data["avg_score"]
+
+    # Round average_score to 1 decimal place and get average_score_int
+    average_score_int = None
+    if average_score:
+        average_score_int = int(average_score + 0.5)  # for standard rounding
+        average_score = round(average_score, 1)
+
+    # Get reviews
+    if request.user.is_authenticated:
+        # Seperate user's own review from other reviews
+        user_review = all_club_reviews.filter(user=request.user).first()
+        club_reviews = approved_club_reviews.exclude(user=request.user)
+    else:
+        user_review = None
+        club_reviews = approved_club_reviews
+
+    return render(
+        request,
+        "clubs/club_reviews.html",
+        {
+            "club": club,
+            "user_review": user_review,
+            "other_reviews": club_reviews,
+            "average_score_int": average_score_int,
+            "average_score": average_score,
+            "review_count": review_count,
+        },
+    )
 
 
 def venue_modal(request, venue_id):

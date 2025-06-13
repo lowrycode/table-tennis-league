@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<section id="club-reviews-header" class="w-100 d-flex flex-column align-items-center py-5">  
+  <div class="container-max-6 w-100 px-3">
+    <div class="row">
+      <div class="col-12"> 
+        <div class="text-center">
+          <!-- Title and Club Name -->
+          <h1 class="h2-style text-center">Club Reviews</h1>
+          <p class="text-center fs-5 mb-0">{{ club.name }}</p>
+          <!-- Review Summary -->
+          {% if review_count > 0 %}
+            {% comment %} Club has reviews {% endcomment %}
+            <div class="text-center mb-0">
+              {% with average_score_int as star_rating%}
+                {% include "clubs/partials/star_rating.html" %}
+              {% endwith %}
+              <span class="ms-3 fw-bold">{{ average_score }} Average</span>
+            </div>
+            <span>({{ review_count }} review{{ review_count|pluralize }})</span>
+          {% else %}
+            {% comment %} No reviews {% endcomment %}
+            <div class="text-center mb-0">
+              {% include "clubs/partials/star_rating_empty.html" %}
+            </div>
+            <span>(no reviews)</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="{% url 'clubs' %}" class="btn btn-custom mt-3">Return to Clubs page</a>
+</section>
+
+<!-- User Review Section -->
+{% if user.is_authenticated %}
+  <section id="user-review" class="w-100 d-flex justify-content-center mt-3">
+    <div class="container-max-6 w-100">
+      {% with user_review as review %}
+        {% if review %}
+          {% if review.approved %}
+            <p class="fst-italic text-center mt-3 mb-0">You have already written a review for this club</p>
+            {% else %}
+            <p class="fst-italic text-center red mt-3 mb-0">Your review has not yet been approved</p>
+          {% endif %}
+          {% include "clubs/partials/club_review.html" %}
+          <div class="d-flex justify-content-center col-gap-4 my-4">
+            <a href="#" class="btn btn-custom">Edit review</a>
+            <a href="#" class="btn btn-custom-danger">Delete review</a>
+          </div>
+        {% else %}
+        <div class="d-flex justify-content-center align-items-center col-gap-4 my-4">  
+            <p class="fst-italic text-center mb-0">Have you visited this club?</p>
+            <a href="#" class="btn btn-custom2">Write a review</a>
+          </div>
+        {% endif %}
+      {% endwith %}
+  
+    </div>
+  </section>
+{% endif %}
+
+<section class="w-100 d-flex justify-content-center mt-2 pt-3">
+  <div class="container-max-6 w-100">
+    <!-- Approved reviews from other users -->
+    {% for review in other_reviews %}
+      {% if review.approved %}
+        {% include "clubs/partials/club_review.html" %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<a href="{% url 'clubs' %}" class="btn btn-custom my-5">Return to Clubs page</a>
+
+{% endblock %}

@@ -277,6 +277,16 @@ def create_week(season, week_num):
     )
 
 
+def delete_club_reviews(**filters):
+    """
+    Helper to delete objects from ClubReview model with optional filters.
+
+    Args:
+        **filters: Optional keyword arguments for filtering.
+    """
+    delete_objects(ClubReview, **filters)
+
+
 def delete_fixtures(**filters):
     """
     Helper to delete objects from Fixture model with optional filters.
