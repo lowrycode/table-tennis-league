@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.db import transaction
 from django.db.models import Prefetch, Avg, Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,12 +9,14 @@ from django.http import (
 )
 from django.forms.models import model_to_dict
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubReview
 from .forms import (
     UpdateClubInfoForm,
     AssignClubVenueForm,
     UpdateVenueInfoForm,
     CreateVenueForm,
+    ClubReviewForm,
 )
 from .decorators import club_admin_required
 from .filters import ClubInfoFilter
@@ -394,6 +397,67 @@ def venue_modal(request, venue_id):
     )
 
 
+# Views restricted to logged-in users
+@login_required
+def create_club_review(request, club_id):
+    """
+    Renders a page with a form for creating a club review.
+
+    The view is restricted to authenticated users who have not already written
+    a review for the club.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with review details for the club.
+    """
+
+    club = get_object_or_404(Club, id=club_id)
+
+    # Check user has not already written a review for this club
+    existing_review = ClubReview.objects.filter(
+        club=club, user=request.user
+    ).first()
+    if existing_review:
+        messages.warning(
+            request,
+            "You have already written a review for this club.",
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    if request.method == "POST":
+        club_review_form = ClubReviewForm(request.POST)
+        if club_review_form.is_valid():
+            club_review = club_review_form.save(commit=False)
+            club_review.club = club
+            club_review.user = request.user
+            club_review.save()
+
+            # Success message and redirect
+            messages.success(
+                request,
+                (
+                    f"Your review for {club.name} has been created "
+                    "and is awaiting approval."
+                ),
+            )
+            return redirect(reverse("club_reviews", args=[club.id]))
+    else:
+        club_review_form = ClubReviewForm()
+
+    return render(
+        request,
+        "clubs/create_club_review.html",
+        {
+            "club": club,
+            "form": club_review_form,
+        },
+    )
+
+
+# Views restricted to Club Admins
 @club_admin_required
 def club_admin_dashboard(request):
     """

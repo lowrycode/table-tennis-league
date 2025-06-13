@@ -4,7 +4,7 @@ and updates for venues, club information, and associated venue metadata.
 """
 
 from django import forms
-from .models import ClubInfo, ClubVenue, Venue, VenueInfo
+from .models import ClubInfo, ClubVenue, Venue, VenueInfo, ClubReview
 
 
 class AssignClubVenueForm(forms.ModelForm):
@@ -44,6 +44,30 @@ class AssignClubVenueForm(forms.ModelForm):
             self.fields["venue"].queryset = Venue.objects.exclude(
                 id__in=assigned_venue_ids
             )
+
+
+class ClubReviewForm(forms.ModelForm):
+    """
+    Form for creating or editing a club review.
+    """
+
+    class Meta:
+        model = ClubReview
+        fields = [
+            "score",
+            "headline",
+            "review_text",
+        ]
+        labels = {
+            "score": "Rating (1-5 stars)",
+            "headline": "Review Title",
+            "review_text": "Your Review",
+        }
+        widgets = {
+            "score": forms.NumberInput(attrs={"min": 1, "max": 5}),
+            "headline": forms.TextInput(attrs={"maxlength": 100}),
+            "review_text": forms.Textarea(attrs={"rows": 10}),
+        }
 
 
 class CreateVenueForm(forms.ModelForm):

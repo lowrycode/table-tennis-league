@@ -48,6 +48,19 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | One-to-one relationship with Club is enforced with appropriate error message displayed |
 | ✓ | Boolean fields are unchecked by default |
 
+### ClubReview Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows ClubReview model under Clubs app |
+| ✓ | ClubReviews are listed by updated_on field (most recent first) |
+| ✓ | ClubReviews can be filtered by is_approved status |
+| ✓ | ClubReview model contains all expected fields |
+| ✓ | Fields are all required and score must be in range 1 to 5 |
+| ✓ | Error message displayed when missing required fields |
+| ✓ | Constraint for Club and User together is enforced (a user cannot write more than one review per club) |
+| ✓ | Approved field is unchecked by default |
+
 ### VenueInfo Model
 
 | Status  | Test Description |
@@ -428,17 +441,29 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Map is responsive on different screen sizes |
 | ✓ | No console errors or warnings were caused by interacting with the map |
 
-### Club Review Page
+### Club Reviews Page
 
 | Status  | Test Description |
 | ---     | ---              |
 | ✓ | The Reviews page shows the name of the club, the average review score and number of reviews in the page header and data is based on approved reviews only |
 | ✓ | The Reviews page lists all approved reviews for that club, showing star rating, headline, review text, the date it was last modified and the username for the user who posted it. |
 | ✓ | Reviews are sorted by most recent first. |
-| ✓ | Authenticated users who have not made a review see a button for creating a review |
+| ✓ | Authenticated users who have not made a review see a button for creating a review which links to the Create Review Page |
 | ✓ | Authenticated users who have made a review see their review above the others with buttons for editing or deleting their review |
 | ✓ | If the authenticated user's review has not yet been approved, a message states this |
 | ✓ | Unauthenticated users do not see buttons for creating, editing or deleting reviews |
+| ✓ | No console errors or warnings were caused by interacting with the page |
+
+### Create Club Review Page
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | The Create Club Review page redirects unauthenticated users to the login page and returns them to the page following successful login |
+| ✓ | If an authenticated user who has already written a review for the specified club tries to access the page (by direct url), they are redirected to the Club Reviews page for that club with a warning message |
+| ✓ | The Create Club Review page includes a form with required fields for a star rating (1 to 5), a headline and review text |
+| ✓ | Form errors display for invalid forms |
+| ✓ | On successful form submission, the user is redirected to the Club Reviews page, a success message is shown and the new review shows as awaiting approval. |
+| ✓ | Once approved, the average club rating score and review count updates |
 | ✓ | No console errors or warnings were caused by interacting with the page |
 
 ### Club Admin Page - Managing Club and Venue Info

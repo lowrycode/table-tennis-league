@@ -6,6 +6,11 @@ urlpatterns = [
     path("", views.clubs, name="clubs"),
     path("<int:club_id>/reviews/", views.club_reviews, name="club_reviews"),
     path(
+        "<int:club_id>/reviews/create/",
+        views.create_club_review,
+        name="create_club_review",
+    ),
+    path(
         "admin-dashboard/",
         views.club_admin_dashboard,
         name="club_admin_dashboard",
