@@ -35,9 +35,9 @@
 </section>
 
 <!-- User Review Section -->
-{% if user.is_authenticated %}
-  <section id="user-review" class="w-100 d-flex justify-content-center mt-3">
-    <div class="container-max-6 w-100">
+<section id="user-review" class="w-100 d-flex justify-content-center mt-3">
+  <div class="container-max-6 w-100">
+    {% if user.is_authenticated %}
       {% with user_review as review %}
         {% if review %}
           {% if review.approved %}
@@ -57,10 +57,11 @@
           </div>
         {% endif %}
       {% endwith %}
-  
-    </div>
-  </section>
-{% endif %}
+    {% else %}
+      <p class="fst-italic text-center my-3">Login to write a review for this club</p>
+    {% endif %}
+  </div>
+</section>
 
 <section class="w-100 d-flex justify-content-center mt-2 pt-3">
   <div class="container-max-6 w-100">
@@ -73,6 +74,8 @@
   </div>
 </section>
 
-<a href="{% url 'clubs' %}" class="btn btn-custom my-5">Return to Clubs page</a>
+{% if review_count > 0 %}
+  <a href="{% url 'clubs' %}" class="btn btn-custom my-5">Return to Clubs page</a>
+{% endif %}
 
 {% endblock %}

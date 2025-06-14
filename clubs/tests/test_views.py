@@ -1127,13 +1127,18 @@ class ClubReviewsPageTests(TestCase):
         """
         response = self.client.get(self.url)
 
-        # Approved reviews
         self.assertNotContains(response, "Update Review</a>")
         self.assertNotContains(response, "Delete Review</a>")
         self.assertNotContains(response, "Write a review</a>")
 
-        # Unapproved reviews
-        self.assertNotContains(response, "Unapproved Review 1")
+    def test_unauthenticated_user_prompted_to_login_to_write_review(self):
+        """
+        Verify that unauthenticated users are prompted to login to write
+        a review.
+        """
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Login to write a review for this club")
 
     def test_authenticated_user_without_review_sees_write_review_button(self):
         """
