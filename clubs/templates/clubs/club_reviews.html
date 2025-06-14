@@ -48,7 +48,7 @@
           {% include "clubs/partials/club_review.html" %}
           <div class="d-flex justify-content-center col-gap-4 my-4">
             <a href="{% url 'update_club_review' club.id %}" class="btn btn-custom" aria-label="Update your review for {{ club.name }}">Update review</a>
-            <a href="#" class="btn btn-custom-danger" aria-label="Delete your review for {{ club.name }}">Delete review</a>
+            <a href="{% url 'delete_club_review' club.id %}" class="btn btn-custom-danger" aria-label="Delete your review for {{ club.name }}">Delete review</a>
           </div>
         {% else %}
         <div class="d-flex justify-content-center align-items-center col-gap-4 my-4">  

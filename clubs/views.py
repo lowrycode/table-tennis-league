@@ -458,6 +458,44 @@ def create_club_review(request, club_id):
 
 
 @login_required
+def delete_club_review(request, club_id):
+    """
+    Renders a page asking users to confirm deletion of a club review.
+
+    The view is restricted to authenticated users who have already
+    written a review for the club.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with club review form.
+    """
+    club = get_object_or_404(Club, id=club_id)
+
+    # Get the existing review for the user and club
+    try:
+        existing_review = ClubReview.objects.get(club=club, user=request.user)
+    except ClubReview.DoesNotExist:
+        messages.warning(
+            request, "You have not yet written a review for this club."
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    if request.method == "POST":
+        existing_review.delete()
+        messages.success(
+            request, f"Your review for {club.name} has been deleted."
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    return render(
+        request, "clubs/confirm_delete_club_review.html", {"club": club}
+    )
+
+
+@login_required
 def update_club_review(request, club_id):
     """
     Renders a page with a form to edit an existing club review.
@@ -489,9 +527,7 @@ def update_club_review(request, club_id):
         )
         if club_review_form.is_valid():
             club_review = club_review_form.save(commit=False)
-            club_review.approved = (
-                False
-            )
+            club_review.approved = False
             club_review.save()
 
             messages.success(

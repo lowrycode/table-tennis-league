@@ -3081,6 +3081,123 @@ class CreateClubReviewTests(TestCase):
         self.assertIsInstance(response.context["form"], ClubReviewForm)
 
 
+class DeleteClubReviewTests(TestCase):
+    """Tests for deleting a club review using the delete_club_review view."""
+
+    def setUp(self):
+        """
+        Create a user, club and review for use in tests.
+        """
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+        )
+        self.other_user = User.objects.create_user(
+            username="otheruser", password="password123"
+        )
+        self.club = Club.objects.create(name="Test Club")
+        self.review = ClubReview.objects.create(
+            club=self.club,
+            user=self.user,
+            score=3,
+            headline="Nice club",
+            review_text="Friendly atmosphere.",
+            approved=True,
+        )
+        self.url = reverse("delete_club_review", args=[self.club.id])
+
+    # Access Restrictions
+    def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_returns_404_for_invalid_club(self):
+        """Verify view returns 404 for a non-existent club ID."""
+        self.client.force_login(self.user)
+        invalid_url = reverse("delete_club_review", args=[999])
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_without_review_redirects(self):
+        """
+        Verify users are redirected with a warning if they have not yet
+        written a review for the club.
+        """
+        self.client.force_login(self.other_user)
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("not yet written a review", messages_list[0].message)
+
+    # GET Request
+    def test_authenticated_user_sees_confirmation_page(self):
+        """Verify confirmation page is shown to user with existing review."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "clubs/confirm_delete_club_review.html"
+        )
+        self.assertContains(response, "Are you sure you want to delete")
+
+    def test_page_contains_csrf_token(self):
+        """Verify CSRF token is present in the delete confirmation form."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    # POST Request
+    def test_valid_post_deletes_review(self):
+        """
+        Verify posting to the view deletes the review and redirects
+        with a success message.
+        """
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertIn("has been deleted", messages_list[0].message)
+
+        self.assertFalse(ClubReview.objects.filter(id=self.review.id).exists())
+
+    def test_user_cannot_delete_another_users_review(self):
+        """
+        Verify a user cannot delete someone else's review.
+        """
+        self.client.force_login(self.other_user)
+        response = self.client.post(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("not yet written a review", messages_list[0].message)
+
+        # Review should still exist
+        self.assertTrue(ClubReview.objects.filter(id=self.review.id).exists())
+
+    def test_view_context_contains_club(self):
+        """Verify context includes the club instance."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertIn("club", response.context)
+        self.assertEqual(response.context["club"], self.club)
+
+
 class UpdateClubReviewTests(TestCase):
     """Tests for updating a club review using the update_club_review view."""
 

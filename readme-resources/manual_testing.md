@@ -449,7 +449,10 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | The Reviews page lists all approved reviews for that club, showing star rating, headline, review text, the date it was last modified and the username for the user who posted it. |
 | ✓ | Reviews are sorted by most recent first. |
 | ✓ | Authenticated users who have not made a review see a button for creating a review which links to the Create Review Page |
+| ✓ | Clicking the 'Write a review' button takes the user to the Create Club Review page |
 | ✓ | Authenticated users who have made a review see their review above the others with buttons for updating or deleting their review |
+| ✓ | Clicking the Update button takes the user to the Update Club Review page |
+| ✓ | Clicking the Delete button takes the user to the Confirm Delete Club Review page |
 | ✓ | If the authenticated user's review has not yet been approved, a message states this |
 | ✓ | Unauthenticated users do not see buttons for creating, updating or deleting reviews |
 | ✓ | No console errors or warnings were caused by interacting with the page |
@@ -477,6 +480,18 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | On successful form submission, the user is redirected to the Club Reviews page, a success message is shown and the updated review shows as awaiting approval. |
 | ✓ | If the previous review had been approved, the average club rating score and review count updates |
 | ✓ | Once approved, the average club rating score and review count updates on the Clubs page and Club Reviews page |
+| ✓ | No console errors or warnings were caused by interacting with the page |
+
+### Confirm Delete Club Review Page
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | The Delete Club Review page redirects unauthenticated users to the login page and returns them to the page following successful login |
+| ✓ | If an authenticated user who has not yet written a review for the specified club tries to access the page (by direct url), they are redirected to the Club Reviews page for that club with a warning message |
+| ✓ | Clicking the cancel button takes users back to the Club Reviews page |
+| ✓ | Clicking the delete button deletes the ClubReview record (verified in Django Admin), redirects the user to the Club Reviews page and shows a success message |
+| ✓ | On successful deletion, the review does not show on the Club Reviews page and the average review score and review count is also updated |
+| ✓ | If the review had been approved, the average club rating score and review count updates on the Clubs page and Club Reviews page |
 | ✓ | No console errors or warnings were caused by interacting with the page |
 
 ### Club Admin Page - Managing Club and Venue Info
