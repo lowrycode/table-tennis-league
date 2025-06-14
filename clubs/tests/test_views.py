@@ -3079,3 +3079,135 @@ class CreateClubReviewTests(TestCase):
         self.assertIn("form", response.context)
         self.assertEqual(response.context["club"], self.club)
         self.assertIsInstance(response.context["form"], ClubReviewForm)
+
+
+class UpdateClubReviewTests(TestCase):
+    """Tests for updating a club review using the update_club_review view."""
+
+    def setUp(self):
+        """
+        Create a user, club and review for use in tests.
+        """
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+        self.review = ClubReview.objects.create(
+            club=self.club,
+            user=self.user,
+            score=3,
+            headline="Nice club",
+            review_text="It was good overall.",
+            approved=True,
+        )
+        self.url = reverse("update_club_review", args=[self.club.id])
+        self.valid_update_data = {
+            "score": 5,
+            "headline": "Updated headline",
+            "review_text": "Much better now!",
+        }
+
+    # Access Restrictions
+    def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_returns_404_for_invalid_club(self):
+        """Verify view returns 404 for a non-existent club ID."""
+        self.client.force_login(self.user)
+        invalid_url = reverse("update_club_review", args=[999])
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_without_review_redirects(self):
+        """
+        Verify users are redirected with a warning if they have not yet
+        written a review for the club.
+        """
+        another_user = User.objects.create_user(
+            username="otheruser", password="password123"
+        )
+        self.client.force_login(another_user)
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("not yet written a review", messages_list[0].message)
+
+    # GET Request
+    def test_authenticated_user_sees_prefilled_form(self):
+        """Verify form is pre-filled with existing review data."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/update_club_review.html")
+        self.assertContains(response, "Update Review")
+        self.assertContains(response, self.review.headline)
+
+    def test_page_contains_csrf_token(self):
+        """Verify CSRF token is present in the form."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    # POST Request
+    def test_valid_post_updates_review(self):
+        """
+        Verify submitting valid data updates the review,
+        resets approval and redirects with success.
+        """
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.url, self.valid_update_data, follow=True
+        )
+
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertIn("has been updated", messages_list[0].message)
+
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.score, 5)
+        self.assertEqual(self.review.headline, "Updated headline")
+        self.assertFalse(self.review.approved)
+
+    def test_invalid_post_shows_form_errors(self):
+        """
+        Verify invalid form submission re-renders the page with errors.
+        """
+        self.client.force_login(self.user)
+        invalid_data = {
+            "score": "",
+            "headline": "",
+            "review_text": "",
+        }
+        response = self.client.post(self.url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "form", "score", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "headline", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "review_text", "This field is required."
+        )
+
+    def test_view_context_contains_club_and_form(self):
+        """Verify context includes the club and form instance."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertIn("club", response.context)
+        self.assertIn("form", response.context)
+        self.assertEqual(response.context["club"], self.club)
+        self.assertIsInstance(response.context["form"], ClubReviewForm)

@@ -449,9 +449,9 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | The Reviews page lists all approved reviews for that club, showing star rating, headline, review text, the date it was last modified and the username for the user who posted it. |
 | ✓ | Reviews are sorted by most recent first. |
 | ✓ | Authenticated users who have not made a review see a button for creating a review which links to the Create Review Page |
-| ✓ | Authenticated users who have made a review see their review above the others with buttons for editing or deleting their review |
+| ✓ | Authenticated users who have made a review see their review above the others with buttons for updating or deleting their review |
 | ✓ | If the authenticated user's review has not yet been approved, a message states this |
-| ✓ | Unauthenticated users do not see buttons for creating, editing or deleting reviews |
+| ✓ | Unauthenticated users do not see buttons for creating, updating or deleting reviews |
 | ✓ | No console errors or warnings were caused by interacting with the page |
 
 ### Create Club Review Page
@@ -464,6 +464,19 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Form errors display for invalid forms |
 | ✓ | On successful form submission, the user is redirected to the Club Reviews page, a success message is shown and the new review shows as awaiting approval. |
 | ✓ | Once approved, the average club rating score and review count updates |
+| ✓ | No console errors or warnings were caused by interacting with the page |
+
+### Update Club Review Page
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | The Update Club Review page redirects unauthenticated users to the login page and returns them to the page following successful login |
+| ✓ | If an authenticated user who has not yet written a review for the specified club tries to access the page (by direct url), they are redirected to the Club Reviews page for that club with a warning message |
+| ✓ | The Update Club Review page includes a form with required fields for a star rating (1 to 5), a headline and review text and is pre-populated |
+| ✓ | Form errors display for invalid forms |
+| ✓ | On successful form submission, the user is redirected to the Club Reviews page, a success message is shown and the updated review shows as awaiting approval. |
+| ✓ | If the previous review had been approved, the average club rating score and review count updates |
+| ✓ | Once approved, the average club rating score and review count updates on the Clubs page and Club Reviews page |
 | ✓ | No console errors or warnings were caused by interacting with the page |
 
 ### Club Admin Page - Managing Club and Venue Info

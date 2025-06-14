@@ -11,6 +11,11 @@ urlpatterns = [
         name="create_club_review",
     ),
     path(
+        "<int:club_id>/reviews/update/",
+        views.update_club_review,
+        name="update_club_review",
+    ),
+    path(
         "admin-dashboard/",
         views.club_admin_dashboard,
         name="club_admin_dashboard",

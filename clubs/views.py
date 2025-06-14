@@ -457,6 +457,64 @@ def create_club_review(request, club_id):
     )
 
 
+@login_required
+def update_club_review(request, club_id):
+    """
+    Renders a page with a form to edit an existing club review.
+
+    The view is restricted to authenticated users who have already
+    written a review for the club.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with club review form.
+    """
+    club = get_object_or_404(Club, id=club_id)
+
+    # Get the existing review for the user and club
+    try:
+        existing_review = ClubReview.objects.get(club=club, user=request.user)
+    except ClubReview.DoesNotExist:
+        messages.warning(
+            request, "You have not yet written a review for this club."
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    if request.method == "POST":
+        club_review_form = ClubReviewForm(
+            request.POST, instance=existing_review
+        )
+        if club_review_form.is_valid():
+            club_review = club_review_form.save(commit=False)
+            club_review.approved = (
+                False
+            )
+            club_review.save()
+
+            messages.success(
+                request,
+                (
+                    f"Your review for {club.name} has been updated and "
+                    "is awaiting approval."
+                ),
+            )
+            return redirect(reverse("club_reviews", args=[club.id]))
+    else:
+        club_review_form = ClubReviewForm(instance=existing_review)
+
+    return render(
+        request,
+        "clubs/update_club_review.html",
+        {
+            "club": club,
+            "form": club_review_form,
+        },
+    )
+
+
 # Views restricted to Club Admins
 @club_admin_required
 def club_admin_dashboard(request):
