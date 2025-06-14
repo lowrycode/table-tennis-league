@@ -1128,7 +1128,7 @@ class ClubReviewsPageTests(TestCase):
         response = self.client.get(self.url)
 
         # Approved reviews
-        self.assertNotContains(response, "Edit Review</a>")
+        self.assertNotContains(response, "Update Review</a>")
         self.assertNotContains(response, "Delete Review</a>")
         self.assertNotContains(response, "Write a review</a>")
 
@@ -1160,7 +1160,7 @@ class ClubReviewsPageTests(TestCase):
         response = self.client.get(self.url)
         self.assertContains(response, "Your review has not yet been approved")
         self.assertContains(response, "Unapproved Review 1")
-        self.assertContains(response, "Edit review")
+        self.assertContains(response, "Update review")
         self.assertContains(response, "Delete review")
 
     def test_authenticated_user_does_not_see_other_unapproved_reviews(self):
@@ -1178,7 +1178,7 @@ class ClubReviewsPageTests(TestCase):
     ):
         """
         Verify authenticated user with an approved review sees the correct
-        message and that edit/delete buttons are present.
+        message and that update/delete buttons are present.
         """
         self.client.force_login(self.user1)  # user1 has an approved review
         response = self.client.get(self.url)
@@ -1186,7 +1186,7 @@ class ClubReviewsPageTests(TestCase):
         self.assertContains(
             response, "You have already written a review for this club"
         )
-        self.assertContains(response, "Edit review")
+        self.assertContains(response, "Update review")
         self.assertContains(response, "Delete review")
 
 
