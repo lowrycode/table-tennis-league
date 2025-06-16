@@ -28,6 +28,7 @@ from league.models import (
     Team,
     Fixture,
     FixtureResult,
+    SinglesMatch,
 )
 from clubs.models import Club, Venue
 
@@ -1765,3 +1766,22 @@ class SinglesMatchTests(TestCase):
             "Away player must be from the same season as the fixture",
             str(cm.exception),
         )
+
+    def test_deleting_fixture_result_deletes_singles_match(self):
+        """
+        Verify deleting FixtureResult deletes related SinglesMatch.
+        """
+        self.assertTrue(
+            SinglesMatch.objects.filter(id=self.singles_match.id).exists()
+        )
+        self.fixture_result.delete()
+        self.assertFalse(
+            SinglesMatch.objects.filter(id=self.singles_match.id).exists()
+        )
+
+    def test_cannot_delete_team_player_if_in_singles_match(self):
+        """
+        Verify deleting TeamPlayer raises ProtectedError.
+        """
+        with self.assertRaises(ProtectedError):
+            self.team_player1.delete()
