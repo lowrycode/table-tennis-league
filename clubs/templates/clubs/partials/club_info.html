@@ -7,12 +7,23 @@
       <!-- Club Name -->
       <h3>{{club.name}}</h3>
       <!-- Reviews -->
-      <a
-        href="{% url 'club_reviews' club.id %}"
-        class="d-flex flex-wrap align-items-center gap-2 mb-2"
-        aria-label="Visit the review page for {{ club.name }}"
-        title="Go to reviews page"
-      >
+      {% if from_admin %}
+        <a
+          href="#"
+          class="d-flex flex-wrap align-items-center gap-2 mb-2 disabled-link"
+          role="link"
+          aria-disabled="true"
+          aria-label="Link is disabled in Club Admin page"
+          title="Link is disabled in Club Admin page"
+        >
+      {% else %}
+        <a
+          href="{% url 'club_reviews' club.id %}"
+          class="d-flex flex-wrap align-items-center gap-2 mb-2"
+          aria-label="Visit the review page for {{ club.name }}"
+          title="Go to reviews page"
+        >
+      {% endif %}
         {% if club.review_average_score %}
           <div aria-hidden="true">
             {% with club.review_average_score_int as star_rating%}

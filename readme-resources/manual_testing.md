@@ -505,6 +505,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | The Club Admin page includes a section displaying the current status of information (missing, pending approval or approved) |
 | ✓ | The Toggle Preview button correctly allows the user to toggle a view of the most recent data as it appears on the clubs page (or will appear when approved) |
 | ✓ | If not all data is approved, a message is displayed above the preview to clarify that this is how the data will appear on the clubs page once approved |
+| ✓ | The preview shows review summary data as a disabled link with muted text and hover effects to show it is disabled (also works after unassigning a venue) |
 | ✓ | If no club information exists (even if venues have been assigned), the Toggle Preview button is not displayed and a status message displays "(Club Information REQUIRED)" with the red label |
 | ✓ | If no venue has been assigned, a status message displays "(Venue REQUIRED)" with the red label |
 | ✓ | If no venue information exists, a status message displays "(INFO REQUIRED)" with the red label |

@@ -73,6 +73,17 @@ def build_club_context_for_admin(club):
         "has_pending_info": False,
         "info": {},
         "venues": [],
+        "review_average_score": (
+            round(club.review_average_score, 1)
+            if club.review_average_score
+            else None
+        ),
+        "review_average_score_int": (
+            int(club.review_average_score + 0.5)
+            if club.review_average_score
+            else None
+        ),
+        "review_count": club.review_count,
     }
 
     # Update info
@@ -566,7 +577,16 @@ def club_admin_dashboard(request):
     Returns:
         HttpResponse: Rendered admin dashboard for the user's assigned club.
     """
-    club = request.user.club_admin.club
+    club_id = request.user.club_admin.club_id
+
+    # Annotate club with review data
+    club = Club.objects.annotate(
+        review_average_score=Avg(
+            "reviews__score", filter=Q(reviews__approved=True)
+        ),
+        review_count=Count("reviews", filter=Q(reviews__approved=True)),
+    ).get(id=club_id)
+
     club_dict = build_club_context_for_admin(club)
 
     return render(
@@ -574,6 +594,7 @@ def club_admin_dashboard(request):
         "clubs/admin_dashboard.html",
         {
             "club": club_dict,
+            "from_admin": True
         },
     )
 
@@ -729,7 +750,15 @@ def unassign_venue(request, venue_id):
         return HttpResponseForbidden("Invalid request method")
 
     # Get Club
-    club = request.user.club_admin.club
+    club_id = request.user.club_admin.club_id
+
+    # Annotate club with review data
+    club = Club.objects.annotate(
+        review_average_score=Avg(
+            "reviews__score", filter=Q(reviews__approved=True)
+        ),
+        review_count=Count("reviews", filter=Q(reviews__approved=True)),
+    ).get(id=club_id)
 
     # Delete ClubVenue
     # This approach silently handles missing Venue or ClubVenue objects
@@ -745,7 +774,7 @@ def unassign_venue(request, venue_id):
     return render(
         request,
         "clubs/partials/admin_club_info_section.html",
-        {"club": club_dict},
+        {"club": club_dict, "from_admin": True},
     )
 
 

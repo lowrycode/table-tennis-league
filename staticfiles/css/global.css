@@ -202,6 +202,11 @@ a:hover, .a-style:hover {
   color: var(--primary-3);
 }
 
+a.disabled-link {
+  color: var(--light-4);
+  cursor: not-allowed;
+}
+
 /* Form Info */
 .form-info {
   background-color: var(--light-2);

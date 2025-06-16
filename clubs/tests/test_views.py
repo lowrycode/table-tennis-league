@@ -1349,6 +1349,50 @@ class ClubAdminDashboardTests(TestCase):
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_1.contact_name)
 
+    def test_context_includes_review_data_and_from_admin(self):
+        """
+        Verify context contains the following:
+        - club.review_average_score
+        - club.review_average_score_int
+        - club.review_count
+        - from_admin = True
+        """
+        self.client.force_login(self.user)
+
+        # Create users
+        user1 = User.objects.create_user(
+            username="testuser1",
+            email="user1@example.com",
+            password="password123",
+        )
+        user2 = User.objects.create_user(
+            username="testuser2",
+            email="user2@example.com",
+            password="password123",
+        )
+        user3 = User.objects.create_user(
+            username="testuser3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Add approved reviews to the club
+        create_club_review(self.club, user1, 4, "Headline", "Review text.")
+        create_club_review(self.club, user2, 2, "Headline", "Review text.")
+
+        # Add unapproved review to the club
+        create_club_review(
+            self.club, user3, 5, "Headline", "Review text.", False
+        )
+
+        response = self.client.get(reverse("club_admin_dashboard"))
+        context_club = response.context["club"]
+
+        self.assertEqual(context_club["review_average_score"], 3.0)
+        self.assertEqual(context_club["review_average_score_int"], 3)
+        self.assertEqual(context_club["review_count"], 2)
+        self.assertTrue(response.context["from_admin"])
+
     # Venue Info
     def test_page_elements_for_no_assigned_venues(self):
         """
@@ -2119,6 +2163,50 @@ class UnassignVenueViewTests(TestCase):
         self.assertTemplateUsed(
             response, "clubs/partials/admin_club_info_section.html"
         )
+
+    def test_context_includes_review_data_and_from_admin(self):
+        """
+        Verify context contains the following:
+        - club.review_average_score
+        - club.review_average_score_int
+        - club.review_count
+        - from_admin = True
+        """
+        self.client.force_login(self.user)
+
+        # Create users
+        user1 = User.objects.create_user(
+            username="testuser1",
+            email="user1@example.com",
+            password="password123",
+        )
+        user2 = User.objects.create_user(
+            username="testuser2",
+            email="user2@example.com",
+            password="password123",
+        )
+        user3 = User.objects.create_user(
+            username="testuser3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Add approved reviews to the club
+        create_club_review(self.club, user1, 4, "Headline", "Review text.")
+        create_club_review(self.club, user2, 2, "Headline", "Review text.")
+
+        # Add unapproved review to the club
+        create_club_review(
+            self.club, user3, 5, "Headline", "Review text.", False
+        )
+
+        response = self.client.post(self.url)
+        context_club = response.context["club"]
+
+        self.assertEqual(context_club["review_average_score"], 3.0)
+        self.assertEqual(context_club["review_average_score_int"], 3)
+        self.assertEqual(context_club["review_count"], 2)
+        self.assertTrue(response.context["from_admin"])
 
 
 class AssignVenueTests(TestCase):
