@@ -1,19 +1,19 @@
-<section id="fixtures-section" class="container-max-8 w-100 px-3">
+<section id="fixtures-section" class="container-max-8 w-100">
   <div class="row">
     <div class="col-12 my-5"> 
-      <div class="my-5">
+      <div class="mt-5">
         <!-- Title and Filter Button -->
-        <div class="d-flex justify-content-between">
-          <h1 class="h2-style text-center flex-grow-1 m-0">Fixtures</h1>
+        <div class="position-relative text-center">
+          <h1 class="h2-style m-0 px-5">Fixtures</h1>
           <button
-            class="btn-toggle btn fs-4"
+            class="btn-toggle btn fs-4 position-absolute end-0 top-50 translate-middle-y"
             data-target="#filter-fixtures"
             aria-label="{{ filters_applied|yesno:'Filters active,No filters applied' }}"
           >
             <i class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"></i>
           </button>
         </div>
-                <!-- Fixture Status Key -->
+        <!-- Fixture Status Key -->
         {% if fixture_status_key %}
           <div
             id="fixture-status-key"
@@ -41,6 +41,18 @@
           {% include 'league/partials/fixtures_filter_panel_inner.html' %}
         </form>
       </div>
+      {% if current_week_id %}
+        <!-- Jump to Current Week Link -->
+        <div class="text-center my-4">
+          <a
+            href="#current-week"
+            class="fw-bold"
+            aria-label="Skip to fixtures for the current week"
+          >
+            Jump to Current Week
+          </a>
+        </div>
+      {% endif %}
       <!-- Main Content -->
       {% if not season %}
         <p class="text-center py-3">Season not found.</p>

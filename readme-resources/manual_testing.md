@@ -628,6 +628,8 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | If a week has no fixtures, a placeholder "No fixtures this week." is shown |
 | ✓ | If no weeks are found, a placeholder "No weeks to display." is shown |
 | ✓ | If season not found, a placeholder "Season not found." is shown |
+| ✓ | If today's date is within one of the fixture weeks, a 'Jump to Current Week' link displays near the top of the page which navigates to fixtures for that week |
+| ✓ | If today's date is not within one of the fixture weeks (e.g. out of season), the 'Jump to Current Week' link does not display |
 | ✓ | Venue buttons are styled to look like links used elsewhere on the website and show tooltip when hovered |
 | ✓ | Login not required to view the fixtures page |
 | ✓ | Page is responsive on different screen sizes |

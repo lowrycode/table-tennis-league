@@ -1,6 +1,8 @@
-from datetime import time
+from datetime import time, datetime, timedelta
+from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from test_utils.helpers import (
     create_club,
     create_division,
@@ -303,6 +305,46 @@ class FixturesPageTests(TestCase):
 
         response = self.client.get(self.url)
         self.assertContains(response, "No fixtures this week.</div>")
+
+    def test_current_week_when_in_season(self):
+        """
+        Verify that current_week_id is passed from view, the template includes
+        the 'Jump to Current Week' link and that a week section includes an id
+        of 'current-week'
+        """
+        week_start = self.week2_season2.start_date
+        test_date = datetime.combine(
+            week_start + timedelta(days=2), datetime.min.time()
+        )
+        aware_test_date = timezone.make_aware(test_date)
+
+        with patch("league.views.timezone.now", return_value=aware_test_date):
+            response = self.client.get(self.url)
+            current_week_id = response.context.get("current_week_id")
+
+            self.assertEqual(current_week_id, self.week2_season2.id)
+            self.assertContains(response, "Jump to Current Week")
+            self.assertContains(response, 'id="current-week"')
+
+    def test_current_week_when_out_of_season(self):
+        """
+        Verify that current_week_id is passed as None from the view, the
+        template does not include the 'Jump to Current Week' link and that
+        id='current-week' is not found
+        """
+        week_start = self.week1_season1.start_date
+        test_date = datetime.combine(
+            week_start - timedelta(days=20), datetime.min.time()
+        )
+        aware_test_date = timezone.make_aware(test_date)
+
+        with patch("league.views.timezone.now", return_value=aware_test_date):
+            response = self.client.get(self.url)
+            current_week_id = response.context.get("current_week_id")
+
+            self.assertIsNone(current_week_id)
+            self.assertNotContains(response, "Jump to Current Week")
+            self.assertNotContains(response, 'id="current-week"')
 
     # Filters and HTMX
     def test_context_contains_filter_and_filters_applied(self):

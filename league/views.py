@@ -1,6 +1,8 @@
+from datetime import timedelta
 from django.http import HttpResponseBadRequest
 from django.db.models import Prefetch
 from django.shortcuts import render
+from django.utils import timezone
 from .models import Week, Fixture
 from .filters import FixtureFilter
 
@@ -30,6 +32,7 @@ def fixtures(request):
         season = None
 
     # Get season_weeks
+    current_week_id = None
     if season:
         season_weeks = (
             Week.objects.filter(season=season)
@@ -38,6 +41,13 @@ def fixtures(request):
             )
             .order_by("start_date")
         )
+
+        # Find current week (start_date <= today <= end_date)
+        today = timezone.now().date()
+        for week in season_weeks:
+            if week.start_date <= today <= week.start_date + timedelta(days=6):
+                current_week_id = week.id
+                break
     else:
         season_weeks = None
 
@@ -59,6 +69,7 @@ def fixtures(request):
         "fixture_status_key": fixture_status_key,
         "filter": fixture_filter,
         "filters_applied": filters_applied,
+        "current_week_id": current_week_id,
     }
 
     # If htmx request, return only the fixtures_section partial template

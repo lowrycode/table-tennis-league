@@ -1,5 +1,8 @@
 {% load fixture_tags %}
-<section class="week-fixtures my-5">
+<section 
+  {% if current_week_id == week.id %}id="current-week"{% endif %}
+  class="week-fixtures pt-5"
+>
   <h2 class="fs-5 text-center mb-0">{{ week.name }}: <span class="p-style">Begins {{ week.start_date|date:"jS M" }}</span></h2>
   {% if week.details %}<p class="mt-1 mb-0 text-center">{{ week.details }}</p>{% endif %}
   {% if week.week_fixtures.all %}
