@@ -547,7 +547,10 @@ class PlayerTests(TestCase):
 
     # Single-field tests
     def test_club_status_choices_default(self):
-        """Verify club_status defaults to 'pending' if not provided and only allows valid choices."""
+        """
+        Verify club_status defaults to 'pending' if not provided and
+        only allows valid choices.
+        """
         player = Player.objects.create(
             forename="Test",
             surname="Player",
@@ -557,7 +560,10 @@ class PlayerTests(TestCase):
         self.assertEqual(player.club_status, "pending")
 
     def test_unique_forename_surname_date_of_birth(self):
-        """Verify combination of forename, surname, and date_of_birth must be unique."""
+        """
+        Verify combination of forename, surname, and date_of_birth must
+        be unique.
+        """
         with self.assertRaises(IntegrityError):
             Player.objects.create(**self.player_data)
 
@@ -1334,3 +1340,13 @@ class FixtureTests(TestCase):
             ValidationError, "Away team is not in the selected season."
         ):
             fixture.full_clean()
+
+    def test_save_auto_assigns_venue_from_home_team(self):
+        """
+        Verify that save() assigns venue from home_team if venue is blank.
+        """
+        self.fixture_data["venue"] = None
+        fixture = Fixture(**self.fixture_data)
+        fixture.full_clean()
+        fixture.save()
+        self.assertEqual(fixture.venue, self.team1.home_venue)

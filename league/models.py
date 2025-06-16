@@ -466,3 +466,10 @@ class Fixture(models.Model):
                 raise ValidationError(
                     {"away_team": "Away team is not in the selected season."}
                 )
+
+    def save(self, *args, **kwargs):
+        # Auto-assign venue if blank using home team's default home_venue
+        if not self.venue and self.home_team:
+            self.venue = self.home_team.home_venue
+
+        super().save(*args, **kwargs)

@@ -171,6 +171,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Duplicate team constraint enforced (can't have same home and away team) |
 | ✓ | Division constraint enforced (both teams must be in stated division) |
 | ✓ | Season constraint enforced (both teams must be assigned to stated season) |
+| ✓ | Venue auto-populated from home team default venue if left blank |
 
 ## Common Page Elements
 
