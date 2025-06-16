@@ -473,3 +473,53 @@ class Fixture(models.Model):
             self.venue = self.home_team.home_venue
 
         super().save(*args, **kwargs)
+
+
+class FixtureResult(models.Model):
+    WINNER_CHOICES = [
+        ("home", "Home"),
+        ("away", "Away"),
+        ("draw", "Draw"),
+    ]
+    STATUS_CHOICES = [
+        ("played", "Played"),
+        ("forfeited", "Forfeited"),
+    ]
+
+    fixture = models.OneToOneField(
+        Fixture, on_delete=models.CASCADE, related_name="result"
+    )
+    home_score = models.PositiveSmallIntegerField()
+    away_score = models.PositiveSmallIntegerField()
+    winner = models.CharField(
+        max_length=4,
+        choices=WINNER_CHOICES,
+        blank=True,
+        help_text="This field is auto-assigned",
+    )
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="played"
+    )
+
+    class Meta:
+        ordering = ["-fixture__datetime"]
+
+    def __str__(self):
+        return (
+            f"{self.fixture.home_team.team_name} {self.home_score} vs "
+            f"{self.away_score} {self.fixture.away_team.team_name}"
+        )
+
+    def clean(self):
+        super().clean()
+        if self.home_score + self.away_score != 10:
+            raise ValidationError("Total score must add up to 10.")
+
+    def save(self, *args, **kwargs):
+        if self.home_score > self.away_score:
+            self.winner = "home"
+        elif self.home_score < self.away_score:
+            self.winner = "away"
+        else:
+            self.winner = "draw"
+        super().save(*args, **kwargs)

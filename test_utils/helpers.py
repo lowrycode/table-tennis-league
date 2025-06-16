@@ -2,7 +2,7 @@ import calendar
 from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from league.models import Division, Season, Week, Team, Fixture
+from league.models import Division, Season, Week, Team, Fixture, FixtureResult
 from clubs.models import Club, Venue, VenueInfo, ClubReview
 
 
@@ -219,13 +219,20 @@ def create_fixture(season, division, week, home_team, away_team):
     )
 
 
+def create_fixture_result(
+    fixture, home_score, away_score, winner=None, status="played"
+):
+    return FixtureResult.objects.create(
+        fixture=fixture,
+        home_score=home_score,
+        away_score=away_score,
+        winner=winner,
+        status=status,
+    )
+
+
 def create_club_review(
-    club,
-    user,
-    score,
-    headline,
-    review_text,
-    approved=True
+    club, user, score, headline, review_text, approved=True
 ):
     return ClubReview.objects.create(
         club=club,

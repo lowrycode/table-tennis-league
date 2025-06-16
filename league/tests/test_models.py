@@ -7,6 +7,14 @@ from django.utils import timezone
 from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
+    create_club,
+    create_division,
+    create_season,
+    create_venue,
+    create_team,
+    create_week,
+    create_fixture,
+    create_fixture_result,
 )
 from league.models import (
     Division,
@@ -16,10 +24,75 @@ from league.models import (
     TeamPlayer,
     Team,
     Fixture,
+    FixtureResult,
 )
 from clubs.models import Club, Venue
 
 
+# Helper Setup Functions
+def create_fixture_result_setup():
+    club = create_club("Test Club")
+    division = create_division(name="Division 1", rank=1)
+    season = create_season(
+        name="2024/25",
+        short_name="24-25",
+        slug="24-25",
+        start_year=2024,
+        end_year=2025,
+        is_current=True,
+        divisions_list=[division],
+    )
+    venue = create_venue("Venue 1")
+
+    team1 = create_team(
+        season=season,
+        division=division,
+        club=club,
+        venue=venue,
+        team_name="Team A",
+        home_day="monday",
+        home_time=time(19, 0),
+    )
+    team2 = create_team(
+        season=season,
+        division=division,
+        club=club,
+        venue=venue,
+        team_name="Team B",
+        home_day="tuesday",
+        home_time=time(19, 0),
+    )
+
+    week = create_week(season=season, week_num=1)
+
+    fixture = create_fixture(
+        season=season,
+        division=division,
+        week=week,
+        home_team=team1,
+        away_team=team2,
+    )
+
+    fixture_result = create_fixture_result(
+        fixture=fixture,
+        home_score=7,
+        away_score=3,
+    )
+
+    return {
+        "club": club,
+        "division": division,
+        "season": season,
+        "venue": venue,
+        "team1": team1,
+        "team2": team2,
+        "week": week,
+        "fixture": fixture,
+        "fixture_result": fixture_result,
+    }
+
+
+# Tests
 class DivisionTests(TestCase):
     """
     Unit tests for the Division model to verify field behaviour, validation,
@@ -1350,3 +1423,102 @@ class FixtureTests(TestCase):
         fixture.full_clean()
         fixture.save()
         self.assertEqual(fixture.venue, self.team1.home_venue)
+
+
+class FixtureResultTests(TestCase):
+    def setUp(self):
+        # Create a fixture with result using helper method
+        setup_data = create_fixture_result_setup()
+
+        # Assign to self
+        for key, value in setup_data.items():
+            setattr(self, key, value)
+
+    def test_create_fixture_result_setup(self):
+        """Verify a FixtureResult can be created and saved."""
+        self.assertEqual(self.fixture_result.winner, "home")
+        self.assertEqual(self.fixture_result.status, "played")
+
+    def test_string_representation(self):
+        """
+        Verify str representation is in the format:
+        <home_team> <home_score> vs <away_score> <away_team>
+        """
+        expected = "Team A 7 vs 3 Team B"
+        self.assertEqual(str(self.fixture_result), expected)
+
+    def test_save_sets_winner_home(self):
+        """Verify save() logic correctly sets 'home' as winner."""
+        self.assertEqual(self.fixture_result.winner, "home")
+
+    def test_save_sets_winner_away(self):
+        """Verify save() logic correctly sets 'away' as winner."""
+        self.fixture_result.delete()
+        fixture_result = create_fixture_result(
+            fixture=self.fixture,
+            home_score=3,
+            away_score=7,
+        )
+        self.assertEqual(fixture_result.winner, "away")
+
+    def test_save_sets_draw(self):
+        """Verify save() logic correctly sets 'draw' if scores are equal."""
+        self.fixture_result.delete()
+        fixture_result = create_fixture_result(
+            fixture=self.fixture,
+            home_score=5,
+            away_score=5,
+        )
+        self.assertEqual(fixture_result.winner, "draw")
+
+    def test_default_status_is_played(self):
+        """Verify default status is 'played'."""
+        self.assertEqual(self.fixture_result.status, "played")
+
+    def test_ordering_by_fixture_datetime(self):
+        """
+        Verify FixtureResult objects are ordered by related fixture datetime.
+        """
+        # Create a second fixture a week later
+        week = create_week(season=self.season, week_num=2)
+
+        fixture2 = create_fixture(
+            season=self.season,
+            division=self.division,
+            week=week,
+            home_team=self.team2,
+            away_team=self.team1,
+        )
+
+        fixture_result2 = create_fixture_result(
+            fixture=fixture2,
+            home_score=4,
+            away_score=6,
+        )
+
+        results = list(FixtureResult.objects.all())
+
+        # Ensure ordering by reverse fixture datetime
+        self.assertEqual(results[0], fixture_result2)
+        self.assertEqual(results[1], self.fixture_result)
+
+    def test_one_to_one_constraint(self):
+        """Verify only one result per fixture is allowed."""
+        with self.assertRaises(IntegrityError):
+            create_fixture_result(
+                fixture=self.fixture,
+                home_score=4,
+                away_score=6,
+            )
+
+    def test_scores_must_add_to_ten(self):
+        """Verify error raised when scores don't add to 10."""
+        self.fixture_result.delete()
+        result = FixtureResult(
+            fixture=self.fixture,
+            home_score=3,
+            away_score=5,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            result.full_clean()
+        self.assertIn("Total score must add up to 10.", str(cm.exception))

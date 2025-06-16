@@ -1,5 +1,14 @@
 from django.contrib import admin, messages
-from .models import Division, Season, Week, Player, TeamPlayer, Team, Fixture
+from .models import (
+    Division,
+    Season,
+    Week,
+    Player,
+    TeamPlayer,
+    Team,
+    Fixture,
+    FixtureResult,
+)
 
 
 @admin.register(Division)
@@ -110,4 +119,10 @@ class TeamAdmin(admin.ModelAdmin):
 @admin.register(Fixture)
 class FixtureAdmin(admin.ModelAdmin):
     list_filter = ("season", "division", "week")
-    ordering = ("-datetime", )
+    ordering = ("-datetime",)
+
+
+@admin.register(FixtureResult)
+class FixtureResultAdmin(admin.ModelAdmin):
+    readonly_fields = ("winner",)
+    ordering = ("-fixture__datetime",)

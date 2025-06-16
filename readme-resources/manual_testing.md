@@ -173,6 +173,20 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Season constraint enforced (both teams must be assigned to stated season) |
 | ✓ | Venue auto-populated from home team default venue if left blank |
 
+### FixtureResult Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows FixtureResult model under League app |
+| ✓ | Fixture results are listed with expected str representation (<home_team> <home_score> vs <away_score> <away_team>) |
+| ✓ | Fixture results are listed by fixture date (desc) |
+| ✓ | FixtureResults model contains all expected fields |
+| ✓ | Required fields display error messages when missing |
+| ✓ | Unique constraint is enforced (can't have more than one fixture result per fixture) |
+| ✓ | Total score (home + away) must add up to 10 |
+| ✓ | Winner field is auto-populated and read-only |
+| ✓ | A FixtureResult record can be updated and deleted in Django Admin |
+
 ## Common Page Elements
 
 ### Navbar
