@@ -2,7 +2,17 @@ import calendar
 from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from league.models import Division, Season, Week, Team, Fixture, FixtureResult
+from league.models import (
+    Division,
+    Season,
+    Week,
+    Team,
+    Fixture,
+    FixtureResult,
+    SinglesMatch,
+    Player,
+    TeamPlayer,
+)
 from clubs.models import Club, Venue, VenueInfo, ClubReview
 
 
@@ -140,6 +150,19 @@ def create_club(name):
     return Club.objects.create(name=name)
 
 
+def create_club_review(
+    club, user, score, headline, review_text, approved=True
+):
+    return ClubReview.objects.create(
+        club=club,
+        user=user,
+        score=score,
+        headline=headline,
+        review_text=review_text,
+        approved=approved,
+    )
+
+
 def create_venue(name):
     return Venue.objects.create(name=name)
 
@@ -231,16 +254,20 @@ def create_fixture_result(
     )
 
 
-def create_club_review(
-    club, user, score, headline, review_text, approved=True
+def create_player(
+    forename,
+    surname,
+    current_club,
+    date_of_birth=date(2000, 1, 1),
+    club_status="confirmed",
 ):
-    return ClubReview.objects.create(
-        club=club,
-        user=user,
-        score=score,
-        headline=headline,
-        review_text=review_text,
-        approved=approved,
+
+    return Player.objects.create(
+        forename=forename,
+        surname=surname,
+        date_of_birth=date_of_birth,
+        current_club=current_club,
+        club_status=club_status,
     )
 
 
@@ -262,6 +289,18 @@ def create_season(
     return season
 
 
+def create_singles_match(
+    fixture_result, home_player, away_player, home_sets, away_sets
+):
+    return SinglesMatch.objects.create(
+        fixture_result=fixture_result,
+        home_player=home_player,
+        away_player=away_player,
+        home_sets=home_sets,
+        away_sets=away_sets,
+    )
+
+
 def create_team(season, division, club, venue, team_name, home_day, home_time):
     return Team.objects.create(
         season=season,
@@ -272,6 +311,14 @@ def create_team(season, division, club, venue, team_name, home_day, home_time):
         home_day=home_day,
         home_time=home_time,
         approved=True,
+    )
+
+
+def create_team_player(player, team, paid_fees=True):
+    return TeamPlayer.objects.create(
+        player=player,
+        team=team,
+        paid_fees=paid_fees,
     )
 
 

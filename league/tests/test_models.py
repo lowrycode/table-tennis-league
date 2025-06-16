@@ -15,6 +15,9 @@ from test_utils.helpers import (
     create_week,
     create_fixture,
     create_fixture_result,
+    create_player,
+    create_team_player,
+    create_singles_match,
 )
 from league.models import (
     Division,
@@ -1522,3 +1525,243 @@ class FixtureResultTests(TestCase):
         with self.assertRaises(ValidationError) as cm:
             result.full_clean()
         self.assertIn("Total score must add up to 10.", str(cm.exception))
+
+
+class SinglesMatchTests(TestCase):
+    def setUp(self):
+        setup_data = create_fixture_result_setup()
+        for key, value in setup_data.items():
+            setattr(self, key, value)
+
+        # Create players
+        self.player1 = create_player("John", "Doe", self.club)
+        self.player2 = create_player("Joe", "Bloggs", self.club)
+
+        # Create team players
+        self.team_player1 = create_team_player(self.player1, self.team1)
+        self.team_player2 = create_team_player(self.player2, self.team2)
+
+        # Create singles match
+        self.singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=self.team_player1,
+            away_player=self.team_player2,
+            home_sets=3,
+            away_sets=1,
+        )
+
+    def test_valid_match_sets_winner(self):
+        """Verify winner is set correctly when home wins."""
+        self.assertEqual(self.singles_match.winner, "home")
+
+    def test_away_wins_sets_winner_correctly(self):
+        """Verify winner is set correctly when away wins."""
+        self.singles_match.delete()
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=self.team_player1,
+            away_player=self.team_player2,
+            home_sets=1,
+            away_sets=3,
+        )
+        self.assertEqual(singles_match.winner, "away")
+
+    def test_disallow_draw(self):
+        """Verify match with equal sets raises validation error."""
+        self.singles_match.delete()
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=self.team_player1,
+            away_player=self.team_player2,
+            home_sets=3,
+            away_sets=3,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn("Matches cannot end in a draw.", str(cm.exception))
+
+    def test_max_set_limit(self):
+        """Verify players cannot win more than target sets (3)."""
+        self.singles_match.delete()
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=self.team_player1,
+            away_player=self.team_player2,
+            home_sets=4,
+            away_sets=0,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn("Players cannot have more than", str(cm.exception))
+
+    def test_target_sets_required_to_win(self):
+        """Verify at least one player must win target sets (3)."""
+        self.singles_match.delete()
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=self.team_player1,
+            away_player=self.team_player2,
+            home_sets=2,
+            away_sets=1,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn("At least one player must win", str(cm.exception))
+
+    def test_unique_constraint(self):
+        """Verify duplicate home/away players for fixture raises error."""
+        with self.assertRaises(IntegrityError):
+            create_singles_match(
+                fixture_result=self.fixture_result,
+                home_player=self.team_player1,
+                away_player=self.team_player2,
+                home_sets=3,
+                away_sets=2,
+            )
+
+    def test_string_representation(self):
+        """
+        Verify str format is:
+        <home_player> <home_sets> vs <away_sets> <away_player>
+        """
+        expected = "John Doe 3 vs 1 Joe Bloggs"
+        self.assertEqual(str(self.singles_match), expected)
+
+    def test_player_cannot_play_themselves(self):
+        """Verify a player cannot be both home and away."""
+        team_player = self.team_player1
+        self.singles_match.delete()
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=team_player,
+            away_player=team_player,
+            home_sets=3,
+            away_sets=1,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn(
+            "A player cannot play against themselves", str(cm.exception)
+        )
+
+    def test_home_player_wrong_club(self):
+        """Verify home player must belong to the home team's club."""
+        self.singles_match.delete()
+
+        # Assign team player from a different club
+        foreign_club = create_club("Foreign Club")
+        team = create_team(
+            self.season,
+            self.division,
+            foreign_club,
+            self.venue,
+            "Spy Team",
+            "monday",
+            time(19, 0),
+        )
+        foreign_player = create_player("Rob", "Intruder", foreign_club)
+        foreign_team_player = create_team_player(foreign_player, team)
+
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=foreign_team_player,
+            away_player=self.team_player2,
+            home_sets=3,
+            away_sets=1,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn(
+            "Home player must belong to the home team's club",
+            str(cm.exception),
+        )
+
+    def test_away_player_wrong_club(self):
+        """Verify away player must belong to the away team's club."""
+        self.singles_match.delete()
+
+        # Assign team player from a different club
+        foreign_club = create_club("Foreign Club")
+        team = create_team(
+            self.season,
+            self.division,
+            foreign_club,
+            self.venue,
+            "Spy Team",
+            "monday",
+            time(19, 0),
+        )
+        foreign_player = create_player("Rob", "Intruder", foreign_club)
+        foreign_team_player = create_team_player(foreign_player, team)
+
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=self.team_player1,
+            away_player=foreign_team_player,
+            home_sets=3,
+            away_sets=1,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn(
+            "Away player must belong to the away team's club",
+            str(cm.exception),
+        )
+
+    def test_players_must_be_in_same_season_as_fixture(self):
+        """Verify home and away players must be from same season as fixture."""
+
+        # Create a new season and a team in that season
+        past_season = create_season(
+            name="Past Season",
+            short_name="20-21",
+            slug="20-21",
+            start_year=2020,
+            end_year=2021,
+            is_current=False,
+            divisions_list=[self.division],
+        )
+        past_team = create_team(
+            past_season,
+            self.division,
+            self.club,
+            self.venue,
+            "Past Team",
+            "monday",
+            time(19, 0),
+        )
+
+        # Create a player and assign them to the other team/season
+        player = create_player("George", "Legend", self.club)
+        past_team_player = create_team_player(player, past_team)
+
+        # Test home player with mismatched season
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=past_team_player,
+            away_player=self.team_player2,
+            home_sets=3,
+            away_sets=1,
+        )
+
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn(
+            "Home player must be from the same season as the fixture",
+            str(cm.exception),
+        )
+
+        # Test away player with mismatched season
+        singles_match = create_singles_match(
+            fixture_result=self.fixture_result,
+            home_player=self.team_player1,
+            away_player=past_team_player,
+            home_sets=3,
+            away_sets=1,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            singles_match.full_clean()
+        self.assertIn(
+            "Away player must be from the same season as the fixture",
+            str(cm.exception),
+        )

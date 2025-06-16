@@ -1,3 +1,4 @@
+import math
 from datetime import time, timedelta
 from django.utils.timezone import now
 from django.db import models
@@ -522,4 +523,151 @@ class FixtureResult(models.Model):
             self.winner = "away"
         else:
             self.winner = "draw"
+        super().save(*args, **kwargs)
+
+
+class SinglesMatch(models.Model):
+    WINNER_CHOICES = [
+        ("home", "Home"),
+        ("away", "Away"),
+    ]
+    BEST_OF = 5
+    TARGET_SETS = math.ceil(BEST_OF / 2)
+
+    fixture_result = models.ForeignKey(
+        FixtureResult, on_delete=models.CASCADE, related_name="singles_matches"
+    )
+    home_player = models.ForeignKey(
+        TeamPlayer,
+        on_delete=models.PROTECT,
+        related_name="home_singles_matches",
+    )
+    away_player = models.ForeignKey(
+        TeamPlayer,
+        on_delete=models.PROTECT,
+        related_name="away_singles_matches",
+    )
+    home_sets = models.PositiveSmallIntegerField()
+    away_sets = models.PositiveSmallIntegerField()
+    winner = models.CharField(
+        max_length=4,
+        choices=WINNER_CHOICES,
+        blank=True,
+        help_text="This field is auto-assigned",
+    )
+
+    class Meta:
+        verbose_name_plural = "Singles matches"
+        ordering = ["home_player", "away_player"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["fixture_result", "home_player", "away_player"],
+                name="unique_fixture_home_away_players",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.home_player.player.full_name} {self.home_sets} vs "
+            f"{self.away_sets} {self.away_player.player.full_name}"
+        )
+
+    def clean(self):
+        super().clean()
+
+        if self.home_sets is not None and self.away_sets is not None:
+            # Disallow draws
+            if self.home_sets == self.away_sets:
+                raise ValidationError(
+                    "Matches cannot end in a draw. Sets must be unequal."
+                )
+
+            # Enforce best of 5 matches
+            if (
+                self.home_sets > self.TARGET_SETS
+                or self.away_sets > self.TARGET_SETS
+            ):
+                raise ValidationError(
+                    f"Matches are best of {self.BEST_OF}. "
+                    f"Players cannot have more than {self.TARGET_SETS} sets."
+                )
+
+            if (
+                self.home_sets != self.TARGET_SETS
+                and self.away_sets != self.TARGET_SETS
+            ):
+                raise ValidationError(
+                    f"Matches are best of {self.BEST_OF}. "
+                    f"At least one player must win {self.TARGET_SETS} sets."
+                )
+
+        # Check home player and away player are different
+        if (
+            self.home_player
+            and self.away_player
+            and self.home_player == self.away_player
+        ):
+            raise ValidationError("A player cannot play against themselves.")
+
+        # Season validation
+        if self.fixture_result:
+            fixture_season = self.fixture_result.fixture.season
+
+            if (
+                self.home_player
+                and self.home_player.team.season != fixture_season
+            ):
+                raise ValidationError(
+                    {
+                        "home_player": (
+                            "Home player must be from the same season as "
+                            "the fixture."
+                        )
+                    }
+                )
+
+            if (
+                self.away_player
+                and self.away_player.team.season != fixture_season
+            ):
+                raise ValidationError(
+                    {
+                        "away_player": (
+                            "Away player must be from the same season as "
+                            "the fixture."
+                        )
+                    }
+                )
+
+        # Club validation - allows for reserves from same club
+        if self.fixture_result:
+            fixture = self.fixture_result.fixture
+
+            if (
+                self.home_player
+                and self.home_player.team.club != fixture.home_team.club
+            ):
+                raise ValidationError(
+                    {
+                        "home_player": (
+                            "Home player must belong to the home team's club."
+                        )
+                    }
+                )
+
+            if (
+                self.away_player
+                and self.away_player.team.club != fixture.away_team.club
+            ):
+                raise ValidationError(
+                    {
+                        "away_player": (
+                            "Away player must belong to the away team's club."
+                        )
+                    }
+                )
+
+    def save(self, *args, **kwargs):
+        if self.home_sets is not None and self.away_sets is not None:
+            self.winner = "home" if self.home_sets > self.away_sets else "away"
         super().save(*args, **kwargs)

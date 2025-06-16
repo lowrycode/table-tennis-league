@@ -8,6 +8,7 @@ from .models import (
     Team,
     Fixture,
     FixtureResult,
+    SinglesMatch,
 )
 
 
@@ -126,3 +127,9 @@ class FixtureAdmin(admin.ModelAdmin):
 class FixtureResultAdmin(admin.ModelAdmin):
     readonly_fields = ("winner",)
     ordering = ("-fixture__datetime",)
+
+
+@admin.register(SinglesMatch)
+class SinglesMatchAdmin(admin.ModelAdmin):
+    readonly_fields = ("winner",)
+    ordering = ["home_player", "away_player"]

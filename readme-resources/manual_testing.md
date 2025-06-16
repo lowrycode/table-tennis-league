@@ -180,12 +180,30 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Admin Panel shows FixtureResult model under League app |
 | ✓ | Fixture results are listed with expected str representation (<home_team> <home_score> vs <away_score> <away_team>) |
 | ✓ | Fixture results are listed by fixture date (desc) |
-| ✓ | FixtureResults model contains all expected fields |
+| ✓ | FixtureResult model contains all expected fields |
 | ✓ | Required fields display error messages when missing |
 | ✓ | Unique constraint is enforced (can't have more than one fixture result per fixture) |
 | ✓ | Total score (home + away) must add up to 10 |
 | ✓ | Winner field is auto-populated and read-only |
 | ✓ | A FixtureResult record can be updated and deleted in Django Admin |
+
+### SinglesMatch Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows SinglesMatch model under League app |
+| ✓ | Singles matches are listed with expected str representation (<home_player> <home_sets> vs <away_sets> <away_player>) |
+| ✓ | Singles matches are listed alphabetically by home player surname, then away player surname |
+| ✓ | SinglesMatch model contains all expected fields |
+| ✓ | Required fields display error messages when missing |
+| ✓ | Unique constraint is enforced (can't have duplicate home/away players for fixture) |
+| ✓ | Winner field is auto-populated correctly and is read-only |
+| ✓ | Scores cannot be equal (draws not allowed) |
+| ✓ | Scores must be consistent with best of 5 (at least one player must have 3 sets and more than 3 sets is not allowed) |
+| ✓ | Players cannot play against themselves |
+| ✓ | Players must be Team Players registered for that season |
+| ✓ | Players must be Team Players from the same club (not just same team to allow for reserves) |
+| ✓ | A SinglesMatch record can be updated and deleted in Django Admin |
 
 ## Common Page Elements
 
