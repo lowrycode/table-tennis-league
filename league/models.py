@@ -794,6 +794,7 @@ class SinglesGame(models.Model):
         ("home", "Home"),
         ("away", "Away"),
     ]
+    MIN_WINNING_SCORE = 11
 
     singles_match = models.ForeignKey(
         SinglesMatch, on_delete=models.CASCADE, related_name="singles_games"
@@ -842,10 +843,14 @@ class SinglesGame(models.Model):
                 )
 
         if home_points is not None and away_points is not None:
-            # Check that at least one player has 11 or more
-            if home_points < 11 and away_points < 11:
+            # Check that at least one player has MIN_WINNING_SCORE or more
+            if (
+                home_points < self.MIN_WINNING_SCORE
+                and away_points < self.MIN_WINNING_SCORE
+            ):
                 raise ValidationError(
-                    "One player must have at least 11 points to win a set."
+                    f"One player must have at least {self.MIN_WINNING_SCORE} "
+                    "points to win a set."
                 )
 
             # Difference must be at least 2
@@ -854,10 +859,12 @@ class SinglesGame(models.Model):
                     "Winner must be at least 2 points ahead."
                 )
 
-            # If either score is over 11, ensure the margin is exactly 2
-            if (home_points > 11 or away_points > 11) and abs(
-                home_points - away_points
-            ) != 2:
+            # If either score is over MIN_WINNING_SCORE,
+            # ensure the margin is exactly 2
+            if (
+                home_points > self.MIN_WINNING_SCORE
+                or away_points > self.MIN_WINNING_SCORE
+            ) and abs(home_points - away_points) != 2:
                 raise ValidationError(
                     "In extended play, the winner must win by exactly "
                     "2 points."
@@ -884,6 +891,7 @@ class DoublesGame(models.Model):
         ("home", "Home"),
         ("away", "Away"),
     ]
+    MIN_WINNING_SCORE = 11
 
     doubles_match = models.ForeignKey(
         DoublesMatch, on_delete=models.CASCADE, related_name="doubles_games"
@@ -932,10 +940,14 @@ class DoublesGame(models.Model):
                 )
 
         if home_points is not None and away_points is not None:
-            # Check that at least one team has 11 or more
-            if home_points < 11 and away_points < 11:
+            # Check that at least one team has MIN_WINNING_SCORE or more
+            if (
+                home_points < self.MIN_WINNING_SCORE
+                and away_points < self.MIN_WINNING_SCORE
+            ):
                 raise ValidationError(
-                    "One team must have at least 11 points to win a set."
+                    f"One team must have at least {self.MIN_WINNING_SCORE} "
+                    "points to win a set."
                 )
 
             # Difference must be at least 2
@@ -944,10 +956,12 @@ class DoublesGame(models.Model):
                     "Winning team must be at least 2 points ahead."
                 )
 
-            # If either score is over 11, ensure the margin is exactly 2
-            if (home_points > 11 or away_points > 11) and abs(
-                home_points - away_points
-            ) != 2:
+            # If either score is over MIN_WINNING_SCORE,
+            # ensure the margin is exactly 2
+            if (
+                home_points > self.MIN_WINNING_SCORE
+                or away_points > self.MIN_WINNING_SCORE
+            ) and abs(home_points - away_points) != 2:
                 raise ValidationError(
                     "In extended play, the winning team must win by exactly "
                     "2 points."
