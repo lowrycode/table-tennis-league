@@ -10,6 +10,7 @@ from .models import (
     FixtureResult,
     SinglesMatch,
     DoublesMatch,
+    SinglesGame,
 )
 from .forms import DoublesMatchAdminForm
 
@@ -142,3 +143,9 @@ class DoublesMatchAdmin(admin.ModelAdmin):
     form = DoublesMatchAdminForm
     readonly_fields = ("winner",)
     ordering = ["fixture_result"]
+
+
+@admin.register(SinglesGame)
+class SinglesGameAdmin(admin.ModelAdmin):
+    readonly_fields = ("winner",)
+    ordering = ["singles_match", "set_num"]

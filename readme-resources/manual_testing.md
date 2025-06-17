@@ -226,6 +226,25 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | All players must be Team Players from the same club as the home/away team (not just same team to allow for reserves) |
 | ✓ | A DoublesMatch record can be updated and deleted in Django Admin |
 
+### SinglesGame Model
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows SinglesGame model under League app |
+| ✓ | Singles games are listed with expected str representation (<home_player> vs <away_player>: Set <set_num>: <home_score>-<away_score>) |
+| ✓ | Singles games are ordered by singles match then set number (ascending) |
+| ✓ | SinglesGame model contains all expected fields |
+| ✓ | Required fields display error messages when missing |
+| ✓ | Unique constraint is enforced (can't have duplicate set number for singles match) |
+| ✓ | Set number must be between 1 and 5 inclusive |
+| ✓ | Winner field is auto-populated correctly and is read-only |
+| ✓ | Scores cannot be equal (draws not allowed) |
+| ✓ | At least one score must be greater than 10 points  |
+| ✓ | Winning score must be at least 2 points higher and exactly 2 points higher if both scores greater than or equal to 10 points |
+| ✓ | A SinglesGame record can be updated and deleted in Django Admin |
+
+
+
 ## Common Page Elements
 
 ### Navbar

@@ -13,6 +13,7 @@ from league.models import (
     Player,
     TeamPlayer,
     DoublesMatch,
+    SinglesGame,
 )
 from clubs.models import Club, Venue, VenueInfo, ClubReview
 
@@ -375,6 +376,15 @@ def create_singles_match(
         away_player=away_player,
         home_sets=home_sets,
         away_sets=away_sets,
+    )
+
+
+def create_singles_game(singles_match, set_num, home_points, away_points):
+    return SinglesGame.objects.create(
+        singles_match=singles_match,
+        set_num=set_num,
+        home_points=home_points,
+        away_points=away_points
     )
 
 
