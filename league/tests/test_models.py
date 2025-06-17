@@ -8,9 +8,7 @@ from test_utils.helpers import (
     helper_test_required_fields,
     helper_test_max_length,
     create_club,
-    create_division,
     create_season,
-    create_venue,
     create_team,
     create_week,
     create_fixture,
@@ -18,6 +16,8 @@ from test_utils.helpers import (
     create_player,
     create_team_player,
     create_singles_match,
+    create_doubles_match,
+    create_fixture_result_setup,
 )
 from league.models import (
     Division,
@@ -29,71 +29,9 @@ from league.models import (
     Fixture,
     FixtureResult,
     SinglesMatch,
+    DoublesMatch,
 )
 from clubs.models import Club, Venue
-
-
-# Helper Setup Functions
-def create_fixture_result_setup():
-    club = create_club("Test Club")
-    division = create_division(name="Division 1", rank=1)
-    season = create_season(
-        name="2024/25",
-        short_name="24-25",
-        slug="24-25",
-        start_year=2024,
-        end_year=2025,
-        is_current=True,
-        divisions_list=[division],
-    )
-    venue = create_venue("Venue 1")
-
-    team1 = create_team(
-        season=season,
-        division=division,
-        club=club,
-        venue=venue,
-        team_name="Team A",
-        home_day="monday",
-        home_time=time(19, 0),
-    )
-    team2 = create_team(
-        season=season,
-        division=division,
-        club=club,
-        venue=venue,
-        team_name="Team B",
-        home_day="tuesday",
-        home_time=time(19, 0),
-    )
-
-    week = create_week(season=season, week_num=1)
-
-    fixture = create_fixture(
-        season=season,
-        division=division,
-        week=week,
-        home_team=team1,
-        away_team=team2,
-    )
-
-    fixture_result = create_fixture_result(
-        fixture=fixture,
-        home_score=7,
-        away_score=3,
-    )
-
-    return {
-        "club": club,
-        "division": division,
-        "season": season,
-        "venue": venue,
-        "team1": team1,
-        "team2": team2,
-        "week": week,
-        "fixture": fixture,
-        "fixture_result": fixture_result,
-    }
 
 
 # Tests
@@ -1430,6 +1368,12 @@ class FixtureTests(TestCase):
 
 
 class FixtureResultTests(TestCase):
+    """
+    Unit tests for the FixtureResult model covering field behaviour, string
+    representation, ordering, validation, auto-assigning winner field and
+    uniqueness constraints.
+    """
+
     def setUp(self):
         # Create a fixture with result using helper method
         setup_data = create_fixture_result_setup()
@@ -1529,6 +1473,12 @@ class FixtureResultTests(TestCase):
 
 
 class SinglesMatchTests(TestCase):
+    """
+    Unit tests for the SinglesMatch model covering field behaviour, string
+    representation, validation, auto-assigning winner field, uniqueness
+    constraints and deletion behaviour.
+    """
+
     def setUp(self):
         setup_data = create_fixture_result_setup()
         for key, value in setup_data.items():
@@ -1785,3 +1735,107 @@ class SinglesMatchTests(TestCase):
         """
         with self.assertRaises(ProtectedError):
             self.team_player1.delete()
+
+
+class DoublesMatchTests(TestCase):
+    """
+    Unit tests for the DoublesMatch model covering field behaviour, string
+    representation, validation, auto-assigning winner field and deletion
+    behaviour.
+    """
+
+    def setUp(self):
+        setup_data = create_fixture_result_setup()
+        for key, value in setup_data.items():
+            setattr(self, key, value)
+
+        # Create players
+        self.player1 = create_player("John", "Doe", self.club)
+        self.player2 = create_player("Joe", "Bloggs", self.club)
+        self.player3 = create_player("Anna", "Jones", self.club)
+        self.player4 = create_player("Steve", "White", self.club)
+
+        # Create team players
+        self.tp1 = create_team_player(self.player1, self.team1)
+        self.tp2 = create_team_player(self.player2, self.team1)
+        self.tp3 = create_team_player(self.player3, self.team2)
+        self.tp4 = create_team_player(self.player4, self.team2)
+
+        # Create doubles match
+        self.doubles_match = create_doubles_match(
+            fixture_result=self.fixture_result,
+            home_players=[self.tp1, self.tp2],
+            away_players=[self.tp3, self.tp4],
+            home_sets=3,
+            away_sets=2,
+        )
+
+    def test_valid_match_sets_winner(self):
+        """Verify winner is set correctly when home wins."""
+        self.assertEqual(self.doubles_match.winner, "home")
+
+    def test_away_wins_sets_winner_correctly(self):
+        """Verify winner is set correctly when away wins."""
+        self.doubles_match.delete()
+        match = create_doubles_match(
+            fixture_result=self.fixture_result,
+            home_players=[self.tp1, self.tp2],
+            away_players=[self.tp3, self.tp4],
+            home_sets=1,
+            away_sets=3,
+        )
+        self.assertEqual(match.winner, "away")
+
+    def test_disallow_draw(self):
+        """Verify match with equal sets raises validation error."""
+        self.doubles_match.delete()
+        match = create_doubles_match(
+            fixture_result=self.fixture_result,
+            home_players=[self.tp1, self.tp2],
+            away_players=[self.tp3, self.tp4],
+            home_sets=2,
+            away_sets=2,
+        )
+        with self.assertRaises(ValidationError):
+            match.full_clean()
+
+    def test_max_set_limit(self):
+        """Verify players cannot win more than target sets (3)."""
+        self.doubles_match.delete()
+        match = create_doubles_match(
+            fixture_result=self.fixture_result,
+            home_players=[self.tp1, self.tp2],
+            away_players=[self.tp3, self.tp4],
+            home_sets=4,
+            away_sets=1,
+        )
+        with self.assertRaises(ValidationError):
+            match.full_clean()
+
+    def test_target_sets_required_to_win(self):
+        """Verify at least one team must win target sets (3)."""
+        self.doubles_match.delete()
+        match = create_doubles_match(
+            fixture_result=self.fixture_result,
+            home_players=[self.tp1, self.tp2],
+            away_players=[self.tp3, self.tp4],
+            home_sets=2,
+            away_sets=1,
+        )
+        with self.assertRaises(ValidationError):
+            match.full_clean()
+
+    def test_string_representation(self):
+        """Verify correct format for __str__ output."""
+        expected = "Joe Bloggs + John Doe 3 vs 2 Anna Jones + Steve White"
+        self.assertEqual(str(self.doubles_match), expected)
+
+    def test_deleting_fixture_result_deletes_doubles_match(self):
+        """Verify deleting FixtureResult also deletes related DoublesMatch."""
+        self.assertTrue(
+            DoublesMatch.objects.filter(id=self.doubles_match.id).exists()
+        )
+        self.fixture_result.delete()
+        self.assertFalse(
+            DoublesMatch.objects.filter(id=self.doubles_match.id).exists()
+        )

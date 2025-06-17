@@ -1,5 +1,5 @@
 import calendar
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from league.models import (
@@ -12,6 +12,7 @@ from league.models import (
     SinglesMatch,
     Player,
     TeamPlayer,
+    DoublesMatch,
 )
 from clubs.models import Club, Venue, VenueInfo, ClubReview
 
@@ -144,6 +145,69 @@ def debug_response_as_file(response, file_path="debug_response.html"):
     return file_path
 
 
+# --- Helpers for test setup ---
+def create_fixture_result_setup():
+    club = create_club("Test Club")
+    division = create_division(name="Division 1", rank=1)
+    season = create_season(
+        name="2024/25",
+        short_name="24-25",
+        slug="24-25",
+        start_year=2024,
+        end_year=2025,
+        is_current=True,
+        divisions_list=[division],
+    )
+    venue = create_venue("Venue 1")
+
+    team1 = create_team(
+        season=season,
+        division=division,
+        club=club,
+        venue=venue,
+        team_name="Team A",
+        home_day="monday",
+        home_time=time(19, 0),
+    )
+    team2 = create_team(
+        season=season,
+        division=division,
+        club=club,
+        venue=venue,
+        team_name="Team B",
+        home_day="tuesday",
+        home_time=time(19, 0),
+    )
+
+    week = create_week(season=season, week_num=1)
+
+    fixture = create_fixture(
+        season=season,
+        division=division,
+        week=week,
+        home_team=team1,
+        away_team=team2,
+    )
+
+    fixture_result = create_fixture_result(
+        fixture=fixture,
+        home_score=7,
+        away_score=3,
+    )
+
+    return {
+        "club": club,
+        "division": division,
+        "season": season,
+        "venue": venue,
+        "team1": team1,
+        "team2": team2,
+        "week": week,
+        "fixture": fixture,
+        "fixture_result": fixture_result,
+    }
+
+
 # --- Helpers for object creation and deletion ---
 # Clubs app
 def create_club(name):
@@ -203,6 +267,19 @@ def create_venue_info(
 # League app
 def create_division(name, rank):
     return Division.objects.create(name=name, rank=rank)
+
+
+def create_doubles_match(
+    fixture_result, home_players, away_players, home_sets, away_sets
+):
+    match = DoublesMatch.objects.create(
+        fixture_result=fixture_result,
+        home_sets=home_sets,
+        away_sets=away_sets,
+    )
+    match.home_players.set(home_players)
+    match.away_players.set(away_players)
+    return match
 
 
 def create_fixture(season, division, week, home_team, away_team):
