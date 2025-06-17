@@ -477,6 +477,14 @@ class Fixture(models.Model):
 
 
 class FixtureResult(models.Model):
+    """
+    Represents the match result for a fixture.
+
+    Each fixture involves 3 home players and 3 away players where each
+    home player plays each away player. There is also one doubles match.
+    The total number of matches per fixture is 10.
+    """
+
     WINNER_CHOICES = [
         ("home", "Home"),
         ("away", "Away"),
@@ -527,6 +535,13 @@ class FixtureResult(models.Model):
 
 
 class SinglesMatch(models.Model):
+    """
+    Represents a singles match for a fixture.
+
+    There will normally be 9 SingleMatch records linked to each
+    FixtureResult record (if a team has all 3 players).
+    """
+
     WINNER_CHOICES = [
         ("home", "Home"),
         ("away", "Away"),
@@ -665,6 +680,99 @@ class SinglesMatch(models.Model):
                             "Away player must belong to the away team's club."
                         )
                     }
+                )
+
+    def save(self, *args, **kwargs):
+        if self.home_sets is not None and self.away_sets is not None:
+            self.winner = "home" if self.home_sets > self.away_sets else "away"
+        super().save(*args, **kwargs)
+
+
+class DoublesMatch(models.Model):
+    """
+    Represents a doubles match for a fixture with 2 players per team.
+
+    Each FixtureResult is linked to one DoublesMatch record.
+    """
+
+    WINNER_CHOICES = [
+        ("home", "Home"),
+        ("away", "Away"),
+    ]
+    BEST_OF = 5
+    TARGET_SETS = math.ceil(BEST_OF / 2)
+
+    fixture_result = models.OneToOneField(
+        FixtureResult, on_delete=models.CASCADE, related_name="doubles_match"
+    )
+    home_players = models.ManyToManyField(
+        TeamPlayer, related_name="home_doubles_matches"
+    )
+    away_players = models.ManyToManyField(
+        TeamPlayer, related_name="away_doubles_matches"
+    )
+    home_sets = models.PositiveSmallIntegerField()
+    away_sets = models.PositiveSmallIntegerField()
+    winner = models.CharField(
+        max_length=4,
+        choices=WINNER_CHOICES,
+        blank=True,
+        help_text="This field is auto-assigned",
+    )
+
+    class Meta:
+        verbose_name_plural = "Doubles matches"
+        ordering = ["fixture_result"]
+
+    def __str__(self):
+        if not self.pk:
+            return "DoublesMatch (unsaved)"
+        
+        home_players_arr = [
+            p.player.full_name for p in self.home_players.all()
+        ]
+        away_players_arr = [
+            p.player.full_name for p in self.away_players.all()
+        ]
+
+        home_players_str = " + ".join(home_players_arr)
+        away_players_str = " + ".join(away_players_arr)
+
+        return (
+            f"{home_players_str} {self.home_sets} vs "
+            f"{self.away_sets} {away_players_str}"
+        )
+
+    def clean(self):
+        super().clean()
+
+        # Note: M2M validation cannot be done before saving record so
+        # validations based on these fields done in DoublesMatchAdminForm
+
+        if self.home_sets is not None and self.away_sets is not None:
+            # Disallow draws
+            if self.home_sets == self.away_sets:
+                raise ValidationError(
+                    "Matches cannot end in a draw. Sets must be unequal."
+                )
+
+            # Enforce best of 5 matches
+            if (
+                self.home_sets > self.TARGET_SETS
+                or self.away_sets > self.TARGET_SETS
+            ):
+                raise ValidationError(
+                    f"Matches are best of {self.BEST_OF}. "
+                    f"Players cannot have more than {self.TARGET_SETS} sets."
+                )
+
+            if (
+                self.home_sets != self.TARGET_SETS
+                and self.away_sets != self.TARGET_SETS
+            ):
+                raise ValidationError(
+                    f"Matches are best of {self.BEST_OF}. "
+                    f"At least one player must win {self.TARGET_SETS} sets."
                 )
 
     def save(self, *args, **kwargs):

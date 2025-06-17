@@ -205,6 +205,27 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Players must be Team Players from the same club (not just same team to allow for reserves) |
 | ✓ | A SinglesMatch record can be updated and deleted in Django Admin |
 
+### DoublesMatch Model
+
+*Note: M2M field validation enforced through form clean() rather than model clean()*
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Admin Panel shows DoublesMatch model under League app |
+| ✓ | Doubles matches are listed with expected str representation (<home_player1> + <home_player2> <home_sets> vs <away_sets> <away_player1> + <away_player2> ) |
+| ✓ | Doubles matches are listed according to order defined in FixtureResult model |
+| ✓ | DoublesMatch model contains all expected fields |
+| ✓ | Required fields display error messages when missing |
+| ✓ | Winner field is auto-populated correctly and is read-only |
+| ✓ | Unique constraint enforced (only one doubles match allowed per fixture result) |
+| ✓ | Scores cannot be equal (draws not allowed) |
+| ✓ | Scores must be consistent with best of 5 (at least one player must have 3 sets and more than 3 sets is not allowed) |
+| ✓ | A player cannot play for both teams |
+| ✓ | Each doubles team must have exactly 2 players |
+| ✓ | All players must be Team Players registered for that season |
+| ✓ | All players must be Team Players from the same club as the home/away team (not just same team to allow for reserves) |
+| ✓ | A DoublesMatch record can be updated and deleted in Django Admin |
+
 ## Common Page Elements
 
 ### Navbar
