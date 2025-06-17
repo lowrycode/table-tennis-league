@@ -19,6 +19,7 @@ from test_utils.helpers import (
     create_doubles_match,
     create_fixture_result_setup,
     create_singles_game,
+    create_doubles_game,
 )
 from league.models import (
     Division,
@@ -32,6 +33,7 @@ from league.models import (
     SinglesMatch,
     DoublesMatch,
     SinglesGame,
+    DoublesGame,
 )
 from clubs.models import Club, Venue
 
@@ -1946,15 +1948,15 @@ class SinglesGameTests(TestCase):
 
     def test_extended_play_not_exactly_two_point_gap_invalid(self):
         """
-        Verify winning score must be exactly 2 points higher if both players
-        have at least 10 points.
+        Verify winning score must be exactly 2 points higher if either player
+        has a score over 11 points.
         """
         self.singles_game.delete()
         singles_game = create_singles_game(
             singles_match=self.singles_match,
             set_num=1,
             home_points=15,
-            away_points=12,
+            away_points=9,
         )
         with self.assertRaises(ValidationError) as cm:
             singles_game.full_clean()
@@ -2029,3 +2031,196 @@ class SinglesGameTests(TestCase):
         self.assertEqual(games[0], self.singles_game)
         self.assertEqual(games[1], singles_game2)
         self.assertEqual(games[2], singles_game3)
+
+
+class DoublesGameTests(TestCase):
+    """
+    Unit tests for the DoublesGame model covering field behaviour, string
+    representation, validation, auto-assigning winner field and deletion
+    behaviour.
+    """
+
+    def setUp(self):
+        """
+        Create FixtureResult (and related data), players, team players,
+        a doubles match a valid sngles game record.
+        """
+
+        setup_data = create_fixture_result_setup()
+        for key, value in setup_data.items():
+            setattr(self, key, value)
+
+        # Create players
+        self.player1 = create_player("John", "Doe", self.club)
+        self.player2 = create_player("Joe", "Bloggs", self.club)
+        self.player3 = create_player("Anna", "Jones", self.club)
+        self.player4 = create_player("Steve", "White", self.club)
+
+        # Create team players
+        self.tp1 = create_team_player(self.player1, self.team1)
+        self.tp2 = create_team_player(self.player2, self.team1)
+        self.tp3 = create_team_player(self.player3, self.team2)
+        self.tp4 = create_team_player(self.player4, self.team2)
+
+        # Create doubles match
+        self.doubles_match = create_doubles_match(
+            fixture_result=self.fixture_result,
+            home_players=[self.tp1, self.tp2],
+            away_players=[self.tp3, self.tp4],
+            home_sets=3,
+            away_sets=2,
+        )
+
+        # Create doubles game
+        self.doubles_game = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=1,
+            home_points=11,
+            away_points=3,
+        )
+
+    def test_valid_game_saves_and_sets_winner(self):
+        """Verify winner is set correctly when home wins."""
+        self.doubles_game.full_clean()
+        self.doubles_game.save()
+        self.assertEqual(self.doubles_game.winner, "home")
+
+    def test_winner_auto_assigned_to_away(self):
+        """Verify winner is set correctly when away wins."""
+        self.doubles_game.delete()
+        doubles_game = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=1,
+            home_points=3,
+            away_points=11,
+        )
+        doubles_game.full_clean()
+        doubles_game.save()
+        self.assertEqual(doubles_game.winner, "away")
+
+    def test_str_representation(self):
+        """Verify correct format for __str__ output."""
+        expected = (
+            f"{self.doubles_match.fixture_result.fixture.home_team} vs "
+            f"{self.doubles_match.fixture_result.fixture.away_team}: "
+            "SET 1: 11-3"
+        )
+        self.assertEqual(str(self.doubles_game), expected)
+
+    def test_points_below_11_raises_validation_error(self):
+        """Verify at least one team must have 11 points or more."""
+        self.doubles_game.delete()
+        doubles_game = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=1,
+            home_points=3,
+            away_points=10,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            doubles_game.full_clean()
+        self.assertIn(
+            "One team must have at least 11 points", str(cm.exception)
+        )
+
+    def test_points_difference_less_than_two_invalid(self):
+        """Verify winning score must be at least 2 points higher."""
+        self.doubles_game.delete()
+        doubles_game = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=1,
+            home_points=11,
+            away_points=10,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            doubles_game.full_clean()
+        self.assertIn(
+            "Winning team must be at least 2 points ahead", str(cm.exception)
+        )
+
+    def test_extended_play_not_exactly_two_point_gap_invalid(self):
+        """
+        Verify winning score must be exactly 2 points higher if either team
+        has a score over 11 points.
+        """
+        self.doubles_game.delete()
+        doubles_game = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=1,
+            home_points=15,
+            away_points=9,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            doubles_game.full_clean()
+        self.assertIn(
+            "winning team must win by exactly 2 points", str(cm.exception)
+        )
+
+    def test_duplicate_set_num_raises_integrity_error(self):
+        """
+        Verify duplicate game set for the same doubles match is forbidden.
+        """
+        with self.assertRaises(IntegrityError):
+            create_doubles_game(
+                doubles_match=self.doubles_match,
+                set_num=1,
+                home_points=11,
+                away_points=5,
+            )
+
+    def test_set_num_cannot_be_zero(self):
+        """
+        Verify set_num cannot be zero
+        """
+        self.doubles_game.delete()
+        doubles_game = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=0,
+            home_points=11,
+            away_points=3,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            doubles_game.full_clean()
+        self.assertIn("Set number must be at least 1", str(cm.exception))
+
+    def test_set_num_cannot_be_greater_than_best_of(self):
+        """
+        Verify set_num cannot be greater than BEST_OF class variable
+        of DoublesMatch.
+        """
+        self.doubles_game.delete()
+        best_of = DoublesMatch.BEST_OF
+        exceed_best_of = best_of + 1
+
+        doubles_game = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=exceed_best_of,
+            home_points=11,
+            away_points=3,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            doubles_game.full_clean()
+        self.assertIn(
+            f"Set number cannot be greater than {best_of}", str(cm.exception)
+        )
+
+    def test_ordering_by_set_num_for_each_doubles_match(self):
+        """Verify records are ordered by set_num (low to high)"""
+        doubles_game3 = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=3,
+            home_points=11,
+            away_points=5,
+        )
+        doubles_game2 = create_doubles_game(
+            doubles_match=self.doubles_match,
+            set_num=2,
+            home_points=11,
+            away_points=5,
+        )
+
+        games = list(
+            DoublesGame.objects.filter(doubles_match=self.doubles_match)
+        )
+        self.assertEqual(games[0], self.doubles_game)
+        self.assertEqual(games[1], doubles_game2)
+        self.assertEqual(games[2], doubles_game3)

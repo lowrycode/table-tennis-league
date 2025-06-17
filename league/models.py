@@ -813,7 +813,7 @@ class SinglesGame(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["singles_match", "set_num"],
-                name="unique_set_per_match",
+                name="unique_set_per_singles_match",
             )
         ]
 
@@ -854,14 +854,102 @@ class SinglesGame(models.Model):
                     "Winner must be at least 2 points ahead."
                 )
 
-            # If both players are over 10, ensure the margin is exactly 2
-            if (
-                home_points >= 10
-                and away_points >= 10
-                and abs(home_points - away_points) != 2
-            ):
+            # If either score is over 11, ensure the margin is exactly 2
+            if (home_points > 11 or away_points > 11) and abs(
+                home_points - away_points
+            ) != 2:
                 raise ValidationError(
                     "In extended play, the winner must win by exactly "
+                    "2 points."
+                )
+
+    def save(self, *args, **kwargs):
+        if self.home_points is not None and self.away_points is not None:
+            self.winner = (
+                "home" if self.home_points > self.away_points else "away"
+            )
+        super().save(*args, **kwargs)
+
+
+class DoublesGame(models.Model):
+    """
+    Represents an individual game within a doubles match and is used to record
+    the points scored by each team.
+
+    There will be up to 5 DoublesGame records linked to each
+    DoublesMatch record (in a best-of-5 match).
+    """
+
+    WINNER_CHOICES = [
+        ("home", "Home"),
+        ("away", "Away"),
+    ]
+
+    doubles_match = models.ForeignKey(
+        DoublesMatch, on_delete=models.CASCADE, related_name="doubles_games"
+    )
+    set_num = models.PositiveSmallIntegerField()
+    home_points = models.PositiveSmallIntegerField()
+    away_points = models.PositiveSmallIntegerField()
+    winner = models.CharField(
+        max_length=4,
+        choices=WINNER_CHOICES,
+        blank=True,
+        help_text="This field is auto-assigned",
+    )
+
+    class Meta:
+        ordering = ["doubles_match", "set_num"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["doubles_match", "set_num"],
+                name="unique_set_per_doubles_match",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.doubles_match.fixture_result.fixture.home_team} vs "
+            f"{self.doubles_match.fixture_result.fixture.away_team}: "
+            f"SET {self.set_num}: "
+            f"{self.home_points}-{self.away_points}"
+        )
+
+    def clean(self):
+        home_points = self.home_points
+        away_points = self.away_points
+
+        # Validate set_num against DoublesMatch.BEST_OF
+        if self.set_num < 1:
+            raise ValidationError("Set number must be at least 1.")
+
+        if self.doubles_match:
+            best_of = getattr(self.doubles_match.__class__, "BEST_OF", None)
+            if best_of is not None and self.set_num > best_of:
+                raise ValidationError(
+                    f"Set number cannot be greater than {best_of} in a "
+                    f"best-of-{best_of} match."
+                )
+
+        if home_points is not None and away_points is not None:
+            # Check that at least one team has 11 or more
+            if home_points < 11 and away_points < 11:
+                raise ValidationError(
+                    "One team must have at least 11 points to win a set."
+                )
+
+            # Difference must be at least 2
+            if abs(home_points - away_points) < 2:
+                raise ValidationError(
+                    "Winning team must be at least 2 points ahead."
+                )
+
+            # If either score is over 11, ensure the margin is exactly 2
+            if (home_points > 11 or away_points > 11) and abs(
+                home_points - away_points
+            ) != 2:
+                raise ValidationError(
+                    "In extended play, the winning team must win by exactly "
                     "2 points."
                 )
 

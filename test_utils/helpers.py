@@ -14,6 +14,7 @@ from league.models import (
     TeamPlayer,
     DoublesMatch,
     SinglesGame,
+    DoublesGame,
 )
 from clubs.models import Club, Venue, VenueInfo, ClubReview
 
@@ -268,6 +269,15 @@ def create_venue_info(
 # League app
 def create_division(name, rank):
     return Division.objects.create(name=name, rank=rank)
+
+
+def create_doubles_game(doubles_match, set_num, home_points, away_points):
+    return DoublesGame.objects.create(
+        doubles_match=doubles_match,
+        set_num=set_num,
+        home_points=home_points,
+        away_points=away_points
+    )
 
 
 def create_doubles_match(
