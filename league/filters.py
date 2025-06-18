@@ -8,6 +8,8 @@ class FixtureFilter(django_filters.FilterSet):
     """
     A dynamic filter for the Fixture model based on season, division, and club.
 
+    This filter is used in views to filter both fixtures and fixture results.
+
     - Season is required and defaults to the current season.
     - Division options are populated based on the selected season.
     - Club options are populated based on the selected season and division.
