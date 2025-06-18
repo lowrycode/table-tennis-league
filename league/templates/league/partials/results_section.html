@@ -2,10 +2,28 @@
   <div class="row">
     <div class="col-12 my-5"> 
       <div class="mt-5">
-        <!-- Title -->
+        <!-- Title and Filter Button -->
         <div class="position-relative text-center">
           <h1 class="h2-style m-0 px-5">Results</h1>
+          <button
+            class="btn-toggle btn fs-4 position-absolute end-0 top-50 translate-middle-y"
+            data-target="#filter-fixtures"
+            aria-label="{{ filters_applied|yesno:'Filters active,No filters applied' }}"
+          >
+            <i class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"></i>
+          </button>
         </div>
+        <!-- Filters Form -->
+        <form
+          id="filter-fixtures"
+          class="filter-box mt-2 p-3 d-none"
+          method="get"
+          data-hx-get="{% url 'results' %}"
+          data-hx-target="#results-section"
+          data-hx-swap="outerHTML"
+        >
+          {% include 'league/partials/fixtures_filter_panel_inner.html' %}
+        </form>
       </div>
       <!-- Main Content -->
       {% if not season %}

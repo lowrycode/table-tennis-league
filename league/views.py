@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 from django.db.models import Prefetch
 from django.shortcuts import render
 from django.utils import timezone
-from .models import Week, Fixture, Season
+from .models import Week, Fixture
 from .filters import FixtureFilter
 
 
@@ -82,33 +82,59 @@ def fixtures(request):
 
 
 def results(request):
+    """
+    Displays the results list, filtered by season and optionally division
+    and club.
+
+    Supports both full-page rendering and partial updates via HTMX.
+    Filters are applied using FixtureFilter and results are grouped by weeks.
+    """
+
     # Prefetch related data for efficiency
     fixtures_with_results = Fixture.objects.select_related(
         "season", "division", "home_team__club", "away_team__club", "result"
     ).filter(result__isnull=False)
 
-    season = Season.objects.filter(is_current=True).first()
+    # Apply filters from GET params using FixtureFilter
+    fixture_filter = FixtureFilter(request.GET, queryset=fixtures_with_results)
+    filtered_fixtures_qs = fixture_filter.qs
+
+    # Get season from bound form - defaults to current season or None
+    if fixture_filter.is_valid():
+        season = fixture_filter.form.cleaned_data.get("season")
+    else:
+        season = None
 
     # Get season_weeks
     if season:
         season_weeks = (
             Week.objects.filter(
-                season=season, week_fixtures__in=fixtures_with_results
+                season=season, week_fixtures__in=filtered_fixtures_qs
             )
             .prefetch_related(
-                Prefetch("week_fixtures", queryset=fixtures_with_results)
-            ).distinct()
+                Prefetch("week_fixtures", queryset=filtered_fixtures_qs)
+            )
+            .distinct()
             .order_by("-start_date")
         )
 
     else:
         season_weeks = None
 
+    # Deduce whether filters are applied by checking for get parameters
+    filters_applied = len(request.GET) > 0
+
     # Build context
     context = {
         "season": season,
         "weeks": season_weeks,
+        "filter": fixture_filter,
+        "filters_applied": filters_applied,
     }
+
+    # If htmx request, return only the results_section partial template
+    if request.headers.get("HX-Request") == "true":
+        return render(request, "league/partials/results_section.html", context)
 
     return render(request, "league/results.html", context)
 

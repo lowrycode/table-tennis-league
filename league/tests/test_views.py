@@ -385,6 +385,23 @@ class FixturesPageTests(TestCase):
         self.assertIsNone(response.context["season"])
         self.assertContains(response, "Season not found.")
 
+    def test_htmx_invisible_season_renders_correct_placeholder(self):
+        """
+        Verify a season with is_visible=False results in context["season]=None
+        and placeholder being displayed.
+        """
+        invisible_season = create_season(
+            "Invisible", "20-21", "20-21", 2020, 2021, False, [self.division1]
+        )
+        invisible_season.is_visible = False
+        invisible_season.save()
+
+        response = self.client.get(
+            self.url, {"season": invisible_season.slug}, HTTP_HX_REQUEST="true"
+        )
+        self.assertIsNone(response.context["season"])
+        self.assertContains(response, "Season not found.")
+
     def test_htmx_division_filter_returns_correct_fixtures(self):
         """Verify HTMX request with division filter updates fixture list."""
         # Create teams and fixture for division 2 in season 2 (current)
@@ -737,3 +754,389 @@ class ResultsPageTests(TestCase):
 
         response = self.client.get(self.url)
         self.assertContains(response, "No results to display.</p>")
+
+    # Filters and HTMX
+    def test_context_contains_filter_and_filters_applied(self):
+        """Verify context contains filter and filters_applied."""
+        response = self.client.get(self.url)
+        self.assertIn("filter", response.context)
+        self.assertIn("filters_applied", response.context)
+
+    def test_htmx_request_returns_partial_template(self):
+        """Verify HTMX requests return the results section partial."""
+        response = self.client.get(self.url, HTTP_HX_REQUEST="true")
+        self.assertTemplateUsed(
+            response, "league/partials/results_section.html"
+        )
+
+    def test_htmx_season_filtering_updates_results_list(self):
+        """Verify HTMX request with season filter updates the results list."""
+        # Create fixture and result for past season
+        past_season = create_season(
+            "Past Season", "20-21", "20-21", 2020, 2021, False, [self.division]
+        )
+        past_week = create_week(past_season, 1)
+        past_team1 = create_team(
+            season=past_season,
+            division=self.division,
+            club=self.club,
+            venue=self.venue,
+            team_name="Team C Past",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        past_team2 = create_team(
+            season=past_season,
+            division=self.division,
+            club=self.club,
+            venue=self.venue,
+            team_name="Team D Past",
+            home_day="tuesday",
+            home_time=time(19, 0),
+        )
+
+        past_fixture = create_fixture(
+            season=past_season,
+            division=self.division,
+            week=past_week,
+            home_team=past_team1,
+            away_team=past_team2,
+        )
+
+        create_fixture_result(
+            fixture=past_fixture,
+            home_score=7,
+            away_score=3,
+        )
+
+        response = self.client.get(
+            self.url, {"season": past_season.slug}, HTTP_HX_REQUEST="true"
+        )
+
+        # Should contain team from past season
+        self.assertContains(response, past_team1.team_name)
+
+        # Should not contain team from current season
+        self.assertNotContains(response, self.fixture.home_team.team_name)
+
+    def test_htmx_invalid_season_renders_correct_placeholder(self):
+        """
+        Verify an invalid season slug results in context["season]=None
+        and placeholder being displayed.
+        """
+        response = self.client.get(
+            self.url, {"season": "non-existent"}, HTTP_HX_REQUEST="true"
+        )
+        self.assertIsNone(response.context["season"])
+        self.assertContains(response, "Season not found.")
+
+    def test_htmx_invisible_season_renders_correct_placeholder(self):
+        """
+        Verify a season with is_visible=False results in context["season]=None
+        and placeholder being displayed.
+        """
+        invisible_season = create_season(
+            "Invisible", "20-21", "20-21", 2020, 2021, False, [self.division]
+        )
+        invisible_season.is_visible = False
+        invisible_season.save()
+
+        response = self.client.get(
+            self.url, {"season": invisible_season.slug}, HTTP_HX_REQUEST="true"
+        )
+        self.assertIsNone(response.context["season"])
+        self.assertContains(response, "Season not found.")
+
+    def test_htmx_division_filter_returns_correct_results(self):
+        """Verify HTMX request with division filter updates results list."""
+        # Create teams, fixture and result for division 2 in current season
+        division2 = create_division("Division 2", 2)
+        self.season.divisions.set([self.division, division2])
+        div2_team1 = create_team(
+            self.season,
+            division2,
+            self.club,
+            self.venue,
+            "Team 1 Division 2",
+            "monday",
+            time(18, 0),
+        )
+        div2_team2 = create_team(
+            self.season,
+            division2,
+            self.club,
+            self.venue,
+            "Team 2 Division 2",
+            "monday",
+            time(18, 0),
+        )
+        div2_fixture = create_fixture(
+            self.season,
+            division2,
+            self.week,
+            div2_team1,
+            div2_team2,
+        )
+
+        create_fixture_result(
+            fixture=div2_fixture,
+            home_score=7,
+            away_score=3,
+        )
+
+        response = self.client.get(
+            self.url,
+            {
+                "division": division2.id,
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        # Should include fixture result from division2
+        self.assertContains(response, div2_fixture.home_team.team_name)
+        self.assertContains(response, div2_fixture.away_team.team_name)
+
+        # Should not contain fixture results from division1
+        self.assertNotContains(response, self.fixture.home_team.team_name)
+
+    def test_htmx_season_and_division_filters_together(self):
+        """
+        Verify HTMX request with both season and division filters update
+        results list correctly.
+        """
+        # Add division 2 to current season
+        division1 = self.division
+        division2 = create_division("Division 2", 2)
+        self.season.divisions.set([division1, division2])
+
+        # Add past season and past week
+        past_season = create_season(
+            "Past Season",
+            "20-21",
+            "20-21",
+            2020,
+            2021,
+            False,
+            [division1, division2],
+        )
+        past_week = create_week(past_season, 1)
+
+        # Add Past teams from both divisions
+        past_div1_team1 = create_team(
+            season=past_season,
+            division=division1,
+            club=self.club,
+            venue=self.venue,
+            team_name="Past Team1 Div1",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        past_div1_team2 = create_team(
+            season=past_season,
+            division=division1,
+            club=self.club,
+            venue=self.venue,
+            team_name="Past Team2 Div1",
+            home_day="tuesday",
+            home_time=time(19, 0),
+        )
+        past_div2_team1 = create_team(
+            season=past_season,
+            division=division2,
+            club=self.club,
+            venue=self.venue,
+            team_name="Past Team1 Div2",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        past_div2_team2 = create_team(
+            season=past_season,
+            division=division2,
+            club=self.club,
+            venue=self.venue,
+            team_name="Past Team2 Div2",
+            home_day="tuesday",
+            home_time=time(19, 0),
+        )
+
+        # Add past fixtures and results
+        past_div1_fixture = create_fixture(
+            past_season,
+            division1,
+            past_week,
+            past_div1_team1,
+            past_div1_team2,
+        )
+        create_fixture_result(
+            fixture=past_div1_fixture,
+            home_score=7,
+            away_score=3,
+        )
+
+        past_div2_fixture = create_fixture(
+            past_season,
+            division2,
+            past_week,
+            past_div2_team1,
+            past_div2_team2,
+        )
+        create_fixture_result(
+            fixture=past_div2_fixture,
+            home_score=7,
+            away_score=3,
+        )
+
+        response = self.client.get(
+            self.url,
+            {
+                "season": past_season.slug,
+                "division": division1.id,
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        # Should include fixture results from division1 past season
+        self.assertContains(response, past_div1_fixture.home_team.team_name)
+        self.assertContains(response, past_div1_fixture.away_team.team_name)
+
+        # Should not contain fixture results from division2 past season
+        self.assertNotContains(response, past_div2_fixture.home_team.team_name)
+        self.assertNotContains(response, past_div2_fixture.home_team.team_name)
+
+        # Should not contain fixture results from division1 current season
+        self.assertNotContains(response, self.fixture.home_team.team_name)
+        self.assertNotContains(response, self.fixture.away_team.team_name)
+
+    def test_htmx_club_filter_returns_club_home_fixture_results(self):
+        """
+        Verify HTMX request with club filter includes fixture results where
+        club team is playing at home
+        """
+
+        # Delete fixtures and associated results
+        delete_fixtures()
+
+        foreign_club = create_club("Some other club")
+        foreign_team1 = create_team(
+            self.season,
+            self.division,
+            foreign_club,
+            self.venue,
+            "Foreign Team 1",
+            "monday",
+            time(18, 0),
+        )
+        foreign_team2 = create_team(
+            self.season,
+            self.division,
+            foreign_club,
+            self.venue,
+            "Foreign Team 2",
+            "monday",
+            time(18, 0),
+        )
+
+        # Create fixture and result where neither home or away team in club
+        fixture_neither_in_club = create_fixture(
+            self.season,
+            self.division,
+            self.week,
+            foreign_team1,
+            foreign_team2,
+        )
+        create_fixture_result(fixture_neither_in_club, 7, 3)
+
+        # Create fixture and result where home team in club but not away team
+        fixture_home_in_club = create_fixture(
+            self.season,
+            self.division,
+            self.week,
+            self.team1,
+            foreign_team1,
+        )
+        create_fixture_result(fixture_home_in_club, 7, 3)
+
+        response = self.client.get(
+            self.url,
+            {
+                "season": self.season.slug,
+                "club": self.club.id,
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        # Should include teams in fixtures where home team is in specified club
+        self.assertContains(response, fixture_home_in_club.home_team.team_name)
+        self.assertContains(response, fixture_home_in_club.away_team.team_name)
+
+        # Should not include teams which do not play against club teams
+        self.assertNotContains(
+            response, fixture_neither_in_club.away_team.team_name
+        )
+
+    def test_htmx_club_filter_returns_club_away_fixture_results(self):
+        """
+        Verify HTMX request with club filter includes results where
+        club team is playing away
+        """
+
+        # Delete fixtures and associated results
+        delete_fixtures()
+
+        foreign_club = create_club("Some other club")
+        foreign_team1 = create_team(
+            self.season,
+            self.division,
+            foreign_club,
+            self.venue,
+            "Foreign Team 1",
+            "monday",
+            time(18, 0),
+        )
+        foreign_team2 = create_team(
+            self.season,
+            self.division,
+            foreign_club,
+            self.venue,
+            "Foreign Team 2",
+            "monday",
+            time(18, 0),
+        )
+
+        # Create fixture and result where neither home or away team in club
+        fixture_neither_in_club = create_fixture(
+            self.season,
+            self.division,
+            self.week,
+            foreign_team1,
+            foreign_team2,
+        )
+        create_fixture_result(fixture_neither_in_club, 7, 3)
+
+        # Create fixture and result where home team in club but not away team
+        fixture_home_in_club = create_fixture(
+            self.season,
+            self.division,
+            self.week,
+            foreign_team1,
+            self.team1,
+        )
+        create_fixture_result(fixture_home_in_club, 7, 3)
+
+        response = self.client.get(
+            self.url,
+            {
+                "season": self.season.slug,
+                "club": self.club.id,
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        # Should include teams in fixtures where away team is in specified club
+        self.assertContains(response, fixture_home_in_club.home_team.team_name)
+        self.assertContains(response, fixture_home_in_club.away_team.team_name)
+
+        # Should not include teams which do not play against club teams
+        self.assertNotContains(
+            response, fixture_neither_in_club.away_team.team_name
+        )

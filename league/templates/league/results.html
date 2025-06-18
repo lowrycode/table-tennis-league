@@ -1,6 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
   <!-- Results Content -->
   {% include 'league/partials/results_section.html' %}
+{% endblock %}
+
+{% block scripts %}
+  <!-- Load HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  
+  <!-- Script controlling toggle behaviour for filter -->
+    <script src="{% static 'js/toggle_btn.js' %}"></script>
 {% endblock %}
