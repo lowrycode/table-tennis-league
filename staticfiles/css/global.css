@@ -126,21 +126,25 @@ h6 {
 .container-max-4 {
   max-width: 400px;
   margin: 0 1rem;
+  padding: 0 10px;
 }
 
 .container-max-5 {
   max-width: 500px;
   margin: 0 1rem;
+  padding: 0 10px;
 }
 
 .container-max-6 {
   max-width: 600px;
   margin: 0 1rem;
+  padding: 0 10px;
 }
 
 .container-max-8 {
   max-width: 800px;
   margin: 0 1rem;
+  padding: 0 10px;
 }
 
 /* BASE COMPONENTS */
@@ -192,13 +196,15 @@ h6 {
 }
 
 /* Links */
-a, .a-style {
+a,
+.a-style {
   text-decoration: none;
   color: var(--primary-2);
   font-weight: 600;
 }
 
-a:hover, .a-style:hover {
+a:hover,
+.a-style:hover {
   color: var(--primary-3);
 }
 
@@ -446,13 +452,15 @@ footer a:hover {
   border: 1px solid var(--light-3);
 }
 
-.week-fixtures ul {
+.week-fixtures ul,
+.week-results ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.week-fixtures li {
+.week-fixtures li,
+.week-results li {
   margin: 0.5rem 0;
   padding: 0.4rem 1rem;
   border: 1px solid var(--light-4);
@@ -472,13 +480,14 @@ footer a:hover {
 
 .fixture-postponed {
   background-color: var(--status-bg-2);
-}  
+}
 
 .fixture-completed {
   background-color: var(--status-bg-3);
 }
 
-.fixture-date, .fixture-venue {
+.fixture-date,
+.fixture-venue {
   font-size: 0.8rem;
 }
 
