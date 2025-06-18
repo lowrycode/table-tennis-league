@@ -486,6 +486,14 @@ footer a:hover {
   background-color: var(--status-bg-3);
 }
 
+.result-played {
+  background-color: var(--light-2);
+}
+
+.result-forfeited {
+  background-color: var(--status-bg-1);
+}
+
 .fixture-date,
 .fixture-venue {
   font-size: 0.8rem;
