@@ -7,12 +7,14 @@ from test_utils.helpers import (
     create_club,
     create_division,
     create_fixture,
+    create_fixture_result,
     create_season,
     create_team,
     create_venue,
     create_week,
     delete_fixtures,
     delete_weeks,
+    create_fixture_result_setup,
 )
 
 
@@ -623,3 +625,115 @@ class FixturesFilterView(TestCase):
         """Verify Bad Request status 400 returned for non-HTMX requests"""
         response = self.client.get(self.url)
         self.assertContains(response, "HTMX requests only", status_code=400)
+
+
+class ResultsPageTests(TestCase):
+    def setUp(self):
+        """Set up test data for the results view tests."""
+
+        # Create a fixture with result using helper method
+        setup_data = create_fixture_result_setup()
+
+        # Assign to self
+        for key, value in setup_data.items():
+            setattr(self, key, value)
+
+        self.url = reverse("results")
+
+    # Basic page details and context
+    def test_results_page_returns_200(self):
+        """Verify valid response has status code 200."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_correct_template_is_used(self):
+        """Verify correct template is used."""
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "league/results.html")
+
+    def test_page_contains_title(self):
+        """Verify page contains title"""
+        response = self.client.get(self.url)
+        self.assertContains(response, "Results</h1>")
+
+    def test_context_contains_season_and_weeks(self):
+        """Verify context contains current season and correct weeks."""
+        # Create another week
+        week2 = create_week(season=self.season, week_num=2)
+
+        # Create fixture without result
+        # (teams reversed to avoid unique constraint)
+        create_fixture(
+            self.season, self.division, week2, self.team2, self.team1
+        )
+
+        response = self.client.get(self.url)
+        self.assertIn("season", response.context)
+        self.assertIn("weeks", response.context)
+        self.assertEqual(response.context["season"], self.season)
+        # no results in second week so should not be included
+        self.assertEqual(len(response.context["weeks"]), 1)
+
+    def test_weeks_are_ordered_by_start_date_desc(self):
+        """Verify weeks are reverse ordered by start date in context."""
+        # Create another week
+        week2 = create_week(season=self.season, week_num=2)
+
+        # Create fixture with result
+        # (teams reversed to avoid unique constraint)
+        fixture2 = create_fixture(
+            self.season, self.division, week2, self.team2, self.team1
+        )
+        create_fixture_result(fixture2, 8, 2)
+
+        response = self.client.get(self.url)
+        weeks = list(response.context["weeks"])
+        self.assertEqual(len(weeks), 2)
+        self.assertGreater(weeks[0].start_date, weeks[1].start_date)
+
+    # Fixtures details, status and fallbacks
+    def test_week_details_are_displayed(self):
+        """
+        Verify week details include week name and start date.
+        """
+        response = self.client.get(self.url)
+        self.assertContains(response, self.week.name)
+        self.assertContains(response, "Begins 1st Sep")
+
+    def test_results_details_are_displayed(self):
+        """
+        Verify details about fixture result are displayed including:
+        - team names
+        - date
+        - score
+        """
+        response = self.client.get(self.url)
+        self.assertContains(response, self.fixture.home_team.team_name)
+        self.assertContains(response, self.fixture.away_team.team_name)
+        self.assertContains(response, "Mon 2nd Sep")
+        self.assertContains(
+            response,
+            (
+                f"{self.fixture.result.home_score}-"
+                f"{self.fixture.result.away_score}"
+            ),
+        )
+
+    def test_placeholder_displayed_when_no_current_season(self):
+        """Verify placeholder is displayed when season is not found."""
+        self.season.is_current = False
+        self.season.save()
+
+        response = self.client.get(self.url)
+        self.assertContains(response, "Season not found.</p>")
+
+    def test_placeholder_displayed_when_weeks_is_empty(self):
+        """Verify placeholder is displayed when weeks is empty."""
+        # Delete fixtures - needed due to protected foreign keys
+        delete_fixtures()
+
+        # Delete weeks
+        delete_weeks()
+
+        response = self.client.get(self.url)
+        self.assertContains(response, "No results to display.</p>")

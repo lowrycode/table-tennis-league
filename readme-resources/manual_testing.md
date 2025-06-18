@@ -758,3 +758,20 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | All filters work across devices and the layout is fully responsive |
 | ✓ | No console errors or warnings were caused by interacting with the modal |
 
+### Results Page - Result Listings
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | The League nav item is highlighted when the Results page is active  |
+| ✓ | A list of Results (grouped by week) is seen |
+| ✓ | Weeks are listed in chronological order (latest first) with week name, start date and details (if provided) |
+| ✓ | Results are listed within each week in chronological order (earliest first), by date and time |
+| ✓ | Each Result includes required information (home team, away team, fixture date, score and a link to view match breakdown) |
+| ✓ | If a match was forfeited, the fixture result is coloured red and the text "FORFEITED" is displayed |
+| ✓ | If no weeks are found with results, a placeholder "No results to display." is shown |
+| ✓ | If season not found, a placeholder "Season not found." is shown |
+| ✓ | Login not required to view the Results page |
+| ✓ | Page is responsive on different screen sizes |
+| ✓ | No console errors or warnings were caused by interacting with page elements |
+
+

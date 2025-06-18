@@ -1,0 +1,22 @@
+<section id="results-section" class="container-max-8 w-100">
+  <div class="row">
+    <div class="col-12 my-5"> 
+      <div class="mt-5">
+        <!-- Title -->
+        <div class="position-relative text-center">
+          <h1 class="h2-style m-0 px-5">Results</h1>
+        </div>
+      </div>
+      <!-- Main Content -->
+      {% if not season %}
+        <p class="text-center py-3">Season not found.</p>
+      {% elif not weeks %}
+        <p class="text-center py-3">No results to display.</p>
+      {% else %}
+        {% for week in weeks %}
+          {% include 'league/partials/result_week.html' %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>

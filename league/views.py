@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 from django.db.models import Prefetch
 from django.shortcuts import render
 from django.utils import timezone
-from .models import Week, Fixture
+from .models import Week, Fixture, Season
 from .filters import FixtureFilter
 
 
@@ -79,6 +79,38 @@ def fixtures(request):
         )
 
     return render(request, "league/fixtures.html", context)
+
+
+def results(request):
+    # Prefetch related data for efficiency
+    fixtures_with_results = Fixture.objects.select_related(
+        "season", "division", "home_team__club", "away_team__club", "result"
+    ).filter(result__isnull=False)
+
+    season = Season.objects.filter(is_current=True).first()
+
+    # Get season_weeks
+    if season:
+        season_weeks = (
+            Week.objects.filter(
+                season=season, week_fixtures__in=fixtures_with_results
+            )
+            .prefetch_related(
+                Prefetch("week_fixtures", queryset=fixtures_with_results)
+            ).distinct()
+            .order_by("-start_date")
+        )
+
+    else:
+        season_weeks = None
+
+    # Build context
+    context = {
+        "season": season,
+        "weeks": season_weeks,
+    }
+
+    return render(request, "league/results.html", context)
 
 
 def fixtures_filter(request):

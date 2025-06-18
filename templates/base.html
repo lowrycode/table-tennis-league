@@ -3,6 +3,7 @@
 {% url 'clubs' as clubs_url %}
 {% url 'contact' as contact_url %}
 {% url 'fixtures' as fixtures_url %}
+{% url 'results' as results_url %}
 {% url 'account_login' as login_url %}
 {% url 'account_signup' as signup_url %}
 {% url 'account_logout' as logout_url %}
@@ -124,6 +125,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end mb-2">
                     <li><a class="dropdown-item" href="{{ fixtures_url }}">Fixtures</a></li>
+                    <li><a class="dropdown-item" href="{{ results_url }}">Results</a></li>
                 </ul>
               </li>
               <!-- Contact -->
