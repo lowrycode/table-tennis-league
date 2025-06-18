@@ -6,7 +6,7 @@
     </div>
   {% endfor %}
   <div class="d-flex gap-3">
-    <a href="{% url 'fixtures' %}" class="btn btn-custom2 btn-sm">Clear Filters</a>
+    <a href="{{ request.path }}" class="btn btn-custom2 btn-sm">Clear Filters</a>
     <button type="submit" class="btn btn-custom btn-sm">Apply Filters</button>
   </div>
 </div>
