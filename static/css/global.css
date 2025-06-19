@@ -54,20 +54,25 @@ h6 {
 }
 
 h1 {
-  font-size: 2.7rem;
+  font-size: calc(2.1rem + .9vw);
 }
 
 h2,
 .h2-style {
-  font-size: 2.2rem;
+  font-family: "PT Serif", serif;
+  font-size: calc(1.6rem + .9vw);
+  font-weight: 700;
 }
 
-h3 {
-  font-size: 1.6rem;
+h3,
+.h3-style {
+  font-family: "PT Serif", serif;
+  font-size: calc(1.2rem + .9vw);
+  font-weight: 700;
 }
 
 h4 {
-  font-size: 1.4rem;
+  font-size: calc(1.2rem + .4vw);
 }
 
 h5 {
@@ -453,28 +458,31 @@ footer a:hover {
 }
 
 .week-fixtures ul,
-.week-results ul {
+.week-results ul,
+#results-breakdown ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
 .week-fixtures li,
-.week-results li {
+.week-results li,
+#results-breakdown li {
   margin: 0.5rem 0;
   padding: 0.4rem 1rem;
   border: 1px solid var(--light-4);
 }
 
-.fixture-status-none {
+.fixture-status-none,
+.fixture-scheduled,
+.result-played,
+.singles-match,
+.doubles-match {
   background-color: var(--light-2);
 }
 
-.fixture-scheduled {
-  background-color: var(--light-2);
-}
-
-.fixture-cancelled {
+.fixture-cancelled,
+.result-forfeited {
   background-color: var(--status-bg-1);
 }
 
@@ -484,14 +492,6 @@ footer a:hover {
 
 .fixture-completed {
   background-color: var(--status-bg-3);
-}
-
-.result-played {
-  background-color: var(--light-2);
-}
-
-.result-forfeited {
-  background-color: var(--status-bg-1);
 }
 
 .fixture-date,
