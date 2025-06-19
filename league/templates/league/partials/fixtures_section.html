@@ -5,6 +5,9 @@
         <!-- Title and Filter Button -->
         <div class="position-relative text-center">
           <h1 class="h2-style m-0 px-5">Fixtures</h1>
+          <p class="m-0 px-5 fw-bold{% if not season.is_current %} red{% endif %}">
+            {{ season.name }}
+          </p>
           <button
             class="btn-toggle btn fs-4 position-absolute end-0 top-50 translate-middle-y"
             data-target="#filter-fixtures"
