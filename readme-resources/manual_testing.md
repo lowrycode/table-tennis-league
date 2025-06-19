@@ -766,7 +766,8 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | A list of Results (grouped by week) is seen |
 | ✓ | Weeks are listed in chronological order (latest first) with week name, start date and details (if provided) |
 | ✓ | Results are listed within each week in chronological order (earliest first), by date and time |
-| ✓ | Each Result includes required information (home team, away team, fixture date, score and a link to view match breakdown) |
+| ✓ | Each Result includes required information (home team, away team, fixture date, score and a link ("score") to view match breakdown) |
+| ✓ | Clicking the link navigates to the Result Breakdown page |
 | ✓ | If a match was forfeited, the fixture result is coloured red and the text "FORFEITED" is displayed |
 | ✓ | If no weeks are found with results, a placeholder "No results to display." is shown |
 | ✓ | If season not found, a placeholder "Season not found." is shown |
@@ -774,7 +775,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Page is responsive on different screen sizes |
 | ✓ | No console errors or warnings were caused by interacting with page elements |
 
-### Fixtures Page - Filters Panel
+### Results Page - Filters Panel
 
 | Status  | Test Description |
 | ---     | ---              |
@@ -794,6 +795,21 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Changing the season and/or division updates the clubs dropdown options but changing the club does not reset the season or division |
 | ✓ | All filters work across devices and the layout is fully responsive |
 | ✓ | No console errors or warnings were caused by interacting with the modal |
+
+### Result Breakdown Page
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Match scores for singles and doubles matches are displayed |
+| ✓ | Game scores for singles and doubles matches are displayed |
+| ✓ | If there are no records for any singles matches and/or the doubles match (e.g. if forfeited), suitable placeholders are shown |
+| ✓ | If there are no game score records for a singles and/or doubles match, suitable placeholders are shown |
+| ✓ | A button to return to results page displays and works correctly |
+| ✓ | The fixture date, time and venue are displayed |
+| ✓ | A summary showing how many singles matches were won by each player is displayed |
+| ✓ | Trying to access the page by direct URL for a fixture with no result redirects the user to the results page |
+| ✓ | Page is responsive on different screen sizes |
+| ✓ | No console errors or warnings were caused by interacting with the page |
 
 
 

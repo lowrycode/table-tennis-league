@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib import messages
 from test_utils.helpers import (
     create_club,
     create_division,
@@ -15,6 +16,12 @@ from test_utils.helpers import (
     delete_fixtures,
     delete_weeks,
     create_fixture_result_setup,
+    create_player,
+    create_team_player,
+    create_singles_match,
+    create_doubles_match,
+    create_singles_game,
+    create_doubles_game,
 )
 
 
@@ -1140,3 +1147,235 @@ class ResultsPageTests(TestCase):
         self.assertNotContains(
             response, fixture_neither_in_club.away_team.team_name
         )
+
+
+class ResultBreakdownPageTests(TestCase):
+    def setUp(self):
+        """Create test data for result_breakdown view."""
+
+        # Create a fixture with result using helper method
+        setup_data = create_fixture_result_setup()
+
+        # Assign to self
+        for key, value in setup_data.items():
+            setattr(self, key, value)
+
+        # Create players
+        self.player1 = create_player("Player", "One", self.club)
+        self.player2 = create_player("Player", "Two", self.club)
+        self.player3 = create_player("Player", "Three", self.club)
+        self.player4 = create_player("Player", "Four", self.club)
+
+        # Create team players
+        self.home_player1 = create_team_player(self.player1, self.team1)
+        self.home_player2 = create_team_player(self.player2, self.team1)
+        self.away_player1 = create_team_player(self.player3, self.team2)
+        self.away_player2 = create_team_player(self.player4, self.team2)
+
+        # Create singles matches
+        self.sm1 = create_singles_match(
+            self.fixture_result, self.home_player1, self.away_player1, 3, 0
+        )
+        self.sm2 = create_singles_match(
+            self.fixture_result, self.home_player1, self.away_player2, 1, 3
+        )
+
+        # Create doubles match
+        self.dm = create_doubles_match(
+            self.fixture_result,
+            [self.home_player1, self.home_player2],
+            [self.away_player1, self.away_player2],
+            3,
+            2,
+        )
+
+        self.url = reverse("result_breakdown", args=[self.fixture.id])
+
+    def test_view_returns_200_with_valid_fixture(self):
+        """Verify the result breakdown page returns status code 200."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        """Verify the correct template is used for the result breakdown."""
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "league/result_breakdown.html")
+
+    def test_redirect_if_no_result(self):
+        """
+        Verify redirects to 'results' if fixture has no result with a
+        warning message.
+        """
+        # Remove result from fixture
+        self.fixture.result.delete()
+        # self.fixture.save()
+
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(response, reverse("results"))
+
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn(
+            "No result found for this fixture",
+            msgs[0].message,
+        )
+        self.assertEqual(msgs[0].level, messages.WARNING)
+
+    def test_context_contains_fixture_and_win_counts(self):
+        """
+        Verify context includes fixture and player win counts dictionaries.
+        """
+        response = self.client.get(self.url)
+        self.assertIn("fixture", response.context)
+        self.assertIn("home_player_win_counts", response.context)
+        self.assertIn("away_player_win_counts", response.context)
+
+        # The fixture should be the same as test fixture
+        self.assertEqual(response.context["fixture"], self.fixture)
+
+    def test_home_player_win_counts_correct(self):
+        """Verify home player wins are counted correctly."""
+        response = self.client.get(self.url)
+        home_win_counts = response.context["home_player_win_counts"]
+
+        # Home player 1 should have 1 win from singles_match
+        self.assertIn(self.home_player1.player, home_win_counts)
+        self.assertEqual(home_win_counts[self.home_player1.player], 1)
+
+    def test_away_player_win_counts_correct(self):
+        """Verify away player wins are counted correctly."""
+        response = self.client.get(self.url)
+        away_win_counts = response.context["away_player_win_counts"]
+
+        self.assertIn(self.away_player2.player, away_win_counts)
+        self.assertEqual(away_win_counts[self.away_player2.player], 1)
+
+    def test_away_player_win_counts_excludes_losers(self):
+        """
+        Verify away player with no wins is not found in away_player_win_counts.
+        """
+        response = self.client.get(self.url)
+        away_win_counts = response.context["away_player_win_counts"]
+
+        self.assertNotIn(self.away_player1.player, away_win_counts)
+
+    def test_template_displays_fixture_details(self):
+        """
+        Verify template renders fixture date, venue, time, team names
+        and scores.
+        """
+        response = self.client.get(self.url)
+
+        # Check fixture info in response content
+        self.assertContains(response, self.fixture.datetime.strftime("%a"))
+        self.assertContains(response, self.venue.name)
+        self.assertContains(response, self.fixture.datetime.strftime("%H:%M"))
+        self.assertContains(response, self.team1.team_name)
+        self.assertContains(response, self.team2.team_name)
+        self.assertContains(response, self.fixture.result.home_score)
+        self.assertContains(response, self.fixture.result.away_score)
+
+    def test_template_displays_home_and_away_player_wins(self):
+        """Verify template renders home and away player win counts."""
+        response = self.client.get(self.url)
+
+        # Player full names should appear with win counts
+        self.assertContains(
+            response, f"{self.home_player1.player.full_name} 1"
+        )
+        self.assertContains(
+            response, f"{self.away_player2.player.full_name} 1"
+        )
+
+    def test_template_lists_singles_match_scores(self):
+        """Verify template lists set scores for singles matches."""
+        response = self.client.get(self.url)
+
+        # Check match scores appear
+        self.assertContains(
+            response, f"{self.sm1.home_sets} - {self.sm1.away_sets}"
+        )
+        self.assertContains(
+            response, f"{self.sm2.home_sets} - {self.sm2.away_sets}"
+        )
+
+    def test_template_lists_singles_game_scores(self):
+        """Verify template lists singles game scores."""
+        # Create singles_games
+        create_singles_game(self.sm1, 1, 11, 3)
+        create_singles_game(self.sm1, 2, 11, 5)
+        create_singles_game(self.sm1, 3, 11, 7)
+
+        response = self.client.get(self.url)
+
+        # Check game scores appear
+        self.assertContains(response, "11-3")
+        self.assertContains(response, "11-5")
+        self.assertContains(response, "11-7")
+
+    def test_template_handles_no_singles_matches(self):
+        """Verify placeholder text is displayed if no singles matches."""
+        # Remove singles matches
+        self.fixture_result.singles_matches.all().delete()
+        response = self.client.get(self.url)
+        self.assertContains(
+            response, "No scores for the singles matches have been recorded."
+        )
+
+    def test_template_handles_no_singles_game_scores(self):
+        """
+        Verify placeholder text displays if no games scores are recorded for
+        a singles match.
+        """
+        # Remove doubles match (this has no game scores either)
+        self.fixture_result.doubles_match.delete()
+
+        response = self.client.get(self.url)
+        self.assertContains(response, "No game scores recorded")
+
+    def test_template_handles_no_doubles_match(self):
+        """Verify placeholder text is displayed if no doubles match."""
+        self.fixture_result.doubles_match.delete()
+        response = self.client.get(self.url)
+        self.assertContains(
+            response, "No scores for the doubles match have been recorded."
+        )
+
+    def test_template_lists_doubles_match_with_players_and_scores(self):
+        """Template lists doubles match details when present."""
+        # Delete singles matches
+        self.fixture.result.singles_matches.all().delete()
+
+        response = self.client.get(self.url)
+
+        # Check doubles match players and scores appear
+        self.assertContains(response, "<span>+</span>")
+        self.assertContains(response, "<span>Player One</span>")
+        self.assertContains(response, "<span>Player Two</span>")
+        self.assertContains(response, "<span>Player Three</span>")
+        self.assertContains(response, "<span>Player Four</span>")
+        self.assertContains(response, "3 - 2")
+
+    def test_template_lists_doubles_game_scores(self):
+        """Verify template lists doubles game scores."""
+        # Create doubles_games
+        create_doubles_game(self.dm, 1, 11, 3)
+        create_doubles_game(self.dm, 2, 11, 5)
+        create_doubles_game(self.dm, 3, 11, 7)
+
+        response = self.client.get(self.url)
+
+        # Check game scores appear
+        self.assertContains(response, "11-3")
+        self.assertContains(response, "11-5")
+        self.assertContains(response, "11-7")
+
+    def test_template_handles_no_doubles_game_scores(self):
+        """
+        Verify placeholder text displays if no games scores are recorded for
+        the doubles match.
+        """
+        # Remove singles matches (these have no game scores either)
+        self.fixture_result.singles_matches.all().delete()
+        response = self.client.get(self.url)
+        self.assertContains(response, "No game scores recorded")

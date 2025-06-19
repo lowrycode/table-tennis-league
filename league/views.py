@@ -1,9 +1,10 @@
 from datetime import timedelta
 from django.http import HttpResponseBadRequest
 from django.db.models import Prefetch
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import Week, Fixture
+from django.contrib import messages
+from .models import Week, Fixture, SinglesMatch, DoublesMatch
 from .filters import FixtureFilter
 
 
@@ -137,6 +138,68 @@ def results(request):
         return render(request, "league/partials/results_section.html", context)
 
     return render(request, "league/results.html", context)
+
+
+def result_breakdown(request, fixture_id):
+    """
+    Display a detailed breakdown of a fixture's result, including singles
+    and doubles match scores and individual player win counts.
+
+    If no result exists for the given fixture, the user is redirected to
+    the results page with a warning.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        fixture_id (int): The ID of the fixture with the related results.
+
+    Returns:
+        HttpResponse: Rendered result breakdown page or redirect to
+        the results page.
+    """
+    # Define querysets
+    singles_qs = SinglesMatch.objects.select_related(
+        "home_player__player", "away_player__player"
+    ).prefetch_related("singles_games")
+
+    doubles_qs = DoublesMatch.objects.prefetch_related(
+        "home_players__player", "away_players__player", "doubles_games"
+    )
+
+    fixture_qs = Fixture.objects.select_related("result").prefetch_related(
+        Prefetch("result__singles_matches", queryset=singles_qs),
+        Prefetch("result__doubles_match", queryset=doubles_qs),
+    )
+
+    # Get fixture with prefetched data
+    fixture = get_object_or_404(fixture_qs, id=fixture_id)
+
+    # Redirect to Results page if fixture has no result
+    if not hasattr(fixture, "result"):
+        messages.warning(request, "No result found for this fixture.")
+        return redirect("results")
+
+    # Count singles wins for both home and away players
+    home_player_win_counts = {}
+    away_player_win_counts = {}
+    for match in fixture.result.singles_matches.all():
+        if match.winner == "home":
+            player = match.home_player.player
+            if player not in home_player_win_counts:
+                home_player_win_counts[player] = 0
+            home_player_win_counts[player] += 1
+        elif match.winner == "away":
+            player = match.away_player.player
+            if player not in away_player_win_counts:
+                away_player_win_counts[player] = 0
+            away_player_win_counts[player] = 1
+
+    return render(
+        request, "league/result_breakdown.html", {
+            "fixture": fixture,
+            "home_player_win_counts": home_player_win_counts,
+            "away_player_win_counts": away_player_win_counts,
+        },
+    )
 
 
 def fixtures_filter(request):

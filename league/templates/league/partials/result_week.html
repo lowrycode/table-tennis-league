@@ -5,7 +5,10 @@
     <ul>
       {% for fixture in week.week_fixtures.all %}
         {% if fixture.result %}
-          <li class="row {% if fixture.result.status == "forfeited" %}result-forfeited{% else %}result-played{% endif %}">
+          <li 
+            id="fixture-result-{{ fixture.id }}"
+            class="row {% if fixture.result.status == "forfeited" %}result-forfeited{% else %}result-played{% endif %}"
+          >
             {% if fixture.result.status == "forfeited" %}
             <div class="w-100 text-center fw-bold red">FORFEITED</div>
             {% endif %}
@@ -16,7 +19,7 @@
               <div class="fixture-date text-nowrap">{{ fixture.datetime|date:"D jS M" }}</div>
               <div class="fs-3 fw-semibold">{{ fixture.result.home_score }}-{{ fixture.result.away_score }}</div>
               <a
-                href="#"
+                href="{% url 'result_breakdown' fixture.id %}?{{ request.GET.urlencode }}"
                 aria-label="See individual matches and scores"
                 title="See individual matches and scores"
               >
