@@ -811,5 +811,27 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Page is responsive on different screen sizes |
 | ✓ | No console errors or warnings were caused by interacting with the page |
 
+### League Tables Page
 
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Navbar includes Tables in League menu dropdown |
+| ✓ | The page shows a table for each division in the current season (by default) |
+| ✓ | Each table includes team name, matches played (P), Wins (W), Losses (L), Draws (D), Points (Pts) and Position (Rank) |
+| ✓ | Teams are sorted by points (highest first); ties are broken using number of team match wins, then team sets, then individual sets |
+| ✓ | If no data is available, suitable placeholders are displayed |
+| ✓ | Tables are visible to all users without requiring login |
+| ✓ | Page is responsive on different screen sizes |
+| ✓ | No console errors or warnings were caused by interacting with the page |
 
+### League Tables Page - Filter Panel
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | A season filter is displayed and defauts to the current season |
+| ✓ | Season filter is a dropdown listing all visible seasons and is sorted by start date (most recent first) |
+| ✓ | Season data updates correctly when filter is applied |
+| ✓ | Suitable placeholders show if no season data is available |
+| ✓ | Filtering updates dynamically without requiring a full page reload |
+| ✓ | Filter is responsive on different screen sizes |
+| ✓ | No console errors or warnings were caused by interacting with the page |

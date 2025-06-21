@@ -1,15 +1,31 @@
 <section id="tables-section" class="container-max-8 w-100">
   <div class="row">
     <div class="col-12 my-5"> 
-      <div class="mt-5">
-        <!-- Title -->
-        <div class="position-relative text-center">
-          <h1 class="h2-style m-0 px-5">League Tables</h1>
-          <p class="m-0 px-5 fw-bold{% if not season.is_current %} red{% endif %}">
-            {{ season.name }}
-          </p>
-        </div>
+      <!-- Title and Filter Button -->
+      <div class="position-relative text-center">
+        <h1 class="h2-style m-0 px-5">League Tables</h1>
+        <p class="m-0 px-5 fw-bold{% if not season.is_current %} red{% endif %}">
+          {{ season.name }}
+        </p>
+        <button
+          class="btn-toggle btn fs-4 position-absolute end-0 top-50 translate-middle-y"
+          data-target="#filter-league-tables"
+          aria-label="{{ filters_applied|yesno:'Filters active,No filters applied' }}"
+        >
+          <i class="fa-solid fa-filter{{ filters_applied|yesno:' blue, text-muted' }}"></i>
+        </button>
       </div>
+      <!-- Filters Form -->
+      <form
+        id="filter-league-tables"
+        class="filter-box mt-2 p-3 d-none"
+        method="get"
+        data-hx-get="{% url 'tables' %}"
+        data-hx-target="#tables-section"
+        data-hx-swap="outerHTML"
+      >
+        {% include 'league/partials/league_tables_filter_panel_inner.html' %}
+      </form>
       <!-- Main Content -->
       {% if not season %}
         <p class="text-center py-3">Season not found.</p>

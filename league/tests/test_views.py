@@ -1703,3 +1703,51 @@ class TablesPageTests(TestCase):
         self.assertEqual(table[1]["Pts"], 1)
         self.assertEqual(table[1]["team_sets_won"], 5)
         self.assertEqual(table[1]["individual_sets_won"], 2)
+
+    # Filters and HTMX
+    def test_context_contains_form_and_filters_applied(self):
+        """Verify context contains form and filters_applied."""
+        response = self.client.get(self.url)
+        self.assertIn("form", response.context)
+        self.assertIn("filters_applied", response.context)
+
+    def test_htmx_request_returns_partial_template(self):
+        """Verify HTMX requests return the tables section partial."""
+        response = self.client.get(self.url, HTTP_HX_REQUEST="true")
+        self.assertTemplateUsed(
+            response, "league/partials/tables_section.html"
+        )
+
+    def test_htmx_season_filtering_updates_results_list(self):
+        """Verify HTMX request with season filter updates the tables."""
+        # Create Teams in season 1 (not current season)
+        s1_d1_team1 = create_team(
+            season=self.season1,
+            division=self.division1,
+            club=self.club,
+            venue=self.venue,
+            team_name="s1 d1 t1",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        s1_d1_team2 = create_team(
+            season=self.season1,
+            division=self.division1,
+            club=self.club,
+            venue=self.venue,
+            team_name="s1 d1 t2",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+
+        response = self.client.get(
+            self.url, {"season": self.season1.slug}, HTTP_HX_REQUEST="true"
+        )
+
+        # Should contain teams from past season
+        self.assertContains(response, s1_d1_team1.team_name)
+        self.assertContains(response, s1_d1_team2.team_name)
+
+        # Should not contain teams from current season
+        self.assertNotContains(response, self.s2_d1_team1.team_name)
+        self.assertNotContains(response, self.s2_d2_team1.team_name)

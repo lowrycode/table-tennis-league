@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import DoublesMatch
+from .models import DoublesMatch, Season
 
 
 class DoublesMatchAdminForm(forms.ModelForm):
@@ -63,3 +63,20 @@ class DoublesMatchAdminForm(forms.ModelForm):
                         )
 
         return cleaned_data
+
+
+class LeagueTableForm(forms.Form):
+    season = forms.ModelChoiceField(
+        queryset=Season.objects.filter(is_visible=True),
+        to_field_name="slug",
+        label="Season",
+        empty_label=None,
+        required=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.data.get("season"):
+            current_season = Season.objects.filter(is_current=True).first()
+            if current_season:
+                self.initial["season"] = current_season.slug

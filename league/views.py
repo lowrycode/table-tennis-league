@@ -9,11 +9,12 @@ from .models import (
     Fixture,
     SinglesMatch,
     DoublesMatch,
-    Season,
     FixtureResult,
     Team,
+    Season,
 )
 from .filters import FixtureFilter
+from .forms import LeagueTableForm
 
 
 # Helper functions
@@ -326,26 +327,45 @@ def result_breakdown(request, fixture_id):
 
 
 def tables(request):
+    """
+    Displays the league tables page with optional season filtering
+    (defaults to current season).
 
-    division_tables = []
-    season = Season.objects.filter(is_current=True).first()
+    Supports HTMX for filtering.
+    """
+    form = LeagueTableForm(request.GET or None)
+
+    if form.is_valid():
+        season = form.cleaned_data["season"]
+    else:
+        season = Season.objects.filter(is_current=True).first()
 
     if season:
-        divisions = season.divisions.all()
-
+        season_divisions = season.divisions.all()
         division_tables = [
             {
                 "division": division,
                 "table": generate_league_table(season, division),
             }
-            for division in divisions
+            for division in season_divisions
         ]
+    else:
+        division_tables = []
+
+    # Deduce whether filters are applied by checking for get parameters
+    filters_applied = len(request.GET) > 0
 
     # Build context
     context = {
         "season": season,
         "division_tables": division_tables,
+        "form": form,
+        "filters_applied": filters_applied,
     }
+
+    # If htmx request, return only the tables_section partial template
+    if request.headers.get("HX-Request") == "true":
+        return render(request, "league/partials/tables_section.html", context)
 
     return render(request, "league/tables.html", context)
 
