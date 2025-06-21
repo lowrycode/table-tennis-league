@@ -60,16 +60,21 @@ def generate_league_table(season, division):
     POINTS_FOR_WIN = 2
     POINTS_FOR_DRAW = 1
 
-    # Prefetch all teams for the division in the given season
+    # Get all teams for the specified season and division
     teams = Team.objects.filter(season=season, division=division)
 
     # Initialize all teams with default data
     teams_data = {team: get_default_team_data(team) for team in teams}
 
-    # Query all fixture results for the season/division
+    # Prefetch fixture result queryset
     fixture_results_qs = FixtureResult.objects.filter(
         fixture__season=season, fixture__division=division
-    ).select_related("fixture", "fixture__home_team", "fixture__away_team")
+    ).select_related(
+        "fixture", "fixture__home_team", "fixture__away_team"
+    ).prefetch_related(
+        "singles_matches",
+        "doubles_match"
+    )
 
     for result in fixture_results_qs:
         home_team = result.fixture.home_team
@@ -98,18 +103,19 @@ def generate_league_table(season, division):
             teams_data[home_team]["Pts"] += POINTS_FOR_DRAW
             teams_data[away_team]["Pts"] += POINTS_FOR_DRAW
 
-        # --- Singles Matches Won ---
+        # Singles Matches Won
         for sm in result.singles_matches.all():
             teams_data[home_team]["individual_sets_won"] += sm.home_sets
             teams_data[away_team]["individual_sets_won"] += sm.away_sets
 
-        # --- Track doubles match win ---
+        # Track doubles match win
         if hasattr(result, "doubles_match"):
             dm = result.doubles_match
             teams_data[home_team]["individual_sets_won"] += dm.home_sets
             teams_data[away_team]["individual_sets_won"] += dm.away_sets
 
-    # Sort by points, then team wins then singles/doubles match wins
+    # Sort by points, then team match wins then team sets,
+    # then singles/doubles match sets
     sorted_result = sorted(
         teams_data.values(),
         key=lambda x: (
