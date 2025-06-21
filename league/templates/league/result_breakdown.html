@@ -6,7 +6,7 @@
     <h2 class="visually-hidden">Match Breakdown</h2>
 
     <!-- Fixture Details -->
-    <div class="row mt-4 mx-2 small text-muted">
+    <div class="row mx-2 small text-muted">
       <div class="col-4 col-sm-3 text-center p-2">
         <p class="m-0">SEASON</p>
         <p class="m-0 fw-bold">{{ fixture.season.name }}</p>
@@ -46,12 +46,18 @@
         {% for player, win_count in home_player_win_counts.items %}
           <p class="mb-1">{{ player.full_name }} {{ win_count }}</p>
         {% endfor %}
+        {% if doubles_winning_team == "home" %}
+          <p class="mb-1 fw-bold text-muted small">(DOUBLES 1)</p>
+        {% endif %}
       </div>
       <!-- Away Player Win Count -->
       <div class="col-6 text-start px-3 px-sm-4 order-sm-2 mt-3">
         {% for player, win_count in away_player_win_counts.items %}
           <p class="mb-1">{{ player.full_name }} {{ win_count }}</p>
         {% endfor %}
+        {% if doubles_winning_team == "away" %}
+          <p class="mb-1 fw-bold text-muted small">(DOUBLES 1)</p>
+        {% endif %}
       </div>
     </div>
 
@@ -73,7 +79,7 @@
               </div>
               <!-- Game scores -->
               {% if sm.singles_games %}
-                <div class="col-12 d-flex justify-content-center gap-2 small fst-italic order-sm-1">
+                <div class="col-12 d-flex justify-content-center gap-2 small text-muted order-sm-1">
                   {% for game in sm.singles_games.all %}
                     <span>
                       {{ game.home_points }}-{{ game.away_points }}
@@ -114,7 +120,7 @@
               </div>
               <!-- Game scores -->
               {% if dm.doubles_games %}
-                <div class="col-12 d-flex justify-content-center gap-2 small fst-italic order-sm-1">
+                <div class="col-12 d-flex justify-content-center gap-2 small text-muted order-sm-1">
                   {% for game in dm.doubles_games.all %}
                     <span>
                       {{ game.home_points }}-{{ game.away_points }}

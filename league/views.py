@@ -305,7 +305,13 @@ def result_breakdown(request, fixture_id):
             player = match.away_player.player
             if player not in away_player_win_counts:
                 away_player_win_counts[player] = 0
-            away_player_win_counts[player] = 1
+            away_player_win_counts[player] += 1
+
+    # Get doubles winning team
+    doubles_winning_team = None
+    doubles_match = getattr(fixture.result, "doubles_match", None)
+    if doubles_match:
+        doubles_winning_team = doubles_match.winner
 
     return render(
         request,
@@ -314,6 +320,7 @@ def result_breakdown(request, fixture_id):
             "fixture": fixture,
             "home_player_win_counts": home_player_win_counts,
             "away_player_win_counts": away_player_win_counts,
+            "doubles_winning_team": doubles_winning_team,
         },
     )
 
