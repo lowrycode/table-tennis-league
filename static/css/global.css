@@ -499,6 +499,12 @@ footer a:hover {
   font-size: 0.8rem;
 }
 
+/* LEAGUE TABLES PAGE */
+.league-table th {
+  background-color: var(--primary-2);
+  color: var(--light-2);  
+}
+
 /* CLUB ADMIN PAGE */
 #club-info-management {
   background-color: var(--light-1);
