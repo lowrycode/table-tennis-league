@@ -738,7 +738,7 @@ class ResultsPageTests(TestCase):
         self.assertContains(
             response,
             (
-                f"{self.fixture.result.home_score}-"
+                f"{self.fixture.result.home_score} - "
                 f"{self.fixture.result.away_score}"
             ),
         )

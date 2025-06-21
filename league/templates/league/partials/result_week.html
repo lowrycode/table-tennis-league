@@ -17,7 +17,7 @@
             </div>
             <div class="col-12 col-sm-2 d-flex flex-sm-column justify-content-center align-items-center px-2 col-gap-4">
               <div class="fixture-date text-nowrap">{{ fixture.datetime|date:"D jS M" }}</div>
-              <div class="fs-3 fw-semibold">{{ fixture.result.home_score }}-{{ fixture.result.away_score }}</div>
+              <div class="fs-3 fw-semibold">{{ fixture.result.home_score }} - {{ fixture.result.away_score }}</div>
               <a
                 href="{% url 'result_breakdown' fixture.id %}?{{ request.GET.urlencode }}"
                 aria-label="See individual matches and scores"
