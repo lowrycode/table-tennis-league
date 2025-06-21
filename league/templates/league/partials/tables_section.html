@@ -1,0 +1,27 @@
+<section id="tables-section" class="container-max-8 w-100">
+  <div class="row">
+    <div class="col-12 my-5"> 
+      <div class="mt-5">
+        <!-- Title -->
+        <div class="position-relative text-center">
+          <h1 class="h2-style m-0 px-5">League Tables</h1>
+          <p class="m-0 px-5 fw-bold{% if not season.is_current %} red{% endif %}">
+            {{ season.name }}
+          </p>
+        </div>
+      </div>
+      <!-- Main Content -->
+      {% if not season %}
+        <p class="text-center py-3">Season not found.</p>
+      {% elif not division_tables %}
+        <p class="text-center py-3">No tables to display.</p>
+      {% else %}
+        {% for item in division_tables %}
+          {% with division=item.division table=item.table %}
+            {% include 'league/partials/league_table.html' %}
+          {% endwith %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>

@@ -11,4 +11,5 @@ urlpatterns = [
         views.result_breakdown,
         name="result_breakdown",
     ),
+    path("tables/", views.tables, name="tables"),
 ]

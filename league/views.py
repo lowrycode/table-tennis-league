@@ -4,10 +4,124 @@ from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib import messages
-from .models import Week, Fixture, SinglesMatch, DoublesMatch
+from .models import (
+    Week,
+    Fixture,
+    SinglesMatch,
+    DoublesMatch,
+    Season,
+    FixtureResult,
+    Team,
+)
 from .filters import FixtureFilter
 
 
+# Helper functions
+def get_default_team_data(team):
+    """
+    Defines the default team data for use in the generate_league_tables
+    helper function.
+    """
+
+    return {
+        "name": team.team_name,
+        "P": 0,
+        "W": 0,
+        "D": 0,
+        "L": 0,
+        "team_sets_won": 0,
+        "individual_sets_won": 0,
+        "Pts": 0,
+    }
+
+
+def generate_league_table(season, division):
+    """
+    Generates the league table data for a given season and division.
+
+    Calculates points from team wins, draws and losses.
+
+    Teams are sorted in the final table by:
+    1. Total points (Pts) - 2 for a win, 1 for a draw
+    2. Number of wins (W)
+    3. Team sets won (team_sets_won)
+    4. Individual sets won (individual_sets_won)
+
+    Args:
+        season (Season): The season for which to generate the league table.
+        division (Division): The division within the season.
+
+    Returns:
+        list[dict]: A list of dictionaries, each containing the team stats
+                    and sorted in league table order.
+    """
+
+    POINTS_FOR_WIN = 2
+    POINTS_FOR_DRAW = 1
+
+    # Prefetch all teams for the division in the given season
+    teams = Team.objects.filter(season=season, division=division)
+
+    # Initialize all teams with default data
+    teams_data = {team: get_default_team_data(team) for team in teams}
+
+    # Query all fixture results for the season/division
+    fixture_results_qs = FixtureResult.objects.filter(
+        fixture__season=season, fixture__division=division
+    ).select_related("fixture", "fixture__home_team", "fixture__away_team")
+
+    for result in fixture_results_qs:
+        home_team = result.fixture.home_team
+        away_team = result.fixture.away_team
+
+        # Update matches played
+        teams_data[home_team]["P"] += 1
+        teams_data[away_team]["P"] += 1
+
+        # Update Team Sets
+        teams_data[home_team]["team_sets_won"] += result.home_score
+        teams_data[away_team]["team_sets_won"] += result.away_score
+
+        # Win/draw/loss
+        if result.winner == "home":
+            teams_data[home_team]["W"] += 1
+            teams_data[away_team]["L"] += 1
+            teams_data[home_team]["Pts"] += POINTS_FOR_WIN
+        elif result.winner == "away":
+            teams_data[away_team]["W"] += 1
+            teams_data[home_team]["L"] += 1
+            teams_data[away_team]["Pts"] += POINTS_FOR_WIN
+        elif result.winner == "draw":
+            teams_data[home_team]["D"] += 1
+            teams_data[away_team]["D"] += 1
+            teams_data[home_team]["Pts"] += POINTS_FOR_DRAW
+            teams_data[away_team]["Pts"] += POINTS_FOR_DRAW
+
+        # --- Singles Matches Won ---
+        for sm in result.singles_matches.all():
+            teams_data[home_team]["individual_sets_won"] += sm.home_sets
+            teams_data[away_team]["individual_sets_won"] += sm.away_sets
+
+        # --- Track doubles match win ---
+        if hasattr(result, "doubles_match"):
+            dm = result.doubles_match
+            teams_data[home_team]["individual_sets_won"] += dm.home_sets
+            teams_data[away_team]["individual_sets_won"] += dm.away_sets
+
+    # Sort by points, then team wins then singles/doubles match wins
+    sorted_result = sorted(
+        teams_data.values(),
+        key=lambda x: (
+            -x["Pts"],
+            -x["W"],
+            -x["team_sets_won"],
+            -x["individual_sets_won"],
+        ),
+    )
+    return sorted_result
+
+
+# Views for pages
 def fixtures(request):
     """
     Displays the fixture list, filtered by season and optionally division
@@ -194,7 +308,9 @@ def result_breakdown(request, fixture_id):
             away_player_win_counts[player] = 1
 
     return render(
-        request, "league/result_breakdown.html", {
+        request,
+        "league/result_breakdown.html",
+        {
             "fixture": fixture,
             "home_player_win_counts": home_player_win_counts,
             "away_player_win_counts": away_player_win_counts,
@@ -202,6 +318,32 @@ def result_breakdown(request, fixture_id):
     )
 
 
+def tables(request):
+
+    division_tables = []
+    season = Season.objects.filter(is_current=True).first()
+
+    if season:
+        divisions = season.divisions.all()
+
+        division_tables = [
+            {
+                "division": division,
+                "table": generate_league_table(season, division),
+            }
+            for division in divisions
+        ]
+
+    # Build context
+    context = {
+        "season": season,
+        "division_tables": division_tables,
+    }
+
+    return render(request, "league/tables.html", context)
+
+
+# View for filter panel
 def fixtures_filter(request):
     """
     Render the fixtures_filter_panel_inner partial with filter form contents.

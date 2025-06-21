@@ -1379,3 +1379,327 @@ class ResultBreakdownPageTests(TestCase):
         self.fixture_result.singles_matches.all().delete()
         response = self.client.get(self.url)
         self.assertContains(response, "No game scores recorded")
+
+
+class TablesPageTests(TestCase):
+    def setUp(self):
+        """Create test data."""
+        # Clubs and venues
+        self.club = create_club("Test Club")
+        self.venue = create_venue("Venue 1")
+
+        # Divisions
+        self.division1 = create_division(name="Division 1", rank=1)
+        self.division2 = create_division(name="Division 2", rank=2)
+
+        # Seasons
+        self.season1 = create_season(
+            name="2023/24",
+            short_name="23-24",
+            slug="23-24",
+            start_year=2023,
+            end_year=2024,
+            is_current=False,
+            divisions_list=[self.division1, self.division2],
+        )
+        self.season2 = create_season(
+            name="2024/25",
+            short_name="24-25",
+            slug="24-25",
+            start_year=2024,
+            end_year=2025,
+            is_current=True,
+            divisions_list=[self.division1, self.division2],
+        )
+
+        # Teams - 3 in each division in active season
+        self.s2_d1_team1 = create_team(
+            season=self.season2,
+            division=self.division1,
+            club=self.club,
+            venue=self.venue,
+            team_name="s2 d1 t1",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        self.s2_d1_team2 = create_team(
+            season=self.season2,
+            division=self.division1,
+            club=self.club,
+            venue=self.venue,
+            team_name="s2 d1 t2",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        self.s2_d1_team3 = create_team(
+            season=self.season2,
+            division=self.division1,
+            club=self.club,
+            venue=self.venue,
+            team_name="s2 d1 t3",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        self.s2_d2_team1 = create_team(
+            season=self.season2,
+            division=self.division2,
+            club=self.club,
+            venue=self.venue,
+            team_name="s2 d2 t1",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        self.s2_d2_team2 = create_team(
+            season=self.season2,
+            division=self.division2,
+            club=self.club,
+            venue=self.venue,
+            team_name="s2 d2 t2",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        self.s2_d2_team3 = create_team(
+            season=self.season2,
+            division=self.division2,
+            club=self.club,
+            venue=self.venue,
+            team_name="s2 d2 t3",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+
+        # Weeks - 3 in current season
+        self.week1 = create_week(season=self.season2, week_num=1)
+        self.week2 = create_week(season=self.season2, week_num=2)
+        self.week3 = create_week(season=self.season2, week_num=3)
+
+        self.url = reverse("tables")
+
+    def test_tables_page_loads_successfully(self):
+        """Veryify status code 200 for tables page."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_tables_page_uses_correct_template(self):
+        """Verify correct template is used for tables page."""
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "league/tables.html")
+
+    def test_tables_page_context_includes_season_and_divisions(self):
+        """Verify context includes current season and division_teams."""
+        response = self.client.get(self.url)
+
+        self.assertIn("season", response.context)
+        self.assertEqual(response.context["season"], self.season2)
+
+        self.assertIn("division_tables", response.context)
+        self.assertEqual(len(response.context["division_tables"]), 2)
+
+    def test_tables_page_displays_divisions_in_rank_order(self):
+        """Verify divisions are ordered by rank."""
+        response = self.client.get(self.url)
+        content = response.content.decode("utf-8")
+
+        d1_index = content.find("Division 1")
+        d2_index = content.find("Division 2")
+
+        self.assertLess(d1_index, d2_index)
+
+    def test_tables_page_handles_no_current_season(self):
+        """Verify placeholder displayed when season not found."""
+        self.season2.is_current = False
+        self.season2.save()
+
+        response = self.client.get(self.url)
+        self.assertContains(response, "Season not found")
+
+    def test_tables_page_handles_seasons_with_no_divisions(self):
+        """Verify placeholder displayed when season has no divisions."""
+        self.season2.divisions.set([])
+        response = self.client.get(self.url)
+        self.assertContains(response, "No tables to display")
+
+    def test_tables_displays_teams_without_fixtures(self):
+        """
+        Verify teams are displayed in the table even if have no fixtures yet.
+        """
+        response = self.client.get(reverse("tables"))
+        content = response.content.decode("utf-8")
+
+        # Teams in division 1 (current season)
+        self.assertIn(self.s2_d1_team1.team_name, content)
+        self.assertIn(self.s2_d1_team2.team_name, content)
+        self.assertIn(self.s2_d1_team3.team_name, content)
+
+        # Teams in division 2 (current season)
+        self.assertIn(self.s2_d2_team1.team_name, content)
+        self.assertIn(self.s2_d2_team2.team_name, content)
+        self.assertIn(self.s2_d2_team3.team_name, content)
+
+    def test_context_sorts_teams_by_points(self):
+        """
+        Verify teams are sorted by points (highest first).
+        """
+
+        # Create fixtures
+        f1 = create_fixture(
+            self.season2,
+            self.division1,
+            self.week1,
+            self.s2_d1_team1,
+            self.s2_d1_team2,
+        )
+        f2 = create_fixture(
+            self.season2,
+            self.division1,
+            self.week2,
+            self.s2_d1_team3,
+            self.s2_d1_team1,
+        )
+
+        # Create fixture results
+        # Team 1: 3pts (win + draw)
+        # Team 2: 0pts (loss)
+        # Team 3: 1pt (draw)
+        create_fixture_result(f1, 10, 0)
+        create_fixture_result(f2, 5, 5)
+
+        response = self.client.get(reverse("tables"))
+        table = response.context["division_tables"][0]["table"]
+
+        # Teams in division 1 (current season)
+        self.assertEqual(table[0]["name"], self.s2_d1_team1.team_name)
+        self.assertEqual(table[0]["Pts"], 3)
+        self.assertEqual(table[1]["name"], self.s2_d1_team3.team_name)
+        self.assertEqual(table[1]["Pts"], 1)
+        self.assertEqual(table[2]["name"], self.s2_d1_team2.team_name)
+        self.assertEqual(table[2]["Pts"], 0)
+
+    def test_context_sorts_tied_points_by_matches_then_sets(self):
+        """
+        Verify teams with the same points are sorted in order of
+        - team matches won
+        - team sets won
+
+        Note: next tie is resolved by individual sets won but this is
+        tested in a subsequent test
+        """
+
+        # Create fixtures and results to verify order by team matches then sets
+        # Team 3: 2pts (win) - won 1 team match and 9 team sets
+        # Team 2: 2pts (draw + draw) - won 0 team matches and 11 team sets
+        # Team 1: 2pts (draw + draw) - won 0 team matches and 10 team sets
+        f1 = create_fixture(
+            self.season2,
+            self.division1,
+            self.week1,
+            self.s2_d1_team1,
+            self.s2_d1_team2,
+        )
+        f2 = create_fixture(
+            self.season2,
+            self.division1,
+            self.week1,
+            self.s2_d1_team2,
+            self.s2_d1_team1,
+        )
+        f3 = create_fixture(
+            self.season2,
+            self.division1,
+            self.week2,
+            self.s2_d1_team3,
+            self.s2_d1_team2,
+        )
+        create_fixture_result(f1, 5, 5)
+        create_fixture_result(f2, 5, 5)
+        create_fixture_result(f3, 9, 1)
+
+        response = self.client.get(reverse("tables"))
+        table = response.context["division_tables"][0]["table"]
+
+        # Teams in division 1 (current season)
+        self.assertEqual(table[0]["name"], self.s2_d1_team3.team_name)
+        self.assertEqual(table[0]["Pts"], 2)
+        self.assertEqual(table[0]["team_sets_won"], 9)
+        self.assertEqual(table[1]["name"], self.s2_d1_team2.team_name)
+        self.assertEqual(table[1]["Pts"], 2)
+        self.assertEqual(table[1]["team_sets_won"], 11)
+        self.assertEqual(table[2]["name"], self.s2_d1_team1.team_name)
+        self.assertEqual(table[2]["Pts"], 2)
+        self.assertEqual(table[2]["team_sets_won"], 10)
+
+    def test_context_sorts_tied_team_sets_by_individual_singles_sets(self):
+        """
+        Verify teams with the same points, matches won and team sets won
+        are sorted by individual singles sets won
+        """
+
+        # Create fixtures and results to verify order by team matches then sets
+        # Team 2 (draw) - won 0 team matches, 5 team sets and 3 singles sets
+        # Team 1 (draw) - won 0 team matches, 5 team sets and 2 singles sets
+        f1 = create_fixture(
+            self.season2,
+            self.division1,
+            self.week1,
+            self.s2_d1_team1,
+            self.s2_d1_team2,
+        )
+        fr1 = create_fixture_result(f1, 5, 5)
+        p1 = create_player("John", "Doe", self.club)
+        p2 = create_player("Joe", "Bloggs", self.club)
+        tp1 = create_team_player(p1, self.s2_d1_team1)
+        tp2 = create_team_player(p2, self.s2_d1_team2)
+        create_singles_match(fr1, tp1, tp2, 1, 3)
+
+        response = self.client.get(reverse("tables"))
+        table = response.context["division_tables"][0]["table"]
+
+        # Teams in division 1 (current season)
+        self.assertEqual(table[0]["name"], self.s2_d1_team2.team_name)
+        self.assertEqual(table[0]["Pts"], 1)
+        self.assertEqual(table[0]["team_sets_won"], 5)
+        self.assertEqual(table[0]["individual_sets_won"], 3)
+        self.assertEqual(table[1]["name"], self.s2_d1_team1.team_name)
+        self.assertEqual(table[1]["Pts"], 1)
+        self.assertEqual(table[1]["team_sets_won"], 5)
+        self.assertEqual(table[1]["individual_sets_won"], 1)
+
+    def test_context_sorts_tied_team_sets_by_individual_doubles_sets(self):
+        """
+        Verify teams with the same points, matches won and team sets won
+        are sorted by individual doubles sets won
+        """
+
+        # Create fixtures and results to verify order by team matches then sets
+        # Team 2 (draw) - won 0 team matches, 5 team sets and 3 singles sets
+        # Team 1 (draw) - won 0 team matches, 5 team sets and 0 singles sets
+        f1 = create_fixture(
+            self.season2,
+            self.division1,
+            self.week1,
+            self.s2_d1_team1,
+            self.s2_d1_team2,
+        )
+        fr1 = create_fixture_result(f1, 5, 5)
+        p1 = create_player("Team 1", "Player 1", self.club)
+        p2 = create_player("Team 1", "Player 2", self.club)
+        p3 = create_player("Team 2", "Player 1", self.club)
+        p4 = create_player("Team 2", "Player 2", self.club)
+        tp1 = create_team_player(p1, self.s2_d1_team1)
+        tp2 = create_team_player(p2, self.s2_d1_team1)
+        tp3 = create_team_player(p3, self.s2_d1_team1)
+        tp4 = create_team_player(p4, self.s2_d1_team1)
+        create_doubles_match(fr1, [tp1, tp2], [tp3, tp4], 2, 3)
+
+        response = self.client.get(reverse("tables"))
+        table = response.context["division_tables"][0]["table"]
+
+        # Teams in division 1 (current season)
+        self.assertEqual(table[0]["name"], self.s2_d1_team2.team_name)
+        self.assertEqual(table[0]["Pts"], 1)
+        self.assertEqual(table[0]["team_sets_won"], 5)
+        self.assertEqual(table[0]["individual_sets_won"], 3)
+        self.assertEqual(table[1]["name"], self.s2_d1_team1.team_name)
+        self.assertEqual(table[1]["Pts"], 1)
+        self.assertEqual(table[1]["team_sets_won"], 5)
+        self.assertEqual(table[1]["individual_sets_won"], 2)
