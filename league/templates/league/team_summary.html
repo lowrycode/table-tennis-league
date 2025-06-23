@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block content %}
+  <!-- Venue Modal -->
+  {% include 'league/partials/venue_modal.html' %}
   <!-- Team Summary -->
   <div class="container container-max-7 my-5">
     <!-- Team Details -->
@@ -27,4 +29,13 @@
       <a href="javascript:history.back()" class="btn btn-custom px-4">Go Back</a>
     </div>
   </div>
+{% endblock %}
+
+{% block scripts %}
+  <!-- Load HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  
+  <!-- Script for initialising modal -->
+  <script src="{% static 'js/league/init_venue_modal.js' %}"></script>
+  
 {% endblock %}

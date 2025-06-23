@@ -21,7 +21,25 @@
               {{fixture.opponent.team_name}}
             </a>
           </td>
-          <td class="text-center">{{fixture.venue}}</td>
+          <td class="text-center">
+            <div class="fixture-venue">
+              <button
+                type="button"
+                class="btn a-style venue-btn p-0"
+                data-home="{{ fixture.home_team.team_name }}"
+                data-away="{{ fixture.away_team.team_name }}"
+                data-hx-get="{% url 'venue_modal' fixture.venue.id %}" 
+                data-hx-target="#modal-venue-info" 
+                data-hx-trigger="click"
+                data-bs-toggle="modal"
+                data-bs-target="#venue-modal"
+                aria-label="Click to view venue information for this fixture"
+                title="View venue info"
+              >
+                {{fixture.home_or_away}}
+              </button>
+            </div>
+          </td>
         </tr>
         {% endfor %}
       </tbody>

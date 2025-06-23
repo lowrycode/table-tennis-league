@@ -53,10 +53,13 @@ def get_fixture_data(team, fixture):
 
     Returns:
         dict: A dictionary containing:
-            - 'week' (int): The week number of the fixture.
+            - 'week' (Week): The week object associated with the fixture.
             - 'datetime' (datetime): Scheduled date and time of the fixture.
-            - 'opponent' (Team): The opposing team.
-            - 'venue' (str): "Home" or "Away".
+            - 'home_team' (Team): The team playing at home.
+            - 'away_team' (Team): The team playing away.
+            - 'opponent' (Team): The opposing team from perspective of `team`.
+            - 'home_or_away' (str): From perspective of 'team'.
+            - 'venue' (Venue): The venue object for the fixture.
     """
 
     # Get fixture week and date
@@ -66,16 +69,19 @@ def get_fixture_data(team, fixture):
     # Get opponent and venue
     if fixture.home_team == team:
         opponent = fixture.away_team
-        venue = "Home"
+        home_or_away = "Home"
     else:
         opponent = fixture.home_team
-        venue = "Away"
+        home_or_away = "Away"
 
     return {
         "week": week,
         "datetime": datetime,
+        "home_team": fixture.home_team,
+        "away_team": fixture.away_team,
         "opponent": opponent,
-        "venue": venue,
+        "home_or_away": home_or_away,
+        "venue": fixture.venue,
     }
 
 
@@ -578,7 +584,7 @@ def team_summary(request, team_id):
 
     team_fixtures_qs = (
         Fixture.objects.filter(Q(home_team=team) | Q(away_team=team))
-        .select_related("result")
+        .select_related("result", "venue")
         .prefetch_related("result__singles_matches", "result__doubles_match")
     )
 
