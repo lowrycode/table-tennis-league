@@ -835,3 +835,27 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Filtering updates dynamically without requiring a full page reload |
 | ✓ | Filter is responsive on different screen sizes |
 | ✓ | No console errors or warnings were caused by interacting with the page |
+
+### Team Summary Page
+
+| Status  | Test Description |
+| ---     | ---              |
+| ✓ | Clicking on a team name in Fixtures, Results and League Tables pages navigates to the Team Summary page |
+| ✓ | The Team Summary page includes summary details about the team including team name, club, season, division, and performance stats. |
+| ✓ | The Team Summary page includes a list of players and reserves who have played for the team in the season with stats (matches played, wins and win percentage) |
+| ✓ | Reserves are marked with "(RESERVE)". |
+| ✓ | Players are sorted by percentage wins then win count.  |
+| ✓ | If a player hasn't played matches yet, a zero value show for matches played but dashes are displayed for wins and percentage wins |
+| ✓ | Team result are listed by week in chronological order  |
+| ✓ | Details of team results include the opponent team (linked), venue (home/away, opens modal), result (win/loss/draw) and score |
+| ✓ | If the team has not yet played any matches, the placeholder “No results to display” is shown  |
+| ✓ | Upcoming fixtures are listed by week in chronological order |
+| ✓ | Fixture details include week, date, opponent team (linked) and venue (opens modal with details) |
+| ✓ | If the team has no upcoming fixtures, the placeholder “No upcoming fixtures” is shown |
+| ✓ | Pressing the Go Back button navigates the user to the previous page |
+| ✓ | Attempting to access the page by direct url for a non-existent team id redirects the user to the 404 page |
+| ✓ | The page correctly shows data for teams within their particular season, not just current season teams |
+| ✓ | Page is responsive on different screen sizes |
+| ✓ | No login is required to view the page |
+| ✓ | No console errors or warnings were caused by interacting with the page |
+
