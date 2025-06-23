@@ -18,9 +18,15 @@
               {{ player.name }}
               {% if not player.is_registered %}<span class="text-muted small">(RESERVE)</span>{% endif %}
             </td>
-            <td class="text-center">{{player.played}}</td>
-            <td class="text-center">{{player.wins}}</td>
-            <td class="text-center fw-bold">{{player.percent}}</td>
+            <td class="text-center">
+              {{player.played}}
+            </td>
+            <td class="text-center">
+              {% if player.played > 0 %}{{player.wins}}{% else %}-{% endif %}
+            </td>
+            <td class="text-center fw-bold">
+              {% if player.played > 0 %}{{player.percent}}{% else %}-{% endif %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>
