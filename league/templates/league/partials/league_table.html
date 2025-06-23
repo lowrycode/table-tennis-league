@@ -18,7 +18,13 @@
         <tr>
           <td class="text-center">{{ forloop.counter }}</td>
           <td>            
-            {{ team.name }}
+            <a
+              href="{% url 'team_summary' team.id %}"
+              aria-label="View Team Summary for {{ team.name }}"
+              title="View Team Summary page"
+            >
+              {{ team.name }}
+            </a>
           </td>
           <td class="text-center">{{ team.P }}</td>
           <td class="text-center">{{ team.W }}</td>

@@ -28,9 +28,26 @@ def get_default_team_data(team):
     """
     Defines the default team data for use in the generate_league_tables
     helper function.
+
+    Args:
+        team (Team): The team instance for which default data is generated.
+
+    Returns:
+        dict: A dictionary containing default team data with keys:
+            - 'id' (int): The team's unique identifier.
+            - 'name' (str): The team's name.
+            - 'P' (int): Matches played (default as 0).
+            - 'W' (int): Matches won (default as 0).
+            - 'D' (int): Matches drawn (default as 0).
+            - 'L' (int): Matches lost (default as 0).
+            - 'team_sets_won' (int): Number of team sets won (default as 0).
+            - 'individual_sets_won' (int): Number of individual sets won
+                                           (default as 0).
+            - 'Pts' (int): Points earned (default as 0).
     """
 
     return {
+        "id": team.id,
         "name": team.team_name,
         "P": 0,
         "W": 0,
