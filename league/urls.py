@@ -12,4 +12,7 @@ urlpatterns = [
         name="result_breakdown",
     ),
     path("tables/", views.tables, name="tables"),
+    path(
+        "team/<int:team_id>/summary", views.team_summary, name="team_summary"
+    ),
 ]

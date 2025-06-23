@@ -1,6 +1,6 @@
 from datetime import timedelta
 from django.http import HttpResponseBadRequest
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib import messages
@@ -12,9 +12,15 @@ from .models import (
     FixtureResult,
     Team,
     Season,
+    TeamPlayer,
 )
 from .filters import FixtureFilter
 from .forms import LeagueTableForm
+
+
+# Constants
+POINTS_FOR_WIN = 2
+POINTS_FOR_DRAW = 1
 
 
 # Helper functions
@@ -33,6 +39,185 @@ def get_default_team_data(team):
         "team_sets_won": 0,
         "individual_sets_won": 0,
         "Pts": 0,
+    }
+
+
+def get_fixture_data(team, fixture):
+    """
+    Builds a dictionary of summary information for an unplayed fixture
+    for the specified team.
+
+    Args:
+        team (Team): The team for which the fixture is being viewed.
+        fixture (Fixture): The fixture object containing match details.
+
+    Returns:
+        dict: A dictionary containing:
+            - 'week' (int): The week number of the fixture.
+            - 'datetime' (datetime): Scheduled date and time of the fixture.
+            - 'opponent' (Team): The opposing team.
+            - 'venue' (str): "Home" or "Away".
+    """
+
+    # Get fixture week and date
+    week = fixture.week
+    datetime = fixture.datetime
+
+    # Get opponent and venue
+    if fixture.home_team == team:
+        opponent = fixture.away_team
+        venue = "Home"
+    else:
+        opponent = fixture.home_team
+        venue = "Away"
+
+    return {
+        "week": week,
+        "datetime": datetime,
+        "opponent": opponent,
+        "venue": venue,
+    }
+
+
+def get_player_match_stats(team_player, team, registered_player_ids):
+    """
+    Calculates match statistics for a given player when playing for the
+    specified team.
+
+    Determines whether the player is officially registered with the team or
+    is a reserve. Considers only singles match records for fixtures where
+    they represented the specified team.
+
+    Args:
+        team_player (TeamPlayer): The player to calculate stats for.
+        team (Team): The team for which the stats are calculated.
+        registered_player_ids (set[int]): A set of IDs for players registered
+                                          to the team.
+
+    Returns:
+        dict: A dictionary containing:
+            - 'name' (str): Full name of the player.
+            - 'is_registered' (bool): Whether the player is officially
+                                      registered to the team.
+            - 'played' (int): Total number of singles matches played for the
+                              specified team.
+            - 'wins' (int): Number of singles matches won.
+            - 'percent' (float): Win percentage (rounded to 1 decimal place).
+    """
+    # Deduce whether player is registered for the team (or a reserve)
+    is_registered = team_player.id in registered_player_ids
+
+    # Get matches where team player or reserve is playing for this team
+    matches = SinglesMatch.objects.filter(
+        Q(home_player=team_player, fixture_result__fixture__home_team=team)
+        | Q(away_player=team_player, fixture_result__fixture__away_team=team)
+    )
+
+    # Count matches played
+    played = matches.count()
+
+    # Count wins
+    wins = matches.filter(
+        (Q(home_player=team_player) & Q(winner="home"))
+        | (Q(away_player=team_player) & Q(winner="away"))
+    ).count()
+
+    # Count percentage wins
+    percent = round((wins / played) * 100, 1) if played else 0.0
+
+    return {
+        "name": f"{team_player.player.full_name}",
+        "is_registered": is_registered,
+        "played": played,
+        "wins": wins,
+        "percent": percent,
+    }
+
+
+def get_result_data(team, fixture, fixture_result):
+    """
+    Builds a summary dictionary for a fixture result.
+
+    Args:
+        team (Team): The team for which the summary is being generated.
+        fixture (Fixture): The fixture object representing the match.
+        fixture_result (FixtureResult): The result of the fixture.
+
+    Returns:
+        dict: A dictionary containing:
+            - 'week' (int)
+            - 'opponent' (Team)
+            - 'venue' (str): "Home" or "Away"
+            - 'outcome' (str): "Win", "Lose", or "Draw"
+            - 'result' (FixtureResult): The full result object
+    """
+
+    week = fixture.week
+
+    # Get opponent and venue
+    if fixture.home_team == team:
+        opponent = fixture.away_team
+        venue = "Home"
+    else:
+        opponent = fixture.home_team
+        venue = "Away"
+
+    # Get match outcome (Win, Lose, Draw)
+    if fixture_result.winner.lower() == "draw":
+        outcome = "Draw"
+    elif fixture_result.winner.lower() == venue.lower():
+        outcome = "Win"
+    else:
+        outcome = "Lose"
+
+    return {
+        "week": week,
+        "opponent": opponent,
+        "venue": venue,
+        "outcome": outcome,
+        "result": fixture_result,
+    }
+
+
+def get_team_summary_stats(results_data):
+    """
+    Calculates summary statistics for a team's performance.
+
+    Args:
+        results_data (list[dict]): A list of dictionaries representing fixture
+                                   results. Each dictionary should contain
+                                   an 'outcome' key with one of the values:
+                                   "Win", "Draw", or "Lose".
+
+    Returns:
+        dict: A dictionary containing the summary statistics:
+            - 'played' (int): Total number of matches played.
+            - 'wins' (int): Number of matches won.
+            - 'draws' (int): Number of matches drawn.
+            - 'losses' (int): Number of matches lost.
+            - 'points' (int): Total points earned.
+    """
+    played = len(results_data)
+    wins = 0
+    draws = 0
+    losses = 0
+    points = 0
+    for result in results_data:
+        if result["outcome"].lower() == "win":
+            wins += 1
+            points += POINTS_FOR_WIN
+        elif result["outcome"].lower() == "draw":
+            draws += 1
+            points += POINTS_FOR_DRAW
+        elif result["outcome"].lower() == "lose":
+            losses += 1
+
+    return {
+        "played": played,
+        "wins": wins,
+        "draws": draws,
+        "losses": losses,
+        "points": points,
     }
 
 
@@ -57,9 +242,6 @@ def generate_league_table(season, division):
                     and sorted in league table order.
     """
 
-    POINTS_FOR_WIN = 2
-    POINTS_FOR_DRAW = 1
-
     # Get all teams for the specified season and division
     teams = Team.objects.filter(season=season, division=division)
 
@@ -67,13 +249,12 @@ def generate_league_table(season, division):
     teams_data = {team: get_default_team_data(team) for team in teams}
 
     # Prefetch fixture result queryset
-    fixture_results_qs = FixtureResult.objects.filter(
-        fixture__season=season, fixture__division=division
-    ).select_related(
-        "fixture", "fixture__home_team", "fixture__away_team"
-    ).prefetch_related(
-        "singles_matches",
-        "doubles_match"
+    fixture_results_qs = (
+        FixtureResult.objects.filter(
+            fixture__season=season, fixture__division=division
+        )
+        .select_related("fixture", "fixture__home_team", "fixture__away_team")
+        .prefetch_related("singles_matches", "doubles_match")
     )
 
     for result in fixture_results_qs:
@@ -374,6 +555,85 @@ def tables(request):
         return render(request, "league/partials/tables_section.html", context)
 
     return render(request, "league/tables.html", context)
+
+
+def team_summary(request, team_id):
+    """
+    Displays the summary page for a specific team including
+    - team summary details and stats
+    - performance stats for each team player (including reserves)
+    - fixture results
+    - upcoming fixtures
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+        team_id (int): The primary key of the team to summarize.
+
+    Returns:
+        HttpResponse: Rendered HTML page displaying the team summary
+                      or 404 page.
+    """
+
+    team = get_object_or_404(Team, id=team_id)
+
+    team_fixtures_qs = (
+        Fixture.objects.filter(Q(home_team=team) | Q(away_team=team))
+        .select_related("result")
+        .prefetch_related("result__singles_matches", "result__doubles_match")
+    )
+
+    # Get registered players and IDs for quick lookup
+    registered_players = TeamPlayer.objects.filter(team=team)
+    registered_player_ids = set(
+        registered_players.values_list("id", flat=True)
+    )
+
+    # Get players who played singles matches for the team
+    singles_players = TeamPlayer.objects.filter(
+        Q(home_singles_matches__fixture_result__fixture__home_team=team)
+        | Q(away_singles_matches__fixture_result__fixture__away_team=team)
+    )
+
+    # Combine all team players (registered + played)
+    all_team_players = registered_players | singles_players
+    all_team_players = all_team_players.distinct().select_related("player")
+
+    # Get player summary data
+    player_data = []
+    for team_player in all_team_players:
+        data = get_player_match_stats(team_player, team, registered_player_ids)
+        player_data.append(data)
+
+    # Sort player summary data by percentage wins
+    player_data = sorted(
+        player_data, key=lambda x: (x["percent"], x["wins"]), reverse=True
+    )
+
+    # Get fixtures and results
+    fixture_data = []
+    results_data = []
+    for fixture in team_fixtures_qs:
+        fixture_result = getattr(fixture, "result", None)
+        if fixture_result:
+            data = get_result_data(team, fixture, fixture_result)
+            results_data.append(data)
+        else:
+            data = get_fixture_data(team, fixture)
+            fixture_data.append(data)
+
+    # Get Team Stats
+    team_stats = get_team_summary_stats(results_data)
+
+    # Build context
+    context = {
+        "team": team,
+        "player_data": player_data,
+        "fixtures_data": fixture_data,
+        "results_data": results_data,
+        "team_stats": team_stats,
+    }
+
+    return render(request, "league/team_summary.html", context)
 
 
 # View for filter panel

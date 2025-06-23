@@ -1,0 +1,39 @@
+<section id="team-results" class="container mt-5">
+  <h2 class="h3-style">Results</h2>
+  {% if results_data %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover table-bordered">
+        <thead>
+          <tr>
+            <th class="text-center">Week</th>
+            <th>Opponent</th>
+            <th class="text-center">Venue</th>
+            <th class="text-center">Result</th>
+            <th class="text-center">Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for match in results_data %}
+          <tr>
+            <td class="text-center">{{ match.week }}</td>
+            <td>
+              <a href="{% url 'team_summary' match.opponent.id %}">
+                {{match.opponent.team_name}}
+              </a>
+            </td>
+            <td class="text-center">{{match.venue}}</td>
+            <td class="text-center">{{ match.outcome }}</td>
+            <td class="text-center">
+              <a href="{% url 'result_breakdown' match.result.id %}">
+                {{ match.result.home_score }} - {{ match.result.away_score }}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>No results to display</p>
+  {% endif %}
+</section>
