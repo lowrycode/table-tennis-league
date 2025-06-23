@@ -145,5 +145,5 @@
       {% endif %}
     </div>
   </section>
-  <a href="{% url 'results' %}?{{ request.GET.urlencode }}#fixture-result-{{ fixture.id }}" class="btn btn-custom mb-5">Return to Results page</a>
+  <a href="javascript:history.back()" class="btn btn-custom px-4 mb-5">Go Back</a>
 {% endblock %}
