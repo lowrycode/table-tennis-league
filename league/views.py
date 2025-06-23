@@ -151,35 +151,42 @@ def get_result_data(team, fixture, fixture_result):
 
     Returns:
         dict: A dictionary containing:
-            - 'week' (int)
-            - 'opponent' (Team)
-            - 'venue' (str): "Home" or "Away"
-            - 'outcome' (str): "Win", "Lose", or "Draw"
+            - 'week' (Week): The week object associated with the fixture.
+            - 'home_team' (Team): The team playing at home.
+            - 'away_team' (Team): The team playing away.
+            - 'opponent' (Team): The opposing team from perspective of `team`.
+            - 'home_or_away' (str): From perspective of 'team'.
+            - 'venue' (Venue): The venue object for the fixture.
+            - 'outcome' (str): "Win", "Lose", or "Draw".
             - 'result' (FixtureResult): The full result object
+
     """
 
     week = fixture.week
 
-    # Get opponent and venue
+    # Get opponent and home_or_away
     if fixture.home_team == team:
         opponent = fixture.away_team
-        venue = "Home"
+        home_or_away = "Home"
     else:
         opponent = fixture.home_team
-        venue = "Away"
+        home_or_away = "Away"
 
     # Get match outcome (Win, Lose, Draw)
     if fixture_result.winner.lower() == "draw":
         outcome = "Draw"
-    elif fixture_result.winner.lower() == venue.lower():
+    elif fixture_result.winner.lower() == home_or_away.lower():
         outcome = "Win"
     else:
         outcome = "Lose"
 
     return {
         "week": week,
+        "home_team": fixture.home_team,
+        "away_team": fixture.away_team,
         "opponent": opponent,
-        "venue": venue,
+        "home_or_away": home_or_away,
+        "venue": fixture.venue,
         "outcome": outcome,
         "result": fixture_result,
     }
@@ -584,7 +591,7 @@ def team_summary(request, team_id):
 
     team_fixtures_qs = (
         Fixture.objects.filter(Q(home_team=team) | Q(away_team=team))
-        .select_related("result", "venue")
+        .select_related("result", "venue", "home_team", "away_team")
         .prefetch_related("result__singles_matches", "result__doubles_match")
     )
 
