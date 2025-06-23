@@ -11,7 +11,13 @@
         <li class="row {{ fixture.status|status_class }}">
           <span class="visually-hidden">Status: {{ fixture.status }}</span>
           <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-end align-items-center fs-5">
-            {{ fixture.home_team.team_name }}  
+            <a
+              href="{% url 'team_summary' fixture.home_team.id %}"
+              aria-label="View Team Summary for {{ fixture.home_team.team_name }}"
+              title="View Team Summary page"
+            >
+              {{ fixture.home_team.team_name }}
+            </a>
           </div>
           <div class="col-12 col-sm-2 d-flex flex-sm-column justify-content-center align-items-center px-2 col-gap-4">
             <div class="fixture-date text-nowrap">{{ fixture.datetime|date:"D jS M" }}</div>
@@ -35,9 +41,14 @@
             </div>
           </div>
           <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-start align-items-center fs-5">
-            {{ fixture.away_team.team_name }}  
+            <a
+              href="{% url 'team_summary' fixture.away_team.id %}"
+              aria-label="View Team Summary for {{ fixture.away_team.team_name }}"
+              title="View Team Summary page"
+            >
+              {{ fixture.away_team.team_name }}
+            </a>
           </div>
-      
         </li>
       {% endfor %}
     </ul>
