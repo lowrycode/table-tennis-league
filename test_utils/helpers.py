@@ -448,6 +448,16 @@ def delete_fixtures(**filters):
     delete_objects(Fixture, **filters)
 
 
+def delete_fixture_results(**filters):
+    """
+    Helper to delete objects from FixtureResult model with optional filters.
+
+    Args:
+        **filters: Optional keyword arguments for filtering.
+    """
+    delete_objects(FixtureResult, **filters)
+
+
 def delete_objects(model, **filters):
     """
     Generic helper to delete objects from a Django model with optional filters.
@@ -461,6 +471,16 @@ def delete_objects(model, **filters):
         delete_objects(Fixture, season=season_1)  # Deletes filtered Fixtures
     """
     model.objects.filter(**filters).delete()
+
+
+def delete_team_players(**filters):
+    """
+    Helper to delete objects from TeamPlayer model with optional filters.
+
+    Args:
+        **filters: Optional keyword arguments for filtering.
+    """
+    delete_objects(TeamPlayer, **filters)
 
 
 def delete_weeks(**filters):

@@ -14,6 +14,8 @@ from test_utils.helpers import (
     create_venue,
     create_week,
     delete_fixtures,
+    delete_fixture_results,
+    delete_team_players,
     delete_weeks,
     create_fixture_result_setup,
     create_player,
@@ -1751,3 +1753,314 @@ class TablesPageTests(TestCase):
         # Should not contain teams from current season
         self.assertNotContains(response, self.s2_d1_team1.team_name)
         self.assertNotContains(response, self.s2_d2_team1.team_name)
+
+
+class TeamSummaryPageTests(TestCase):
+    def setUp(self):
+
+        # Create season info
+        self.division = create_division(name="Division 1", rank=1)
+        self.season = create_season(
+            name="2024/25",
+            short_name="24-25",
+            slug="24-25",
+            start_year=2024,
+            end_year=2025,
+            is_current=True,
+            divisions_list=[self.division],
+        )
+        self.week1 = create_week(season=self.season, week_num=1)
+        self.week2 = create_week(season=self.season, week_num=2)
+        self.week3 = create_week(season=self.season, week_num=3)
+        self.week4 = create_week(season=self.season, week_num=4)
+
+        # Create club, venue and 3 teams
+        self.club = create_club("Club 1")
+        self.venue = create_venue("Venue 1")
+        self.team1 = create_team(
+            season=self.season,
+            division=self.division,
+            club=self.club,
+            venue=self.venue,
+            team_name="Team 1",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        self.team2 = create_team(
+            season=self.season,
+            division=self.division,
+            club=self.club,
+            venue=self.venue,
+            team_name="Team 2",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+        self.team3 = create_team(
+            season=self.season,
+            division=self.division,
+            club=self.club,
+            venue=self.venue,
+            team_name="Team 3",
+            home_day="monday",
+            home_time=time(19, 0),
+        )
+
+        # Create team fixtures 3 played, 1 unplayed
+        self.fixture1_played_home = create_fixture(
+            season=self.season,
+            division=self.division,
+            week=self.week1,
+            home_team=self.team1,
+            away_team=self.team2,
+        )
+        self.fixture2_played_away = create_fixture(
+            season=self.season,
+            division=self.division,
+            week=self.week2,
+            home_team=self.team3,
+            away_team=self.team1,
+        )
+        self.fixture3_played_away = create_fixture(
+            season=self.season,
+            division=self.division,
+            week=self.week3,
+            home_team=self.team2,
+            away_team=self.team1,
+        )
+        self.fixture4_unplayed_home = create_fixture(
+            season=self.season,
+            division=self.division,
+            week=self.week4,
+            home_team=self.team1,
+            away_team=self.team3,
+        )
+
+        # Create unrelated fixture
+        self.fixture_unrelated = create_fixture(
+            season=self.season,
+            division=self.division,
+            week=self.week1,
+            home_team=self.team2,
+            away_team=self.team3,
+        )
+
+        # Create fixture results (a win, a draw and a loss)
+        self.fixture_result1 = create_fixture_result(
+            fixture=self.fixture1_played_home,
+            home_score=7,
+            away_score=3,
+        )
+        self.fixture_result2 = create_fixture_result(
+            fixture=self.fixture2_played_away,
+            home_score=5,
+            away_score=5,
+        )
+        self.fixture_result3 = create_fixture_result(
+            fixture=self.fixture3_played_away,
+            home_score=6,
+            away_score=4,
+        )
+        self.fixture_result_unrelated = create_fixture_result(
+            fixture=self.fixture_unrelated,
+            home_score=10,
+            away_score=0,
+        )
+
+        self.url = reverse("team_summary", args=[self.team1.id])
+
+    def test_team_summary_returns_200_for_valid_team(self):
+        """
+        Verify the view returns a 200 OK response when given a valid team ID.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_team_summary_returns_404_for_invalid_team(self):
+        """
+        Verify the view returns a 404 response when the team ID does not exist.
+        """
+        response = self.client.get(reverse("team_summary", args=[999]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_team_summary_page_uses_correct_template(self):
+        """Verify correct template is used for teams summary page."""
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "league/team_summary.html")
+
+    # Context
+    def test_context_includes_required_keys(self):
+        """
+        Verify that the context includes the following keys:
+        - team
+        - player_data
+        - fixture_data
+        - results_data
+        - team_stats
+        """
+        response = self.client.get(self.url)
+        self.assertIn("team", response.context)
+        self.assertIn("player_data", response.context)
+        self.assertIn("fixtures_data", response.context)
+        self.assertIn("results_data", response.context)
+        self.assertIn("team_stats", response.context)
+
+    def test_context_team_matches_requested_team(self):
+        """Verify the context variable 'team' matches the requested team."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.context["team"], self.team1)
+
+    def test_context_fixtures_data_order_and_contents(self):
+        """
+        Verify that only fixtures without results are included and that they
+        are ordered in chronological order by week (earliest first).
+        """
+        # Delete result from 3rd fixture so have two fixtures to compare
+        self.fixture_result3.delete()
+        f1 = self.fixture3_played_away  # now unplayed
+        f2 = self.fixture4_unplayed_home
+
+        response = self.client.get(self.url)
+        fixtures_data = response.context["fixtures_data"]
+        self.assertEqual(len(fixtures_data), 2)
+        self.assertEqual(fixtures_data[0]["week"], f1.week)
+        self.assertEqual(fixtures_data[1]["week"], f2.week)
+
+    def test_context_results_data_order_and_contents(self):
+        """
+        Verify that only results for the specified team are included in
+        'results_data' and are ordered chronologically (earliest first).
+        """
+        response = self.client.get(self.url)
+        results_data = response.context["results_data"]
+        self.assertEqual(len(results_data), 3)
+        self.assertEqual(results_data[0]["result"], self.fixture_result1)
+        self.assertEqual(results_data[1]["result"], self.fixture_result2)
+        self.assertEqual(results_data[2]["result"], self.fixture_result3)
+
+    def test_team_stats_correctly_computed(self):
+        """
+        Verify that played, wins, draws, losses and points are correctly
+        calculated in team_stats.
+        """
+        response = self.client.get(self.url)
+        stats = response.context["team_stats"]
+        self.assertEqual(stats["played"], 3)
+        self.assertEqual(stats["wins"], 1)
+        self.assertEqual(stats["draws"], 1)
+        self.assertEqual(stats["losses"], 1)
+        self.assertEqual(stats["points"], 3)
+
+    def test_player_data_correctly_calculated_and_sorted(self):
+        """
+        Verify that player data is sorted in descending order by
+        win percent then win count.
+        """
+        # Create players
+        p1 = create_player("Player", "One", self.club)
+        p2 = create_player("Player", "Two", self.club)
+        p3 = create_player("Player", "Three", self.club)
+        p4 = create_player("Player", "Four", self.club)
+        p5 = create_player("Player", "Five", self.club)
+
+        # Create Team Players
+        t1p1 = create_team_player(p1, self.team1)
+        t1p2 = create_team_player(p2, self.team1)
+        t2p1 = create_team_player(p3, self.team2)
+        t2p2 = create_team_player(p4, self.team2)
+        t3p1 = create_team_player(p5, self.team3)
+
+        # Create single matches
+        # Team Player 1 - won 4, lost 0, 100%
+        create_singles_match(self.fixture_result1, t1p1, t2p1, 3, 0)
+        create_singles_match(self.fixture_result1, t1p1, t2p2, 3, 1)
+        create_singles_match(self.fixture_result2, t2p1, t1p1, 0, 3)
+        create_singles_match(self.fixture_result2, t2p2, t1p1, 0, 3)
+
+        # Team Player 2 - won 2, lost 0, 100%
+        create_singles_match(self.fixture_result1, t1p2, t2p1, 3, 0)
+        create_singles_match(self.fixture_result1, t1p2, t2p2, 3, 0)
+
+        # Reserve player - won 1, lost 1, 50%
+        create_singles_match(self.fixture_result2, t2p1, t3p1, 3, 0)
+        create_singles_match(self.fixture_result2, t2p2, t3p1, 0, 3)
+
+        response = self.client.get(self.url)
+        player_data = response.context["player_data"]
+
+        # First item in player_data
+        self.assertEqual(player_data[0]["name"], t1p1.player.full_name)
+        self.assertEqual(player_data[0]["is_registered"], True)
+        self.assertEqual(player_data[0]["played"], 4)
+        self.assertEqual(player_data[0]["wins"], 4)
+        self.assertEqual(player_data[0]["percent"], 100.0)
+
+        # Second item in player_data
+        self.assertEqual(player_data[1]["name"], t1p2.player.full_name)
+        self.assertEqual(player_data[1]["is_registered"], True)
+        self.assertEqual(player_data[1]["played"], 2)
+        self.assertEqual(player_data[1]["wins"], 2)
+        self.assertEqual(player_data[1]["percent"], 100.0)
+
+        # Third item in player_data
+        self.assertEqual(player_data[2]["name"], t3p1.player.full_name)
+        self.assertEqual(player_data[2]["is_registered"], False)
+        self.assertEqual(player_data[2]["played"], 2)
+        self.assertEqual(player_data[2]["wins"], 1)
+        self.assertEqual(player_data[2]["percent"], 50.0)
+        self.assertContains(response, "(RESERVE)")
+
+    # Placeholder fallbacks
+    def test_team_with_no_fixtures_or_results_displays_placeholders(self):
+        """
+        Verify that a team with no fixtures or results displays the
+        correct template.
+        """
+        # Delete all fixtures
+        delete_fixtures()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["fixtures_data"], [])
+        self.assertEqual(response.context["results_data"], [])
+        self.assertContains(response, "No upcoming fixtures")
+        self.assertContains(response, "No results to display")
+
+    def test_team_with_all_fixtures_played_displays_placeholder(self):
+        """
+        Verify that a team with no remaining fixtures displays the
+        correct template.
+        """
+        # Delete unplayed fixture
+        self.fixture4_unplayed_home.delete()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["fixtures_data"], [])
+        self.assertContains(response, "No upcoming fixtures")
+
+    def test_team_with_fixtures_but_no_results(self):
+        """
+        Verify a team with fixtures but no results shows correct placeholder.
+        """
+        # Delete fixture results but keep fixtures
+        delete_fixture_results()
+
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.context["fixtures_data"]), 4)
+        self.assertEqual(response.context["results_data"], [])
+        self.assertContains(response, "No results to display")
+
+    def test_team_with_no_players_or_matches_handles_gracefully(self):
+        """
+        Verify the view handles teams with no registered players and
+        no singles matches.
+        """
+        # Delete fixture results but keep fixtures
+        delete_fixture_results()
+        delete_team_players()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["player_data"], [])
+        self.assertEqual(response.context["results_data"], [])
+        self.assertContains(response, "No player data available")
