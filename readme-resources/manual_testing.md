@@ -315,13 +315,6 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Hero image and overlay display for unauthenticated users |
 | ✓ | About section shows correct content and displays well on different screen sizes |
 | ✓ | About section displays for unauthenticated users |
-| ✓ | FAQ section shows correct content and functionality |
-| ✓ | FAQ section displays well on different screen sizes |
-| ✓ | FAQ section displays for unauthenticated users |
-| ✓ | Sponsors section shows logos for league sponsors in a flexible and responsive layout |
-| ✓ | Clicking on sponsor logo navigates to the correct website |
-| ✓ | Clicking on sponsor logo opens external website in a new browser tab |
-| ✓ | Hovering over sponsor logo with a mouse shows the correct tooltip |
 | ✓ | News section shows all active news items rotating in a carousel |
 | ✓ | Inactive news items do not display (expired, future) |
 | ✓ | When no active news items, a placeholder message is shown instead of the carousel |
@@ -329,6 +322,15 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | New news items immediately show on the homepage upon manual page refresh |
 | ✓ | News items are visible without requiring login |
 | ✓ | News section is responsive on different screen sizes |
+| ✓ | Useful Links section contains cards which correctly link to Clubs, League Tables, Fixtures and Results pages |
+| ✓ | FAQ section shows correct content and functionality |
+| ✓ | FAQ section displays well on different screen sizes |
+| ✓ | FAQ section displays for unauthenticated users |
+| ✓ | Sponsors section shows logos for league sponsors in a flexible and responsive layout |
+| ✓ | Clicking on sponsor logo navigates to the correct website |
+| ✓ | Clicking on sponsor logo opens external website in a new browser tab |
+| ✓ | Hovering over sponsor logo with a mouse shows the correct tooltip |
+
 | ✓ | No console errors or warnings were caused by interacting with page elements |
 
 ### Contact Page

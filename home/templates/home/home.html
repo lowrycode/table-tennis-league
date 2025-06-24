@@ -100,6 +100,111 @@
     {% endif %}
   </section>
 
+  <!-- Useful Links Section -->
+  <section id="useful-links" class="py-5 w-100 d-flex flex-column align-items-center">
+    <h2 class="mb-4 text-center">Useful Links</h2>
+    <div class="container-max-8 w-100 mx-0 px-3">
+      <div class="row row-gap-3 justify-content-center">
+        <!-- Find a Club -->
+        <div class="col-6 col-md-3">
+          <div class="card rounded-0 h-100">
+            <a
+              href="{% url 'clubs' %}"
+              class="text-decoration-none text-dark"
+              aria-label="View Clubs page"
+            >
+              <picture>
+                <source srcset="{% static 'images/find_a_club.webp' %}" type="image/webp">
+                <source srcset="{% static 'images/find_a_club.jpg' %}" type="image/jpeg">
+                <img
+                  src="{% static 'images/find_a_club.jpg' %}"
+                  class="card-img-top rounded-0"
+                  alt="Table tennis club group photo"
+                  loading="lazy"
+                >
+              </picture>
+              <div class="card-body text-center px-2">
+                <h3 class="card-title my-0 fs-card">Find a Club</h3>
+              </div>
+            </a>
+          </div>
+        </div>
+        <!-- League Tables -->
+        <div class="col-6 col-md-3">
+          <div class="card rounded-0 h-100">
+            <a
+              href="{% url 'tables' %}"
+              class="text-decoration-none text-dark"
+              aria-label="View League Tables"
+            >
+              <picture>
+                <source srcset="{% static 'images/league_standings.webp' %}" type="image/webp">
+                <source srcset="{% static 'images/league_standings.jpg' %}" type="image/jpeg">
+                <img
+                  src="{% static 'images/league_standings.jpg' %}"
+                  class="card-img-top rounded-0"
+                  alt="Gold, silver and bronze trophies sitting on a podium inside an arena"
+                  loading="lazy"
+                >
+              </picture>
+              <div class="card-body text-center px-2">
+                <h3 class="card-title my-0 fs-card">League Tables</h3>
+              </div>
+            </a>
+          </div>
+        </div>
+        <!-- Fixtures -->
+        <div class="col-6 col-md-3">
+          <div class="card rounded-0 h-100">
+            <a
+              href="{% url 'fixtures' %}"
+              class="text-decoration-none text-dark"
+              aria-label="View League Fixtures"
+            >
+              <picture>
+                <source srcset="{% static 'images/fixtures.webp' %}" type="image/webp">
+                <source srcset="{% static 'images/fixtures.jpg' %}" type="image/jpeg">
+                <img
+                  src="{% static 'images/fixtures.jpg' %}"
+                  class="card-img-top rounded-0"
+                  alt="League fixtures written on a piece of paper"
+                  loading="lazy"
+                >
+              </picture>
+              <div class="card-body text-center px-2">
+                <h3 class="card-title my-0 fs-card">Fixtures</h3>
+              </div>
+            </a>
+          </div>
+        </div>
+        <!-- Results -->
+        <div class="col-6 col-md-3">
+          <div class="card rounded-0 h-100">
+            <a
+              href="{% url 'results' %}"
+              class="text-decoration-none text-dark"
+              aria-label="View League Results"
+            >
+              <picture>
+                <source srcset="{% static 'images/results_scoreboard.webp' %}" type="image/webp">
+                <source srcset="{% static 'images/results_scoreboard.jpg' %}" type="image/jpeg">
+                <img
+                  src="{% static 'images/results_scoreboard.jpg' %}"
+                  class="card-img-top rounded-0"
+                  alt="A table tennis scoreboard with the league logo printed on the front"
+                  loading="lazy"
+                >
+              </picture>
+              <div class="card-body text-center px-2">
+                <h3 class="card-title my-0 fs-card">Results</h3>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- FAQs Section -->
   <section id="faq" class="py-5 w-100 d-flex justify-content-center">
     <div class="container-max-8 w-100">

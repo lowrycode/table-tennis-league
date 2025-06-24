@@ -54,25 +54,25 @@ h6 {
 }
 
 h1 {
-  font-size: calc(2.1rem + .9vw);
+  font-size: calc(2.1rem + 0.9vw);
 }
 
 h2,
 .h2-style {
   font-family: "PT Serif", serif;
-  font-size: calc(1.6rem + .9vw);
+  font-size: calc(1.6rem + 0.9vw);
   font-weight: 700;
 }
 
 h3,
 .h3-style {
   font-family: "PT Serif", serif;
-  font-size: calc(1.2rem + .9vw);
+  font-size: calc(1.2rem + 0.9vw);
   font-weight: 700;
 }
 
 h4 {
-  font-size: calc(1.2rem + .4vw);
+  font-size: calc(1.2rem + 0.4vw);
 }
 
 h5 {
@@ -356,6 +356,25 @@ footer a:hover {
   position: static;
 }
 
+/* Useful Links Section */
+.fs-card {
+  font-size: clamp(0.7rem, 5vw, 1.2rem);
+}
+
+.card-img-top {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  width: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  transform: scale(1.05);
+}
+
+/* FAQ section */
 #faq {
   width: 100%;
   background-color: var(--light-2);
@@ -511,7 +530,7 @@ footer a:hover {
 #team-fixtures th,
 #team-results th {
   background-color: var(--primary-2);
-  color: var(--light-2);  
+  color: var(--light-2);
 }
 
 /* CLUB ADMIN PAGE */
