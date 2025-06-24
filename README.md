@@ -543,59 +543,73 @@ The following devices were used during testing:
 
 # Code Validation Tests
 
-## HTML
+## HTML - *PASSED*
 
-Each of the individual HTML pages were tested using the <a href="https://validator.w3.org/" target="_blank" rel="noopener">**W3C Markup Validator**</a>. All of the pages passed HTML validation. Some pages required a few amendments before passing; for example, HTMX attributes were changed from the format `hx-get` to `data-hx-get` in order to pass the validation tests.
+Each of the individual HTML pages were tested using the <a href="https://validator.w3.org/" target="_blank" rel="noopener">**W3C Markup Validator**</a> with the *Validate by Direct Input* option. All of the pages passed HTML validation.
+
+![HTML Validation Message from W3C Markup Validator](readme-resources/images/html-validator.jpg)
+
+Some pages required a few amendments before passing; for example, HTMX attributes were changed from the format `hx-get` to `data-hx-get` in order to pass the validation tests.
 
 The table below explicitly states which pages were tested.
 
 | Status  | Test Description |
 | ---     | ---              |
-| ✓ | Home Page passed without errors or warnings |
-| ✓ | Clubs Page passed without errors or warnings |
-| ✓ | Contact Page passed without errors or warnings |
-| ✓ | Signup Page passed without errors or warnings |
-| ✓ | Login Page passed without errors or warnings |
-| ✓ | Account Settings Page passed without errors or warnings |
-| ✓ | Change Password Page passed without errors or warnings |
-| ✓ | Change Email Page passed without errors or warnings |
-| ✓ | Delete Account Confirmation Page passed without errors or warnings |
-| ✓ | Drop Club Admin Status Page passed without errors or warnings |
-| ✓ | Confirm Logout Page passed without errors or warnings |
-| ✓ | Club Admin Page passed without errors or warnings |
-| ✓ | Update Club Info Page passed without errors or warnings |
-| ✓ | Delete Club Info Page passed without errors or warnings (with both option buttons selected) |
-| ✓ | Update Venue Info Page passed without errors or warnings |
-| ✓ | Delete Venue Page passed without errors or warnings |
-| ✓ | Create Venue Page passed without errors or warnings |
-| ✓ | Assign Venue Page passed without errors or warnings |
+| ✓ | **Home Page** passed without errors or warnings |
+| ✓ | **Clubs Page** passed without errors or warnings |
+| ✓ | **Clubs Reviews Page** passed without errors or warnings |
+| ✓ | **Create Club Review Page** passed without errors or warnings |
+| ✓ | **Update Club Review Page** passed without errors or warnings |
+| ✓ | **Delete Club Review Page** passed without errors or warnings |
+| ✓ | **Contact Page** passed without errors or warnings |
+| ✓ | **League Fixtures Page** passed without errors or warnings |
+| ✓ | **League Results Page** passed without errors or warnings |
+| ✓ | **League Tables Page** passed without errors or warnings |
+| ✓ | **Team Summary Page** passed without errors or warnings |
+| ✓ | **Result Breakdown Page** passed without errors or warnings |
+| ✓ | **Signup Page** passed without errors or warnings |
+| ✓ | **Login Page** passed without errors or warnings |
+| ✓ | **Account Settings Page** passed without errors or warnings |
+| ✓ | **Change Email Page** passed without errors or warnings |
+| ✓ | **Change Password Page** passed without errors or warnings |
+| ✓ | **Drop Club Admin Status Page** passed without errors or warnings |
+| ✓ | **Delete Account Confirmation Page** passed without errors or warnings |
+| ✓ | **Confirm Logout Page** passed without errors or warnings |
+| ✓ | **Club Admin Page** passed without errors or warnings |
+| ✓ | **Update Club Info Page** passed without errors or warnings |
+| ✓ | **Delete Club Info Page** passed without errors or warnings (with both option buttons selected) |
+| ✓ | **Update Venue Info Page** passed without errors or warnings |
+| ✓ | **Delete Venue Page** passed without errors or warnings |
+| ✓ | **Create Venue Page** passed without errors or warnings |
+| ✓ | **Assign Venue Page** passed without errors or warnings |
+| ✓ | **403 Error Page** passed without errors or warnings |
+| ✓ | **404 Error Page** passed without errors or warnings |
+| ✓ | **500 Error Page** passed without errors or warnings |
 
 
-## CSS
-
-### Passed
+## CSS - *PASSED*
 
 The custom stylesheet was tested using the <a href="https://jigsaw.w3.org/css-validator/" target="_blank" rel="noopener">**W3C CSS Jigsaw Validator**</a> and returned no errors or warnings.
 
 ![CSS Validation Results from W3C CSS Jigsaw Validator](readme-resources/images/css-validator.jpg)
 
 
-## JavaScript
+## JavaScript - *PASSED*
 
-The JavaScript code was validated using <a href="https://jshint.com/" target="_blank" rel="noopener">**JSHint**</a>. It **passed the validation without any errors** but warnings were displayed when ES6 features were used:
+The JavaScript code was validated using <a href="https://jshint.com/" target="_blank" rel="noopener">**JSHint**</a> and it **passed without any errors or warnings**. The validator was configured to assume **New JavaScript features (ES6)**.
 
-![JavaScript validation message from JSHint](readme-images/js-validator.jpg)
-
-These warnings were ignored since ES6 is the modern standard for JavaScript web development. 
+![Configuration settings used for JSHint](readme-resources/images/js-validator.jpg)
 
 The table below explictly states which files were tested.
 
 | Status  | Test Description |
 | ---     | ---              |
-| ✓ | toggle_btn passed without errors. ES6 features appeared as warnings (arrow functions and const) |
-| ✓ | delete_venue passed without errors. ES6 features appeared as warnings (const) |
-| ✓ | delete_club_info passed without errors. ES6 features appeared as warnings (const) |
-| ✓ | delete_account passed without errors. ES6 features appeared as warnings (const) |
+| ✓ | **enable_button_on_confirm** passed without errors or warnings |
+| ✓ | **toggle_btn** passed without errors or warnings |
+| ✓ | **delete_club_info** passed without errors or warnings |
+| ✓ | **delete_venue** passed without errors or warnings |
+| ✓ | **initialise_map** is called by the Google Maps API, so the google variable being undefined and the initMap function being unused were ignored (they are used later in the parent template) - no other errors or warnings were found |
+| ✓ | **init_venue_modal** passed without errors or warnings |
 
 ## Testing with Chrome DevTools
 
