@@ -36,6 +36,7 @@
 
 <!-- User Review Section -->
 <section id="user-review" class="w-100 d-flex justify-content-center mt-3">
+  <h2 class="visually-hidden">Your Review of This Club</h2>
   <div class="container-max-6 w-100">
     {% if user.is_authenticated %}
       {% with user_review as review %}
@@ -63,16 +64,19 @@
   </div>
 </section>
 
-<section class="w-100 d-flex justify-content-center mt-2 pt-3">
-  <div class="container-max-6 w-100">
-    <!-- Approved reviews from other users -->
-    {% for review in other_reviews %}
-      {% if review.approved %}
-        {% include "clubs/partials/club_review.html" %}
-      {% endif %}
-    {% endfor %}
-  </div>
-</section>
+{% if other_reviews|length > 0 %}
+  <!-- Approved reviews from other users -->
+  <section class="w-100 d-flex justify-content-center mt-2 pt-3">
+    <h2 class="visually-hidden">Reviews from Other Members</h2>
+    <div class="container-max-6 w-100">
+      {% for review in other_reviews %}
+        {% if review.approved %}
+          {% include "clubs/partials/club_review.html" %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
 
 {% if review_count > 0 %}
   <a href="{% url 'clubs' %}#club-article-{{ club.id }}" class="btn btn-custom mt-3 mb-5">Return to Clubs page</a>
