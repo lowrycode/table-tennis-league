@@ -219,7 +219,8 @@ a:hover,
   color: var(--primary-3);
 }
 
-a.disabled-link {
+a.disabled-link,
+.a-style.disabled-link {
   color: var(--light-4);
   cursor: not-allowed;
 }

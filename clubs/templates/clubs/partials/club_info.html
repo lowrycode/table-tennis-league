@@ -8,13 +8,9 @@
       <h3>{{club.name}}</h3>
       <!-- Reviews -->
       {% if from_admin %}
-        <a
-          href="#"
-          class="d-flex flex-wrap align-items-center gap-2 mb-2 disabled-link"
-          role="link"
-          aria-disabled="true"
-          aria-label="Link is disabled in Club Admin page"
-          title="Link is disabled in Club Admin page"
+        <p
+          class="d-flex flex-wrap align-items-center gap-2 mb-2 a-style disabled-link"
+          title="Link is disabled in club admin page"
         >
       {% else %}
         <a
@@ -43,7 +39,11 @@
           </span>
           <span>(no reviews yet)</span>
         {% endif %}
-      </a>
+      {% if from_admin %}
+        </p>
+      {% else %}
+        </a>
+      {% endif %}
     </div>
     {% if club.info.website %}
       <!-- Website -->
