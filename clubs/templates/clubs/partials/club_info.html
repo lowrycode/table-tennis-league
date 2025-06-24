@@ -25,23 +25,23 @@
         >
       {% endif %}
         {% if club.review_average_score %}
-          <div aria-hidden="true">
+          <span aria-hidden="true">
             {% with club.review_average_score_int as star_rating%}
               {% include "clubs/partials/star_rating.html" %}
             {% endwith %}
-          </div>
-          <div aria-label="{{ club.review_average_score }} out of 5 stars">
+          </span>
+          <span>
             {{ club.review_average_score }} Stars
-          </div>
-          <div>
+          </span>
+          <span>
             ({{ club.review_count }} review{{ club.review_count|pluralize }})
-          </div>
+          </span>
         
         {% else %}
-          <div aria-hidden="true">
+          <span aria-hidden="true">
             {% include "clubs/partials/star_rating_empty.html" %}
-          </div>
-          <div>(no reviews yet)</div>
+          </span>
+          <span>(no reviews yet)</span>
         {% endif %}
       </a>
     </div>
