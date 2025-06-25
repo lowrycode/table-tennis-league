@@ -109,6 +109,8 @@ There is *good colour contrast* between text and background colours and a *sans-
 
 Wireframes were produced using <a href="https://balsamiq.com/" target="_blank" rel="noopener">**Balsamiq**</a> at the earliest stages of planning to ensure that the website had a good layout on different devices.
 
+*NOTE: During development, the navbar expand breakpoint was changed from `sm` to `md` due to overflow issues when the league dropdown was added to the navbar. The wireframes below show the original designs and therefore do not reflect this change.*
+
 ### Main Public Pages
 
 ![Wireframes for Homepage](readme-resources/images/wireframe-home.jpg)
