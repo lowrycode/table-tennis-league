@@ -112,7 +112,7 @@ h6 {
 
 /* Text Colour Utilities */
 .green {
-  color: green;
+  color: rgb(0, 94, 0);
 }
 
 .amber {
@@ -120,7 +120,7 @@ h6 {
 }
 
 .red {
-  color: red;
+  color: #a62521;
 }
 
 .blue {
