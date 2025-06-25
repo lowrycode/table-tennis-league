@@ -192,7 +192,7 @@ The items are listed in the order of priority that the users are likely to want 
 
 The default behaviour of the *Bootstrap Navbar* is retained (i.e. the hover effects and the lighter font showing the active page).
 
-*Note: The items in the user dropdown menu change depending on whether the user is logged in or not. This is discussed in more detail in the [User Authentication Pages](#user-authentication-pages) section.*
+*NOTE: The items in the user dropdown menu change depending on whether the user is logged in or not. This is discussed in more detail in the [User Authentication Pages](#user-authentication-pages) section.*
 
 ### Footer
 
@@ -369,7 +369,7 @@ Once a user has logged in, they are reminded of their logged-in status immediate
 
 ![Logged in status banner](readme-resources/images/logged-in-status.jpg)
 
-*Note: A user does not automatically gain club admin status when they signup for an account. This is deliberate as it allows the league administrator complete control over who can create and edit club information on the site. The expectation is that the user would signup for an account and then contact the league administrator (e.g. through the enquiry form). The league administrator would then be able to check that the request is legitimate before assigning club admin status (and, if required, create a new club in the database).*
+*NOTE: A user does not automatically gain club admin status when they signup for an account. This is deliberate as it allows the league administrator complete control over who can create and edit club information on the site. The expectation is that the user would signup for an account and then contact the league administrator (e.g. through the enquiry form). The league administrator would then be able to check that the request is legitimate before assigning club admin status (and, if required, create a new club in the database).*
 
 ## Account Management
 
@@ -523,7 +523,7 @@ Most of the project was developed using a Test-Driven Development (TDD) approach
 
 Thorough manual testing was also conducted on the deployed site before marking a user story as *Done* in the GitHub projects board. These tests are documented [here](readme-resources/manual_testing.md).
 
-*Note: The tests have been ordered by website page rather than by user story, but tests covering each user story will be found in the relevant section.*
+*NOTE: The tests have been ordered by website page rather than by user story, but tests covering each user story will be found in the relevant section.*
 
 The manual tests were repeated a number of times throughout development on various browsers and devices. Before submitting the project, each of the tests were conducted again (on the deployed site) and were conducted by myself and others.
 
@@ -636,7 +636,7 @@ The project was deployed with <a href="https://www.heroku.com/" target="_blank" 
 
 ## 1. Update Code for Deployment
 
-*Note: These steps are already implemented in the code in this repository but this section is included to explain why they were made before deploying the project.*
+*NOTE: These steps are already implemented in the code in this repository but this section is included to explain why they were made before deploying the project.*
 
 A package called **whitenoise** is used for serving static files on Heroku. 
 - It was downloaded using `pip install whitenoise` and added to the requirements.txt file using `pip freeze --local > requirements.txt`
