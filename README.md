@@ -620,15 +620,13 @@ The table below explictly states which files were tested.
 
 ### Lighthouse Tests
 
-The *Lighthouse tool* in **Google Chrome's DevTools** was used to analyse every page on the site. Results for the most significant pages on the site are shown below, for both mobile view and desktop view.
+The *Lighthouse tool* in **Google Chrome's DevTools** was used to analyse every page on the site for performance, accessibility, best practices and SEO. The tests were carried out on the deployed site using both mobile and desktop views.
 
-The results for the **mobile view** were as follows:
-
-![Google Lighthouse analysis on mobile view](readme-resources/images/lighthouse-mobile.jpg)
-
-The results for the **desktop view** were as follows:
+Results obtained when analysing the **desktop view** for the most significant pages on the site are shown below.
 
 ![Google Lighthouse analysis on desktop view](readme-resources/images/lighthouse-desktop.jpg)
+
+The scores for accessibility, best practices and SEO were the same using **mobile view** but the performance results were slightly lower.
 
 # Deployment
 
