@@ -2,4 +2,4 @@
 env.py
 __pycache__/
 pyproject.toml
-clubs/fixtures/
+cityanddistrict/fixtures/
