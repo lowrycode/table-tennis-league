@@ -221,13 +221,9 @@ For example:
 - `.container-max-6`: Limits the width to 600px - used on Accounts Settings page and various form pages used for updating club and venue information
 - `.container-max-4`: Limits the width to 400px - used on narrow pages which often relate to user authentication or custom error pages (404 etc.)
 
-## Public Facing Pages
+## Homepage
 
-This section gives an overview of the pages that are accessible to all users (both authenticated and unauthenticated).
-
-### Homepage
-
-**Hero Section**
+### Hero Section
 
 The Homepage opens with a hero image showing an action shot of a table tennis player. This is designed to immediately engage visitors and convey the energy of the sport.
 
@@ -236,14 +232,14 @@ The Homepage opens with a hero image showing an action shot of a table tennis pl
 The *hero overlay* includes the league logo and is positioned at the bottom of the image on smaller screen sizes but moved to the top on larger screen sizes to make better use of the available spacing without masking the image of the player.
 
 
-**About Section**
+### About Section
 
 The next section provides a friendly welcome to the website and background information about the league. It was placed just above the fold (to prompt users to scroll down) and immediately after the *Hero* section (to inform new users as to the websites content).
 
 ![About section](readme-resources/images/about.jpg)
 
 
-**News Section**
+### News Section
 
 This section displays active league news items in a rotating carousel. Users can cycle through them using navigation buttons, which are hidden when only one news item is available. When no active news items are available, a placeholder message is shown instead.
 
@@ -251,8 +247,15 @@ This section displays active league news items in a rotating carousel. Users can
 
 The league administrator can manage news items via the Django Admin Panel, including setting publish and expiry dates for scheduled visibility.
 
+### Useful Links Section
 
-**FAQs Section**
+This section provides an alternative pathway to the Clubs, League Tables, Fixtures and Results pages which some users may prefer over using the top navigation bar. It signals to new users that these are the most significant pages of the website.
+
+![Useful Links section](readme-resources/images/useful-links.jpg)
+
+Each card includes a key word and related image to grab the attention of the user. On hovering over the card, it expands slightly with a shadow effect to indicate to the user that it is clickable.
+
+### FAQs Section
 
 This section answers the commonly asked questions about the league and is aimed especially at players who are interested in joining the league in the future.
 
@@ -265,7 +268,7 @@ When a different accordion item is opened, any previously opened items will clos
 By restricting the width of the container on larger screen sizes, the caret symbol remains close to the question text and is more aesthetically pleasing.
 
 
-**Sponsors Section**
+### Sponsors Section
 
 This section displays the logos for the league sponsors.
 
@@ -274,7 +277,7 @@ This section displays the logos for the league sponsors.
 Title and aria labels are included for each link. Clicking on a logo opens the sponsors website in another tab. The rel="noopener noreferrer" attribute is used for increased security when navigating to these sites.
 
 
-### Clubs Page
+## Clubs Page
 
 Users arrive at this page by clicking the Clubs item in the navigation bar. The page allows users to find out more information about the clubs in the region. 
 
@@ -282,11 +285,11 @@ It includes:
 - A Google Map showing the positions of the club venues.
 - Information about each club listed in alphabetical order (by club name) and a filter based on checklist criteria.
 
-All of the information on this page is dynamically populated from data in the database. The data itself is submitted by authenticated website users through restricted pages that are only accessible for users who have Club Admin Status on their account. All user submitted information must be approved by the league administrator before it appears on the clubs page. This approach ensures that the information is accurate and contains no offensive content.
+All of the information on this page is dynamically populated from data in the database. The data itself is submitted by authenticated website users through restricted pages that are only accessible for users who have **Club Admin Status** on their account. All user submitted information must be approved by the league administrator before it appears on the clubs page. This approach ensures that the information is accurate and contains no offensive content.
 
 *NOTE: More details about the Club Admin Dashboard are given below.*
 
-**Find-A-Club Section**
+### Find-A-Club Section
 
 This section makes use of the Google Maps JavaScript API to automatically generate markers for each (approved) venue.
 
@@ -296,7 +299,7 @@ The map automatically adjusts its centre and zoom settings to show all the locat
 
 If there are no locations to display, a placeholder shows instead.
 
-**Club Information Section**
+### Club Information Section
 
 This section shows key information for each club.
 
@@ -312,9 +315,11 @@ The display also varies according to whether optional data is provided. For exam
 
 Phone numbers and email addresses are interactive and launch the system's default calling or email app when clicked.
 
+Clicking on the Club Reviews information navigates to the **Club Review** page (more details below).
+
 If a club uses multiple venues, all associated venues are listed under that club. If a venue is shared across clubs, it appears in each relevant club entry.
 
-**Club Filter**
+### Club Filter
 
 Users can filter clubs using tick-box criteria. Clicking the filter icon reveals a dropdown menu where specific features can be selected. Only clubs matching all selected filters will appear in the list.
 
@@ -328,6 +333,29 @@ On applying a filter, only the club-info section is updated via HTMX. This appro
 
 *NOTE: This means that clubs may still display in the map info windows but no longer be present on the page. Clicking on the club in the info window does not cause any errors but it will not cause any navigation if the club is no longer on the page.*
 
+## Club Reviews page
+
+The Club Reviews page is where the CRUD functionality happens for a typical authenticated user.
+
+The page is accessed when a user clicks on the Club review information for a particular club on the Clubs page.
+
+![Club Reviews page](readme-resources/images/club-reviews.jpg)
+
+The page header shows the club name, average review score, number of reviews and a button for returning to the Clubs page.
+
+Each of the reviews which have been approved by the league administrator are listed. If a review is waiting approval, it will not appear in the list of visible reviews.
+
+If the user *is not* logged in, they will see a grey banner prompting them to login to write a review (as in the image above). If a user *is* logged in, they will have the option of creating a review. If they have already written a review, they will see their own review (even if not yet approved but with a message "Your review has not yet been approved") above the reviews that others have made. They will also have the option of updating or deleting their review.
+
+![Club Reviews page - options for logged-in users](readme-resources/images/club-reviews-logged-in.jpg)
+
+The Create Club Review and Update Club Review pages contain a form with field validation. The Update Club Review page pre-populates using the information from the user's existing review.
+
+Clicking the Delete review button takes the user to a confirmation page.
+
+Clicking on a Return to Clubs page button takes the user back to the section they were last viewing on the Clubs page (rather than the top of the page).
+
+*NOTE: The second 'Return to Clubs page' button only shows if there is more than one review for the club as a duplicated button is not necessary in this case and may confuse users.*
 
 ## Contact Page
 
@@ -347,6 +375,139 @@ Upon successful submission, the user is given feedback via a confirmation messag
 The League Administrator can view all submitted enquiries in the Django Admin Panel which displays the Subject, Name, Submission Date and Is Actioned status for each enquiry in a table. Enquiries can also be filtered according to the "Is Actioned" status.
 
 ![Enquiries as viewed in the Django Admin Panel](readme-resources/images/dj-admin-enquiry.jpg)
+
+
+## League Fixtures page
+
+The League Fixtures page can be accessed from the League dropdown menu in the navbar. It displays all league fixtures (played and unplayed) for a given season (current season by default). The fixtures are grouped by week and sorted in chronological order.
+
+![League Fixtures page](readme-resources/images/fixtures.jpg)
+
+The fixtures are colour coded according to whether they are scheduled, completed, postponed or cancelled. The colour key below the title states the colours that are used for each category.
+
+### Filtering and Jumping to Fixtures
+
+The user can open a filter panel by pressing the filter icon. The filter panel allows the user to filter fixtures by season, division and/or club. When filtering by club, only fixtures where either the home team or away team (or both) belong to that club are displayed.
+
+The options in the filter dropdowns update dynamically depending on what is selected in other filters. For example, if "Premier Division" is selected then only clubs with teams in the premier league will show in the Clubs dropdown.
+
+When filters are applied, the colour of the icon changes from grey to blue and the aria-label is updated from "No filters applied" to "Filters active" to assist screen readers.
+
+![Filter panel on Fixtures page](readme-resources/images/fixtures-filter.jpg)
+
+Filters are applied dynamically using HTMX, avoiding full page reloads for a faster and smoother user experience.
+
+If the current date is within a given season, a "Jump to Current Week" link displays at the top of the page. This also streamlines the process of finding relevant fixtures.
+
+![Link for jumping to current week on Fixtures page](readme-resources/images/fixtures-current-week.jpg)
+
+*NOTE: This page currently loads all fixtures for a given season. While this performs well with just 5 teams, it may lead to noticeable delays if more fixtures are added. If performance becomes an issue, I would consider loading only the current and following week's fixtures by default, with an option in the filter panel to display additional fixtures.*
+
+### Additional Fixture Information
+
+Each fixture displays the name of the home and away teams, the fixture date, the fixture time and a "Venue" button styled as a link. Clicking the venue button opens a modal showing the venue information.
+
+![Venue modal on Fixtures page](readme-resources/images/venue-modal.jpg)
+
+Clicking a team name navigates to its Team Summary page, which displays player details and performance statistics.
+
+The links are styled consistently with the rest of the site, including similar hover effects and tooltips.
+
+### Fallbacks for No Fixtures
+
+If there are no fixtures to display, the following fallback messages may be shown instead:
+- "Season not found" - when the league administrator has not marked any season as *current*.
+- "No weeks to display" - when the season does not have any weeks assigned yet.
+- "No fixtures this week" - when a week has no fixtures assigned (e.g. a rest week)
+
+## League Results page
+
+The League Results page can be accessed from the League dropdown menu in the navbar. It displays the team scores for all matches that have been played or forfeited for a given season (current season by default). The results are grouped by week. Weeks are displayed in reverse chronological order with the most recent week first. Within each week, matches are sorted in ascending chronological order (earliest first).
+
+![League Results page](readme-resources/images/results.jpg)
+
+### Filtering Results
+
+The filtering functionality is similar to the Fixtures page.
+
+### Additional Result Information
+
+Just like on the Fixtures page, clicking on a team name redirects to the Team Summary page.
+
+Although the date of the fixture is still displayed, the time of the fixture has been replaced by the fixture result and the Venue button has been replaced by a Scores link. Clicking the scores link navigates to the Result Breakdown page.
+
+### Fallbacks for No Results
+
+If there are no results to display, the following fallback messages may be shown instead:
+- "Season not found" - when the league administrator has not marked any season as *current*.
+- "No results to display" - when no matches have yet been played.
+
+## Result Breakdown page
+
+This page displays the individual match scores for each singles and doubles match, and scores for individual games when available.
+
+![Result Breakdown page](readme-resources/images/result-breakdown.jpg)
+
+The top of the page shows details about the fixture, the overall match score and the summary of how many matches were won by each player (excluding players who didn't win any matches).
+
+A list of scores for the singles matches is shown next, ordered alphabetically by surname (home player then away player). The number of sets/games won by each player is shown and the individual game scores are shown if available.
+
+The scores for the doubles match are shown at the bottom of the page, followed by a button to go back to the previous page.
+
+*NOTE: The sample data includes individual game scores for the current season only.*
+
+The following fallback messages may be shown:
+- "No scores for the singles matches have been recorded" - when no data for the singles matches exists in the database.
+- "No scores for the doubles match have been recorded" - when no data for the doubles match exists in the database.
+- "No game scores recorded" - when individual game scores for either singles or doubles games do not exist in the database.
+
+## League Tables page
+
+The League Tables page can be accessed from the League dropdown menu in the navbar. It displays the league standings for all divisions within a specified season (current season by default).
+
+![League Tables page](readme-resources/images/league-tables.jpg)
+
+Teams are ranked by points (high to low). In the event of a tie, the following secondary criteria is progressively applied until an order is resolved:
+- Number of team matches won
+- Number of team sets won (individual singles and doubles matches)
+- Number of individual games won (within singles and doubles matches)
+
+The league tables for different seasons can be viewed using the filter panel.
+
+Clicking on a team name navigates to the Team Summary page for that team.
+
+The following fallback messages may be shown:
+- "Season not found" - when the league administrator has not marked any season as *current*.
+- "No tables to display" - if there are no divisions assigned to the season.
+- "No table to display" under the division name - if there are no teams assigned to the division yet.
+
+If no matches have been played yet, the table shows a table including team names with initial data as in the image below.
+
+![League Tables before matches have been played page](readme-resources/images/league-table-no-matches.jpg)
+
+## Team Summary Page
+
+The Team Summary page provides an overview of team and player performance. 
+
+![Team Summary page](readme-resources/images/team-summary.jpg)
+
+Summary details for the team are displayed at the top of the page.
+
+The players section lists all players that are registered with the team and any players who have played matches as reserves for the team. They are listed in order of percentage wins (and then total wins if tied).
+
+All player statistics are specific to their performance for the specified team; if a player has also played for another team, their performance for the other team is not taken into consideration.
+
+Reserve players are indicated with the word 'RESERVE' in brackets after their name.
+
+Team results are listed in chronological order by week. Clicking on the opponent navigates to their Team Summary page. Clicking on the venue opens a modal with venue information (as already seen on the Fixtures page). Clicking on the score navigates to the Result Breakdown page for that match.
+
+Upcoming fixtures are listed in chronological order by date. Clicking on the opponent navigates to the Team Summary page for that team and clicking on the venue opens the modal containing venue information.
+
+Clicking the 'Go Back' button near the top or bottom of the page takes the user back to their previous page.
+
+If the team has no fixtures, results or players yet, the page will display as in the image below.
+
+![Team Summary page before fixtures, results and players](readme-resources/images/team-summary-no-data.jpg)
 
 
 ## Error Pages
@@ -381,7 +542,9 @@ Once a user has logged in, they are reminded of their logged-in status immediate
 
 ## Account Management
 
-Another key assessment criteria for the project relates to CRUD functionality. The majority of the CRUD functionality is found in the Club Admin section but the Account Settings page also includes some CRUD functionality: it allows users to:
+Another key assessment criteria for the project relates to CRUD functionality. We have already discussed how a typical user can create, read, edit and delete a review for a club.
+
+The Account Settings page also includes CRUD functionality. It allows users to:
 - View their email address.
 - Change their email address.
 - Change their account password.
@@ -398,9 +561,13 @@ Whenever a user carries out a delete action that is considered "serious" (irreve
 
 ## Club Admin Dashboard
 
-Users who have been assigned club admin status can access the Club Admin Dashboard page from the user dropdown menu. This is where the user can manage the club and venue information that will appear on the clubs page after approval by the League Administrator.
+Users who have been assigned club admin status can access the Club Admin Dashboard page from the user dropdown menu. 
 
-This section contains the majority of the site's CRUD functionality.
+*NOTE: This menu item will not appear for users who have not been assigned Club Admin status by the League Administrator.*
+
+The page allows a club admin to manage the club and venue information that will appear on the clubs page (after approval by the League Administrator).
+
+The CRUD functionality on this page also implements a form of version control whereby old approved information is retained. This means that any previously approved club information will continue to display on the Clubs page whilst the new information is awaiting approval by the league administrator.
 
 ![Club Admin Dashboard](readme-resources/images/club-admin-dashboard.jpg)
 
@@ -408,13 +575,13 @@ Unauthenticated users who try to access this page are redirected to the login pa
 
 ### Managing Clubs
 
-Users can add, edit and delete club information by clicking on the relevant buttons.
+Club admins can add, edit and delete club information by clicking on the relevant buttons.
 
 ![Managing Club Information from Club Admin Dashboard](readme-resources/images/club-admin-clubs.jpg)
 
 The same page is used for adding new club information and updating club information but when updating information the most recent version of the club information is pre-populated in the form.
 
-Since every update needs approval by the league administrator before being shown on the clubs page, updating club information actually creates a new ClubInfo record rather than updating an existing record. This approach ensures that older approved information is retained and the club remains visible on the clubs page while updates await approval. Any outdated records are also deleted every time a new ClubInfo record is created (on the front end website, not Django Admin Panel).
+*NOTE: Since every update needs approval by the league administrator before being shown on the clubs page, updating club information actually creates a new ClubInfo record rather than updating an existing record. This approach ensures that older approved information is retained and the club remains visible on the clubs page while updates await approval. Any outdated records are also deleted every time a new ClubInfo record is created (on the front end website, not Django Admin Panel).*
 
 When deleting club information, users can choose between deleting unapproved information only (to revert back to previously approved information) or to delete both approved and unapproved information (effectively removing all associated ClubInfo records for that club). Users have to tick a confirmation checkbox before doing the latter.
 
