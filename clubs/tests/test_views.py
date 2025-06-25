@@ -3,8 +3,24 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
-from clubs.forms import UpdateClubInfoForm
+from clubs.models import (
+    Club,
+    ClubInfo,
+    Venue,
+    VenueInfo,
+    ClubVenue,
+    ClubAdmin,
+    ClubReview,
+)
+from clubs.forms import UpdateClubInfoForm, ClubReviewForm
+from test_utils.helpers import (
+    create_venue,
+    create_venue_info,
+    delete_objects,
+    create_club,
+    create_club_review,
+    delete_club_reviews,
+)
 
 User = get_user_model()
 
@@ -145,6 +161,50 @@ class ClubsPageDynamicTests(TestCase):
         Club.objects.all().delete()
         response = self.client.get(reverse("clubs"))
         self.assertContains(response, "No clubs found.")
+
+    def test_page_displays_placeholder_for_no_reviews(self):
+        """Verify placeholder is shown if no club reviews exist"""
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, "(no reviews yet)")
+        self.assertContains(
+            response, '<i class="fa-regular fa-star text-muted"></i>'
+        )
+
+    def test_page_displays_average_review_score_and_review_count(self):
+        """
+        Verify average review score and review count is shown and based
+        on approved reviews only.
+        """
+        # Create users
+        user1 = User.objects.create_user(
+            username="user1",
+            email="user1@example.com",
+            password="password123",
+        )
+        user2 = User.objects.create_user(
+            username="user2",
+            email="user2@example.com",
+            password="password123",
+        )
+        user3 = User.objects.create_user(
+            username="user3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Create approved reviews
+        create_club_review(self.club_1, user1, 4, "Headline", "Review text.")
+        create_club_review(self.club_1, user2, 5, "Headline", "Review text.")
+
+        # Create an unapproved review
+        create_club_review(
+            self.club_1, user3, 3, "Headline", "Review text.", False
+        )
+
+        response = self.client.get(reverse("clubs"))
+        self.assertContains(response, '<i class="fa-solid fa-star amber"></i>')
+        self.assertContains(response, "4.5 Stars")
+        self.assertContains(response, "(2 reviews)")
 
     def test_page_displays_contact_names(self):
         """Verify that contact name is shown for approved club."""
@@ -959,6 +1019,182 @@ class ClubsPageLocationsTests(TestCase):
         self.assertNotContains(response, "initialise_map.js")
 
 
+class ClubReviewsPageTests(TestCase):
+    """
+    Tests for club reviews page.
+    """
+
+    def setUp(self):
+        """
+        Create users, clubs and related club reviews for use in tests.
+        """
+        # Create club
+        self.club = create_club("Test Club")
+
+        # Create users
+        self.user1 = User.objects.create_user(
+            username="user1",
+            email="user1@example.com",
+            password="password123",
+        )
+        self.user2 = User.objects.create_user(
+            username="user2",
+            email="user2@example.com",
+            password="password123",
+        )
+        self.user3 = User.objects.create_user(
+            username="user3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Create approved reviews
+        create_club_review(
+            self.club, self.user1, 4, "Approved Review 1", "Review text."
+        )
+        create_club_review(
+            self.club, self.user2, 5, "Approved Review 2", "Review text."
+        )
+
+        # Create an unapproved review
+        create_club_review(
+            self.club,
+            self.user3,
+            3,
+            "Unapproved Review 1",
+            "Review text.",
+            False,
+        )
+
+        self.url = reverse("club_reviews", args=[self.club.id])
+
+    def test_club_reviews_renders_successfully(self):
+        """
+        Verify the club reviews page renders successfully with status 200
+        and includes the club name in the response.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/club_reviews.html")
+        self.assertContains(response, "Test Club")
+
+    def test_club_reviews_returns_404_for_invalid_club(self):
+        """
+        Verify the view returns a 404 error when the club does not exist.
+        """
+        invalid_url = reverse("club_reviews", args=[999])
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_review_summary_display_is_correct(self):
+        """
+        Verify the review summary displays the correct average score and
+        review count.
+        """
+        response = self.client.get(self.url)
+        self.assertContains(response, "4.5 Average")
+        self.assertContains(response, "(2 reviews)")
+
+    def test_no_reviews_displays_empty_star_rating(self):
+        """
+        Verify that when no approved reviews exist, the empty star rating
+        is shown.
+        """
+        delete_club_reviews()
+        response = self.client.get(self.url)
+        self.assertContains(response, "no reviews")
+        self.assertTemplateUsed(
+            response, "clubs/partials/star_rating_empty.html"
+        )
+
+    def test_only_approved_reviews_displayed_for_unauthenticated_user(self):
+        """
+        Verify only approved club reviews are shown on the page.
+        """
+        response = self.client.get(self.url)
+
+        # Approved reviews
+        self.assertContains(response, "Approved Review 1")
+        self.assertContains(response, "Approved Review 2")
+
+        # Unapproved reviews
+        self.assertNotContains(response, "Unapproved Review 1")
+
+    def test_club_review_buttons_do_not_display_for_unauthenticated_user(self):
+        """
+        Verify that review action buttons do not display for unauthenticated
+        users.
+        """
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, "Update Review</a>")
+        self.assertNotContains(response, "Delete Review</a>")
+        self.assertNotContains(response, "Write a review</a>")
+
+    def test_unauthenticated_user_prompted_to_login_to_write_review(self):
+        """
+        Verify that unauthenticated users are prompted to login to write
+        a review.
+        """
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Login to write a review for this club")
+
+    def test_authenticated_user_without_review_sees_write_review_button(self):
+        """
+        Verify 'Write a review' button displays for an authenticated user who
+        has not yet written a review.
+        """
+        user = User.objects.create_user(
+            username="new_user",
+            email="new_user@example.com",
+            password="password123",
+        )
+        self.client.force_login(user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Write a review</a>")
+        self.assertContains(response, "Have you visited this club?")
+
+    def test_authenticated_user_sees_own_unapproved_review(self):
+        """
+        Verify authenticated user sees their own review (even if unapproved)
+        with correct message and buttons.
+        """
+        self.client.force_login(self.user3)  # wrote the unapproved review
+        response = self.client.get(self.url)
+        self.assertContains(response, "Your review has not yet been approved")
+        self.assertContains(response, "Unapproved Review 1")
+        self.assertContains(response, "Update review")
+        self.assertContains(response, "Delete review")
+
+    def test_authenticated_user_does_not_see_other_unapproved_reviews(self):
+        """
+        Verify authenticated users cannot see unapproved reviews from other
+        users.
+        """
+        self.client.force_login(self.user1)
+        response = self.client.get(self.url)
+        self.assertContains(response, "Approved Review 1")
+        self.assertNotContains(response, "Unapproved Review 1")
+
+    def test_authenticated_user_with_approved_review_sees_correct_content(
+        self,
+    ):
+        """
+        Verify authenticated user with an approved review sees the correct
+        message and that update/delete buttons are present.
+        """
+        self.client.force_login(self.user1)  # user1 has an approved review
+        response = self.client.get(self.url)
+
+        self.assertContains(
+            response, "You have already written a review for this club"
+        )
+        self.assertContains(response, "Update review")
+        self.assertContains(response, "Delete review")
+
+
 class ClubAdminDashboardTests(TestCase):
     """
     Tests for verifying behaviour of the Club Admin Dashboard page.
@@ -1112,6 +1348,50 @@ class ClubAdminDashboardTests(TestCase):
         response = self.client.get(reverse("club_admin_dashboard"))
         self.assertContains(response, self.club_info_2.contact_name)
         self.assertNotContains(response, self.club_info_1.contact_name)
+
+    def test_context_includes_review_data_and_from_admin(self):
+        """
+        Verify context contains the following:
+        - club.review_average_score
+        - club.review_average_score_int
+        - club.review_count
+        - from_admin = True
+        """
+        self.client.force_login(self.user)
+
+        # Create users
+        user1 = User.objects.create_user(
+            username="testuser1",
+            email="user1@example.com",
+            password="password123",
+        )
+        user2 = User.objects.create_user(
+            username="testuser2",
+            email="user2@example.com",
+            password="password123",
+        )
+        user3 = User.objects.create_user(
+            username="testuser3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Add approved reviews to the club
+        create_club_review(self.club, user1, 4, "Headline", "Review text.")
+        create_club_review(self.club, user2, 2, "Headline", "Review text.")
+
+        # Add unapproved review to the club
+        create_club_review(
+            self.club, user3, 5, "Headline", "Review text.", False
+        )
+
+        response = self.client.get(reverse("club_admin_dashboard"))
+        context_club = response.context["club"]
+
+        self.assertEqual(context_club["review_average_score"], 3.0)
+        self.assertEqual(context_club["review_average_score_int"], 3)
+        self.assertEqual(context_club["review_count"], 2)
+        self.assertTrue(response.context["from_admin"])
 
     # Venue Info
     def test_page_elements_for_no_assigned_venues(self):
@@ -1883,6 +2163,50 @@ class UnassignVenueViewTests(TestCase):
         self.assertTemplateUsed(
             response, "clubs/partials/admin_club_info_section.html"
         )
+
+    def test_context_includes_review_data_and_from_admin(self):
+        """
+        Verify context contains the following:
+        - club.review_average_score
+        - club.review_average_score_int
+        - club.review_count
+        - from_admin = True
+        """
+        self.client.force_login(self.user)
+
+        # Create users
+        user1 = User.objects.create_user(
+            username="testuser1",
+            email="user1@example.com",
+            password="password123",
+        )
+        user2 = User.objects.create_user(
+            username="testuser2",
+            email="user2@example.com",
+            password="password123",
+        )
+        user3 = User.objects.create_user(
+            username="testuser3",
+            email="user3@example.com",
+            password="password123",
+        )
+
+        # Add approved reviews to the club
+        create_club_review(self.club, user1, 4, "Headline", "Review text.")
+        create_club_review(self.club, user2, 2, "Headline", "Review text.")
+
+        # Add unapproved review to the club
+        create_club_review(
+            self.club, user3, 5, "Headline", "Review text.", False
+        )
+
+        response = self.client.post(self.url)
+        context_club = response.context["club"]
+
+        self.assertEqual(context_club["review_average_score"], 3.0)
+        self.assertEqual(context_club["review_average_score_int"], 3)
+        self.assertEqual(context_club["review_count"], 2)
+        self.assertTrue(response.context["from_admin"])
 
 
 class AssignVenueTests(TestCase):
@@ -2661,3 +2985,439 @@ class DeleteVenueTests(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.WARNING)
         self.assertIn("Unable to delete venue.", messages_list[0].message)
+
+
+class VenueModalTests(TestCase):
+    """
+    Tests for venue_modal view.
+
+    This view is used to render a partial template with venue information
+    to populate the body of a modal in the league app (e.g. Fixtures page).
+    """
+
+    def setUp(self):
+        """
+        Create venue and venue info objects using helper functions.
+        """
+        # Create venue
+        self.venue = create_venue("Test Venue")
+
+        # Create approved venue_info
+        self.venue_info = create_venue_info(venue=self.venue)
+
+        # Create unapproved venue_info
+        create_venue_info(venue=self.venue, approved=False)
+
+        self.url = reverse("venue_modal", args=[self.venue.id])
+
+    def test_htmx_header_required(self):
+        """Verify Bad Request status 400 returned for non-HTMX requests"""
+        # No HTMX header
+        response = self.client.get(self.url)
+        self.assertContains(response, "HTMX requests only", status_code=400)
+
+    def test_htmx_request_returns_partial_with_venue_info(self):
+        """
+        Verify HTMX request renders correct partial and context
+        """
+        response = self.client.get(self.url, HTTP_HX_REQUEST="true")
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/partials/club_venue.html")
+        self.assertIn("venue", response.context)
+        self.assertEqual(response.context["venue"]["id"], self.venue.id)
+        self.assertEqual(response.context["venue"]["name"], self.venue.name)
+        self.assertEqual(
+            response.context["venue"]["street_address"],
+            self.venue_info.street_address,
+        )
+
+    def test_venue_not_found(self):
+        """Verify placeholder shows for non-existent venue"""
+        url = reverse("venue_modal", args=[9999])  # Nonexistent id
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Venue not found")
+
+    def test_no_approved_venue_info(self):
+        """Verify placeholder shows when venue has no approved venue info."""
+        # Delete approved venue info using helper
+        delete_objects(VenueInfo, venue=self.venue, approved=True)
+
+        response = self.client.get(self.url, HTTP_HX_REQUEST="true")
+        self.assertContains(response, "No venue info available")
+
+
+class CreateClubReviewTests(TestCase):
+    """Tests for creating a club review using the create_club_review view."""
+
+    def setUp(self):
+        """
+        Create a user, club and valid review form data for use in tests.
+        """
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+
+        self.valid_review_data = {
+            "score": 4,
+            "headline": "Great atmosphere",
+            "review_text": "Loved the events and the people!",
+        }
+
+        self.url = reverse("create_club_review", args=[self.club.id])
+
+    # Access Restrictions
+    def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_returns_404_for_invalid_club(self):
+        """Verify view returns 404 for a non-existent club ID."""
+        self.client.force_login(self.user)
+        invalid_url = reverse("create_club_review", args=[9999])
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_authenticated_user_can_view_form(self):
+        """Verify authenticated user can access and view the review form."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/create_club_review.html")
+        self.assertContains(response, "Create Club Review")
+
+    def test_page_contains_csrf_token(self):
+        """Verify CSRF token is present in the form."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    def test_existing_review_redirects_user(self):
+        """
+        Verify users are redirected with a warning if they have already
+        written a review for the club.
+        """
+        ClubReview.objects.create(
+            club=self.club,
+            user=self.user,
+            score=5,
+            headline="Already reviewed",
+            review_text="Nice place.",
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("already written a review", messages_list[0].message)
+
+    # Form Submission
+    def test_valid_post_creates_review(self):
+        """
+        Verify submitting valid form data creates a new review and redirects.
+        """
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.url, self.valid_review_data, follow=True
+        )
+
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertIn("has been created", messages_list[0].message)
+
+        review = ClubReview.objects.get(club=self.club, user=self.user)
+        self.assertEqual(review.score, 4)
+        self.assertEqual(review.headline, "Great atmosphere")
+
+    def test_invalid_post_shows_errors(self):
+        """
+        Verify invalid form submission re-renders the page with error messages.
+        """
+        self.client.force_login(self.user)
+        invalid_data = {
+            "score": "",  # Missing required field
+            "headline": "",
+            "review_text": "",
+        }
+        response = self.client.post(self.url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "form", "score", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "headline", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "review_text", "This field is required."
+        )
+        self.assertEqual(ClubReview.objects.count(), 0)
+
+    def test_view_context_contains_club_and_form(self):
+        """Verify context includes the club and the form instance."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertIn("club", response.context)
+        self.assertIn("form", response.context)
+        self.assertEqual(response.context["club"], self.club)
+        self.assertIsInstance(response.context["form"], ClubReviewForm)
+
+
+class DeleteClubReviewTests(TestCase):
+    """Tests for deleting a club review using the delete_club_review view."""
+
+    def setUp(self):
+        """
+        Create a user, club and review for use in tests.
+        """
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+        )
+        self.other_user = User.objects.create_user(
+            username="otheruser", password="password123"
+        )
+        self.club = Club.objects.create(name="Test Club")
+        self.review = ClubReview.objects.create(
+            club=self.club,
+            user=self.user,
+            score=3,
+            headline="Nice club",
+            review_text="Friendly atmosphere.",
+            approved=True,
+        )
+        self.url = reverse("delete_club_review", args=[self.club.id])
+
+    # Access Restrictions
+    def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_returns_404_for_invalid_club(self):
+        """Verify view returns 404 for a non-existent club ID."""
+        self.client.force_login(self.user)
+        invalid_url = reverse("delete_club_review", args=[999])
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_without_review_redirects(self):
+        """
+        Verify users are redirected with a warning if they have not yet
+        written a review for the club.
+        """
+        self.client.force_login(self.other_user)
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("not yet written a review", messages_list[0].message)
+
+    # GET Request
+    def test_authenticated_user_sees_confirmation_page(self):
+        """Verify confirmation page is shown to user with existing review."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "clubs/confirm_delete_club_review.html"
+        )
+        self.assertContains(response, "Are you sure you want to delete")
+
+    def test_page_contains_csrf_token(self):
+        """Verify CSRF token is present in the delete confirmation form."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    # POST Request
+    def test_valid_post_deletes_review(self):
+        """
+        Verify posting to the view deletes the review and redirects
+        with a success message.
+        """
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertIn("has been deleted", messages_list[0].message)
+
+        self.assertFalse(ClubReview.objects.filter(id=self.review.id).exists())
+
+    def test_user_cannot_delete_another_users_review(self):
+        """
+        Verify a user cannot delete someone else's review.
+        """
+        self.client.force_login(self.other_user)
+        response = self.client.post(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("not yet written a review", messages_list[0].message)
+
+        # Review should still exist
+        self.assertTrue(ClubReview.objects.filter(id=self.review.id).exists())
+
+    def test_view_context_contains_club(self):
+        """Verify context includes the club instance."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertIn("club", response.context)
+        self.assertEqual(response.context["club"], self.club)
+
+
+class UpdateClubReviewTests(TestCase):
+    """Tests for updating a club review using the update_club_review view."""
+
+    def setUp(self):
+        """
+        Create a user, club and review for use in tests.
+        """
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+        )
+        self.club = Club.objects.create(name="Test Club")
+        self.review = ClubReview.objects.create(
+            club=self.club,
+            user=self.user,
+            score=3,
+            headline="Nice club",
+            review_text="It was good overall.",
+            approved=True,
+        )
+        self.url = reverse("update_club_review", args=[self.club.id])
+        self.valid_update_data = {
+            "score": 5,
+            "headline": "Updated headline",
+            "review_text": "Much better now!",
+        }
+
+    # Access Restrictions
+    def test_redirects_unauthenticated_user(self):
+        """Verify unauthenticated users are redirected to the login page."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_returns_404_for_invalid_club(self):
+        """Verify view returns 404 for a non-existent club ID."""
+        self.client.force_login(self.user)
+        invalid_url = reverse("update_club_review", args=[999])
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_without_review_redirects(self):
+        """
+        Verify users are redirected with a warning if they have not yet
+        written a review for the club.
+        """
+        another_user = User.objects.create_user(
+            username="otheruser", password="password123"
+        )
+        self.client.force_login(another_user)
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.WARNING)
+        self.assertIn("not yet written a review", messages_list[0].message)
+
+    # GET Request
+    def test_authenticated_user_sees_prefilled_form(self):
+        """Verify form is pre-filled with existing review data."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "clubs/update_club_review.html")
+        self.assertContains(response, "Update Review")
+        self.assertContains(response, self.review.headline)
+
+    def test_page_contains_csrf_token(self):
+        """Verify CSRF token is present in the form."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, "csrfmiddlewaretoken")
+
+    # POST Request
+    def test_valid_post_updates_review(self):
+        """
+        Verify submitting valid data updates the review,
+        resets approval and redirects with success.
+        """
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.url, self.valid_update_data, follow=True
+        )
+
+        self.assertRedirects(
+            response, reverse("club_reviews", args=[self.club.id])
+        )
+        messages_list = list(response.context["messages"])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assertIn("has been updated", messages_list[0].message)
+
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.score, 5)
+        self.assertEqual(self.review.headline, "Updated headline")
+        self.assertFalse(self.review.approved)
+
+    def test_invalid_post_shows_form_errors(self):
+        """
+        Verify invalid form submission re-renders the page with errors.
+        """
+        self.client.force_login(self.user)
+        invalid_data = {
+            "score": "",
+            "headline": "",
+            "review_text": "",
+        }
+        response = self.client.post(self.url, invalid_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "form", "score", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "headline", "This field is required."
+        )
+        self.assertFormError(
+            response, "form", "review_text", "This field is required."
+        )
+
+    def test_view_context_contains_club_and_form(self):
+        """Verify context includes the club and form instance."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertIn("club", response.context)
+        self.assertIn("form", response.context)
+        self.assertEqual(response.context["club"], self.club)
+        self.assertIsInstance(response.context["form"], ClubReviewForm)

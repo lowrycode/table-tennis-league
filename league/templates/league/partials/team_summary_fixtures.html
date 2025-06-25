@@ -1,0 +1,49 @@
+<section id="team-fixtures" class="container mt-5">
+  <h3>Fixtures</h3>
+  {% if fixtures_data %}
+  <div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th class="text-center">Week</th>
+          <th class="text-center">Date</th>
+          <th>Opponent</th>
+          <th class="text-center">Venue</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fixture in fixtures_data %}
+        <tr>
+          <td class="text-center">{{ fixture.week }}</td>
+          <td class="text-center">{{ fixture.datetime|date:"D jS M" }}</td>
+          <td>
+            <a href="{% url 'team_summary' fixture.opponent.id %}">
+              {{fixture.opponent.team_name}}
+            </a>
+          </td>
+          <td class="text-center">
+            <button
+              type="button"
+              class="btn a-style venue-btn p-0"
+              data-home="{{ fixture.home_team.team_name }}"
+              data-away="{{ fixture.away_team.team_name }}"
+              data-hx-get="{% url 'venue_modal' fixture.venue.id %}" 
+              data-hx-target="#modal-venue-info" 
+              data-hx-trigger="click"
+              data-bs-toggle="modal"
+              data-bs-target="#venue-modal"
+              aria-label="Click to view venue information for this fixture"
+              title="View venue info"
+            >
+              {{fixture.home_or_away}}
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p>No upcoming fixtures</p>
+  {% endif %}
+</section>

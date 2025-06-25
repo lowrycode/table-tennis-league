@@ -1,15 +1,22 @@
+from django.urls import reverse
 from django.db import transaction
-from django.db.models import Prefetch
-from django.shortcuts import render, redirect
-from django.http import HttpResponseForbidden
+from django.db.models import Prefetch, Avg, Count, Q
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import (
+    HttpResponseForbidden,
+    HttpResponse,
+    HttpResponseBadRequest,
+)
 from django.forms.models import model_to_dict
 from django.contrib import messages
-from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue
+from django.contrib.auth.decorators import login_required
+from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubReview
 from .forms import (
     UpdateClubInfoForm,
     AssignClubVenueForm,
     UpdateVenueInfoForm,
     CreateVenueForm,
+    ClubReviewForm,
 )
 from .decorators import club_admin_required
 from .filters import ClubInfoFilter
@@ -66,6 +73,17 @@ def build_club_context_for_admin(club):
         "has_pending_info": False,
         "info": {},
         "venues": [],
+        "review_average_score": (
+            round(club.review_average_score, 1)
+            if club.review_average_score
+            else None
+        ),
+        "review_average_score_int": (
+            int(club.review_average_score + 0.5)
+            if club.review_average_score
+            else None
+        ),
+        "review_count": club.review_count,
     }
 
     # Update info
@@ -211,9 +229,17 @@ def clubs(request):
         to_attr="approved_club_venues",
     )
 
-    # Get all Clubs and attach approved ClubInfos and ClubVenues
-    all_clubs = Club.objects.prefetch_related(
-        approved_club_infos_pf, approved_venue_infos_pf
+    # Get all Clubs with annotated review data and prefetch approved
+    # ClubInfos and ClubVenues
+    all_clubs = (
+        Club.objects.annotate(
+            review_average_score=Avg(
+                "reviews__score", filter=Q(reviews__approved=True)
+            ),
+            review_count=Count("reviews", filter=Q(reviews__approved=True)),
+        )
+        .prefetch_related(approved_club_infos_pf, approved_venue_infos_pf)
+        .order_by("name")
     )
 
     # Build clubs list for passing to template
@@ -225,6 +251,17 @@ def clubs(request):
             "name": club.name,
             "info": {},
             "venues": [],
+            "review_average_score": (
+                round(club.review_average_score, 1)
+                if club.review_average_score
+                else None
+            ),
+            "review_average_score_int": (
+                int(club.review_average_score + 0.5)
+                if club.review_average_score
+                else None
+            ),
+            "review_count": club.review_count,
         }
 
         if club.approved_club_infos:
@@ -269,6 +306,263 @@ def clubs(request):
     return render(request, "clubs/clubs.html", context)
 
 
+def club_reviews(request, club_id):
+    """
+    Display reviews for a specific club.
+
+    Retrieves the club by ID and gathers all associated reviews.
+    If the user is authenticated, their own review (if it exists) is
+    separated from the rest. Only approved reviews are included
+    in the average score and review count calculations.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with review details for the club.
+    """
+
+    club = get_object_or_404(Club, id=club_id)
+
+    # Query sets
+    all_club_reviews = ClubReview.objects.filter(club=club)
+    approved_club_reviews = all_club_reviews.filter(approved=True)
+
+    # Get review count and average score
+    aggregate_data = approved_club_reviews.aggregate(
+        avg_score=Avg("score"), count=Count("id")
+    )
+    review_count = aggregate_data["count"]
+    average_score = aggregate_data["avg_score"]
+
+    # Round average_score to 1 decimal place and get average_score_int
+    average_score_int = None
+    if average_score:
+        average_score_int = int(average_score + 0.5)  # for standard rounding
+        average_score = round(average_score, 1)
+
+    # Get reviews
+    if request.user.is_authenticated:
+        # Seperate user's own review from other reviews
+        user_review = all_club_reviews.filter(user=request.user).first()
+        club_reviews = approved_club_reviews.exclude(user=request.user)
+    else:
+        user_review = None
+        club_reviews = approved_club_reviews
+
+    return render(
+        request,
+        "clubs/club_reviews.html",
+        {
+            "club": club,
+            "user_review": user_review,
+            "other_reviews": club_reviews,
+            "average_score_int": average_score_int,
+            "average_score": average_score,
+            "review_count": review_count,
+        },
+    )
+
+
+def venue_modal(request, venue_id):
+    """
+    Handles HTMX request for venue information modal.
+
+    Returns a rendered HTML partial if the venue and approved info exist.
+    Otherwise, returns an informative message.
+    """
+    # If not HTMX request, return error 400
+    if not request.headers.get("HX-Request") == "true":
+        return HttpResponseBadRequest(
+            "This endpoint is for HTMX requests only."
+        )
+
+    # Get venue
+    venue = Venue.objects.filter(id=venue_id).first()
+
+    # If venue not found
+    if not venue:
+        return HttpResponse('<p class="mt-2 fw-semibold">Venue not found</p>')
+
+    # Get latest approved venue info
+    latest_venue_info = (
+        VenueInfo.objects.filter(venue=venue, approved=True)
+        .order_by("-created_on")
+        .first()
+    )
+
+    # If no approved venue info found
+    if not latest_venue_info:
+        return HttpResponse(
+            '<p class="mt-2 fw-semibold">No venue info available</p>'
+        )
+
+    # Build venue_dict
+    venue_dict = model_to_dict(latest_venue_info)
+    venue_dict["name"] = venue.name
+    venue_dict["id"] = venue.id
+
+    return render(
+        request, "clubs/partials/club_venue.html", {"venue": venue_dict}
+    )
+
+
+# Views restricted to logged-in users
+@login_required
+def create_club_review(request, club_id):
+    """
+    Renders a page with a form for creating a club review.
+
+    The view is restricted to authenticated users who have not already written
+    a review for the club.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with review details for the club.
+    """
+
+    club = get_object_or_404(Club, id=club_id)
+
+    # Check user has not already written a review for this club
+    existing_review = ClubReview.objects.filter(
+        club=club, user=request.user
+    ).first()
+    if existing_review:
+        messages.warning(
+            request,
+            "You have already written a review for this club.",
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    if request.method == "POST":
+        club_review_form = ClubReviewForm(request.POST)
+        if club_review_form.is_valid():
+            club_review = club_review_form.save(commit=False)
+            club_review.club = club
+            club_review.user = request.user
+            club_review.save()
+
+            # Success message and redirect
+            messages.success(
+                request,
+                (
+                    f"Your review for {club.name} has been created "
+                    "and is awaiting approval."
+                ),
+            )
+            return redirect(reverse("club_reviews", args=[club.id]))
+    else:
+        club_review_form = ClubReviewForm()
+
+    return render(
+        request,
+        "clubs/create_club_review.html",
+        {
+            "club": club,
+            "form": club_review_form,
+        },
+    )
+
+
+@login_required
+def delete_club_review(request, club_id):
+    """
+    Renders a page asking users to confirm deletion of a club review.
+
+    The view is restricted to authenticated users who have already
+    written a review for the club.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with club review form.
+    """
+    club = get_object_or_404(Club, id=club_id)
+
+    # Get the existing review for the user and club
+    try:
+        existing_review = ClubReview.objects.get(club=club, user=request.user)
+    except ClubReview.DoesNotExist:
+        messages.warning(
+            request, "You have not yet written a review for this club."
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    if request.method == "POST":
+        existing_review.delete()
+        messages.success(
+            request, f"Your review for {club.name} has been deleted."
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    return render(
+        request, "clubs/confirm_delete_club_review.html", {"club": club}
+    )
+
+
+@login_required
+def update_club_review(request, club_id):
+    """
+    Renders a page with a form to edit an existing club review.
+
+    The view is restricted to authenticated users who have already
+    written a review for the club.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        club_id (int): The primary key of the club.
+
+    Returns:
+        HttpResponse: Rendered HTML page with club review form.
+    """
+    club = get_object_or_404(Club, id=club_id)
+
+    # Get the existing review for the user and club
+    try:
+        existing_review = ClubReview.objects.get(club=club, user=request.user)
+    except ClubReview.DoesNotExist:
+        messages.warning(
+            request, "You have not yet written a review for this club."
+        )
+        return redirect(reverse("club_reviews", args=[club.id]))
+
+    if request.method == "POST":
+        club_review_form = ClubReviewForm(
+            request.POST, instance=existing_review
+        )
+        if club_review_form.is_valid():
+            club_review = club_review_form.save(commit=False)
+            club_review.approved = False
+            club_review.save()
+
+            messages.success(
+                request,
+                (
+                    f"Your review for {club.name} has been updated and "
+                    "is awaiting approval."
+                ),
+            )
+            return redirect(reverse("club_reviews", args=[club.id]))
+    else:
+        club_review_form = ClubReviewForm(instance=existing_review)
+
+    return render(
+        request,
+        "clubs/update_club_review.html",
+        {
+            "club": club,
+            "form": club_review_form,
+        },
+    )
+
+
+# Views restricted to Club Admins
 @club_admin_required
 def club_admin_dashboard(request):
     """
@@ -283,7 +577,16 @@ def club_admin_dashboard(request):
     Returns:
         HttpResponse: Rendered admin dashboard for the user's assigned club.
     """
-    club = request.user.club_admin.club
+    club_id = request.user.club_admin.club_id
+
+    # Annotate club with review data
+    club = Club.objects.annotate(
+        review_average_score=Avg(
+            "reviews__score", filter=Q(reviews__approved=True)
+        ),
+        review_count=Count("reviews", filter=Q(reviews__approved=True)),
+    ).get(id=club_id)
+
     club_dict = build_club_context_for_admin(club)
 
     return render(
@@ -291,6 +594,7 @@ def club_admin_dashboard(request):
         "clubs/admin_dashboard.html",
         {
             "club": club_dict,
+            "from_admin": True
         },
     )
 
@@ -446,7 +750,15 @@ def unassign_venue(request, venue_id):
         return HttpResponseForbidden("Invalid request method")
 
     # Get Club
-    club = request.user.club_admin.club
+    club_id = request.user.club_admin.club_id
+
+    # Annotate club with review data
+    club = Club.objects.annotate(
+        review_average_score=Avg(
+            "reviews__score", filter=Q(reviews__approved=True)
+        ),
+        review_count=Count("reviews", filter=Q(reviews__approved=True)),
+    ).get(id=club_id)
 
     # Delete ClubVenue
     # This approach silently handles missing Venue or ClubVenue objects
@@ -462,7 +774,7 @@ def unassign_venue(request, venue_id):
     return render(
         request,
         "clubs/partials/admin_club_info_section.html",
-        {"club": club_dict},
+        {"club": club_dict, "from_admin": True},
     )
 
 

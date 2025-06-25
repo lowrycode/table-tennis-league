@@ -1,0 +1,39 @@
+<section id="summary-details" class="border-bottom border-top">
+  <h2 class="visually-hidden">Summary Details</h2>
+  <div class="row mx-2 small text-muted">
+    <div class="col-6 col-sm-3 text-center p-2">
+      <p class="m-0">CLUB</p>
+      <p class="m-0 fw-bold">{{ team.club }}</p>
+    </div>
+    <div class="col-6 col-sm-3 text-center p-2">
+      <p class="m-0">SEASON</p>
+      <p class="m-0 fw-bold">{{ team.season }}</p>
+    </div>
+    <div class="col-6 col-sm-3 text-center p-2">
+      <p class="m-0">DIVISION</p>
+      <p class="m-0 fw-bold">{{ team.division }}</p>
+    </div>
+    <div class="col-6 col-sm-3 text-center p-2">
+      <p class="m-0">POINTS</p>
+      <p class="m-0 fw-bold">{{ team_stats.points }}</p>
+    </div>
+  </div>
+  <div class="row mx-2 small text-muted">
+    <div class="col-3 text-center p-2">
+      <p class="m-0">PLAYED</p>
+      <p class="m-0 fw-bold">{{ team_stats.played }}</p>
+    </div>
+    <div class="col-3 text-center p-2">
+      <p class="m-0">WON</p>
+      <p class="m-0 fw-bold">{{ team_stats.wins }}</p>
+    </div>
+    <div class="col-3 text-center p-2">
+      <p class="m-0">DRAWN</p>
+      <p class="m-0 fw-bold">{{ team_stats.draws }}</p>
+    </div>
+    <div class="col-3 text-center p-2">
+      <p class="m-0">LOST</p>
+      <p class="m-0 fw-bold">{{ team_stats.losses }}</p>
+    </div>
+  </div>
+</section>

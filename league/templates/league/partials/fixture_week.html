@@ -1,0 +1,62 @@
+{% load fixture_tags %}
+<section 
+  {% if current_week_id == week.id %}id="current-week"{% endif %}
+  class="week-fixtures pt-5"
+>
+  <h2 class="fs-5 text-center mb-0">{{ week.name }}: <span class="p-style">Begins {{ week.start_date|date:"jS M" }}</span></h2>
+  {% if week.details %}<p class="mt-1 mb-0 text-center">{{ week.details }}</p>{% endif %}
+  {% if week.week_fixtures.all %}
+    <ul>
+      {% for fixture in week.week_fixtures.all %}
+        <li class="row {{ fixture.status|status_class }}">
+          <span class="visually-hidden">Status: {{ fixture.status }}</span>
+          <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-end align-items-center fs-5">
+            <a
+              href="{% url 'team_summary' fixture.home_team.id %}"
+              aria-label="View Team Summary for {{ fixture.home_team.team_name }}"
+              title="View Team Summary page"
+            >
+              {{ fixture.home_team.team_name }}
+            </a>
+          </div>
+          <div class="col-12 col-sm-2 d-flex flex-sm-column justify-content-center align-items-center px-2 col-gap-4">
+            <div class="fixture-date text-nowrap">{{ fixture.datetime|date:"D jS M" }}</div>
+            <div class="fs-4">{{ fixture.datetime|date:"H:i" }}</div>
+            <div class="fixture-venue">
+              <button
+                type="button"
+                class="btn a-style venue-btn p-0"
+                data-home="{{ fixture.home_team.team_name }}"
+                data-away="{{ fixture.away_team.team_name }}"
+                data-hx-get="{% url 'venue_modal' fixture.venue.id %}" 
+                data-hx-target="#modal-venue-info" 
+                data-hx-trigger="click"
+                data-bs-toggle="modal"
+                data-bs-target="#venue-modal"
+                aria-label="Click to view venue information for this fixture"
+                title="View venue info"
+              >
+                Venue
+              </button>
+            </div>
+          </div>
+          <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-start align-items-center fs-5">
+            <a
+              href="{% url 'team_summary' fixture.away_team.id %}"
+              aria-label="View Team Summary for {{ fixture.away_team.team_name }}"
+              title="View Team Summary page"
+            >
+              {{ fixture.away_team.team_name }}
+            </a>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <ul>
+      <li class="fixture-status-none">
+        <div class="py-1 text-center">No fixtures this week.</div>
+      </li>
+    </ul>  
+  {% endif %}
+</section>

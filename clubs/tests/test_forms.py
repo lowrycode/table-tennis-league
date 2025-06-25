@@ -4,6 +4,7 @@ from clubs.forms import (
     AssignClubVenueForm,
     UpdateVenueInfoForm,
     CreateVenueForm,
+    ClubReviewForm,
 )
 from clubs.models import Club, Venue, ClubVenue
 
@@ -320,3 +321,66 @@ class CreateVenueFormTests(TestCase):
         self.assertEqual(
             form.errors["name"], ["Venue with this Name already exists."]
         )
+
+
+class ClubReviewFormTests(TestCase):
+    """
+    Unit tests for the ClubReviewForm to validate field labels, required
+    fields, score range validation and general form validity.
+    """
+
+    def setUp(self):
+        """
+        Set up a valid data dictionary used in multiple tests.
+        """
+        self.valid_data = {
+            "score": 4,
+            "headline": "Great club!",
+            "review_text": "Really enjoyed the atmosphere.",
+        }
+
+    def test_form_field_labels(self):
+        """
+        Verify form fields display the correct labels.
+        """
+        form = ClubReviewForm()
+        self.assertEqual(form.fields["score"].label, "Rating (1-5 stars)")
+        self.assertEqual(form.fields["headline"].label, "Review Title")
+        self.assertEqual(form.fields["review_text"].label, "Your Review")
+
+    def test_valid_form(self):
+        """
+        Verify form is valid when all required fields are correctly filled.
+        """
+        form = ClubReviewForm(data=self.valid_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form_missing_required_fields(self):
+        """
+        Verify form is invalid when required fields are missing.
+        """
+        form = ClubReviewForm(data={})
+        self.assertFalse(form.is_valid())
+        self.assertIn("score", form.errors)
+        self.assertIn("headline", form.errors)
+        self.assertIn("review_text", form.errors)
+
+    def test_invalid_form_score_below_minimum(self):
+        """
+        Verify form is invalid when score is below the minimum allowed (1).
+        """
+        data = self.valid_data.copy()
+        data["score"] = 0
+        form = ClubReviewForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("score", form.errors)
+
+    def test_invalid_form_score_above_maximum(self):
+        """
+        Verify form is invalid when score is above the maximum allowed (5).
+        """
+        data = self.valid_data.copy()
+        data["score"] = 6
+        form = ClubReviewForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("score", form.errors)

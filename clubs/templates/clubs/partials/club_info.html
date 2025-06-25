@@ -1,10 +1,52 @@
 {% load static %}
 
 <article id="club-article-{{ club.id }}" class="border club my-5 p-3">
-  <!-- Club Name and Website -->
+  <!-- Club Header  -->
   <div class="d-flex justify-content-between flex-wrap">
-    <h3>{{club.name}}</h3>
+    <div>
+      <!-- Club Name -->
+      <h3>{{club.name}}</h3>
+      <!-- Reviews -->
+      {% if from_admin %}
+        <p
+          class="d-flex flex-wrap align-items-center gap-2 mb-2 a-style disabled-link"
+          title="Link is disabled in club admin page"
+        >
+      {% else %}
+        <a
+          href="{% url 'club_reviews' club.id %}"
+          class="d-flex flex-wrap align-items-center gap-2 mb-2"
+          aria-label="Visit the review page for {{ club.name }}"
+          title="Go to reviews page"
+        >
+      {% endif %}
+        {% if club.review_average_score %}
+          <span aria-hidden="true">
+            {% with club.review_average_score_int as star_rating%}
+              {% include "clubs/partials/star_rating.html" %}
+            {% endwith %}
+          </span>
+          <span>
+            {{ club.review_average_score }} Stars
+          </span>
+          <span>
+            ({{ club.review_count }} review{{ club.review_count|pluralize }})
+          </span>
+        
+        {% else %}
+          <span aria-hidden="true">
+            {% include "clubs/partials/star_rating_empty.html" %}
+          </span>
+          <span>(no reviews yet)</span>
+        {% endif %}
+      {% if from_admin %}
+        </p>
+      {% else %}
+        </a>
+      {% endif %}
+    </div>
     {% if club.info.website %}
+      <!-- Website -->
       <a
         href="{{club.info.website}}"
         target="_blank"

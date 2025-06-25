@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <!-- Venue Modal -->
+  {% include 'league/partials/venue_modal.html' %}
+  <!-- Fixtures Content -->
+  {% include 'league/partials/fixtures_section.html' %}
+{% endblock %}
+
+{% block scripts %}
+  <!-- Load HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  
+  <!-- Script for initialising modal -->
+  <script src="{% static 'js/league/init_venue_modal.js' %}"></script>
+  
+  <!-- Script controlling toggle behaviour for filter -->
+    <script src="{% static 'js/toggle_btn.js' %}"></script>
+{% endblock %}

@@ -1,8 +1,24 @@
+import time
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from clubs.models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
+from test_utils.helpers import (
+    helper_test_boolean_default,
+    helper_test_required_fields,
+    helper_test_max_length,
+    create_club,
+    create_club_review,
+)
+from clubs.models import (
+    Club,
+    ClubInfo,
+    Venue,
+    VenueInfo,
+    ClubVenue,
+    ClubAdmin,
+    ClubReview,
+)
 
 User = get_user_model()
 
@@ -328,6 +344,7 @@ class VenueInfoTests(TestCase):
     Unit tests for the VenueInfo model to verify string representation,
     field constraints and relationships.
     """
+
     def setUp(self):
         """
         Set up a Venue and associated VenueInfo instance for use in tests.
@@ -482,6 +499,7 @@ class ClubVenueTests(TestCase):
     Unit tests for the ClubVenue model to verify string representation,
     required fields and relationships.
     """
+
     def setUp(self):
         """Set up Club, Venue, and ClubVenue instances for use in tests."""
         self.club = Club.objects.create(name="My Test Club")
@@ -580,6 +598,7 @@ class ClubAdminTests(TestCase):
     Unit tests for the ClubAdmin model to verify string representation,
     required fields and relationships.
     """
+
     def setUp(self):
         """Set up User, Club, and ClubAdmin instances for use in tests."""
         self.user = User.objects.create_user(
@@ -648,92 +667,224 @@ class ClubAdminTests(TestCase):
         self.assertFalse(ClubAdmin.objects.filter(pk=self.admin.pk).exists())
 
 
-# Helper functions
-def helper_test_boolean_default(field_name, default_value, model, info_data):
+class ClubReviewTests(TestCase):
     """
-    Test that a boolean field has the correct default value.
-
-    Args:
-        field_name (str): The name of the boolean field to test.
-        default_value (bool): The expected default value of the field.
-        model (Model): The Django model class to test.
-        info_data (dict): Dictionary of valid model data for required fields.
-
-    Returns:
-        bool: True if the field's value matches the default; False otherwise.
+    Unit tests for the ClubReview model to verify field constraints,
+    relationships and default behaviours.
     """
-    # Amend info_data
-    info_data.pop(field_name, None)
 
-    # Create test_object from info_data
-    test_object = model.objects.create(**info_data)
-
-    # Check placeholder is recorded as default
-    result = getattr(test_object, field_name) == default_value
-
-    # Return result
-    return result
-
-
-def helper_test_required_fields(
-    test_case, test_object, field_name, is_required
-):
-    """
-    Assert that a field is correctly assigned as required or optional.
-
-    Args:
-        test_case (TestCase): The test case instance calling this helper.
-        test_object (Model): The Django model instance to validate.
-        field_name (str): The name of the field being tested.
-        is_required (bool): Indicates whether field should be required or not
-
-    Raises:
-        AssertionError: If field's validation does not match expectations.
-    """
-    with test_case.assertRaises(ValidationError) as cm:
-        test_object.full_clean()
-    errors = cm.exception.message_dict
-
-    model_name = test_object.__class__.__name__
-
-    if is_required:
-        test_case.assertIn(
-            field_name,
-            errors,
-            msg=f"{field_name} should be required in {model_name}",
+    def setUp(self):
+        """Set up a user, club and club_review for use in tests."""
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="example@example.com",
+            password="password123",
         )
-    else:
-        test_case.assertNotIn(
-            field_name,
-            errors,
-            msg=f"{field_name} should not be required in {model_name}",
+        self.club = create_club("Test Club")
+        self.club_review = create_club_review(
+            self.club,
+            self.user,
+            4,
+            "A very friendly club",
+            (
+                "I always love visiting this club. They are so friendly. "
+                "There are players of all abilities and styles."
+            ),
         )
 
+        # Data used for testing default boolean values and max lengths
+        self.club_review_data = {
+            "club": self.club,
+            "user": self.user,
+            "score": 4,
+            "headline": "Headline",
+            "review_text": "Review Text",
+        }
 
-def helper_test_max_length(
-    test_case, model, info_data, field_name, max_length
-):
-    """
-    Validate that a field enforces its maximum length constraint.
+    def test_valid_setup_info_data(self):
+        """
+        Verify initial test data for ClubReview is valid.
+        """
+        # These should pass without raising errors
+        self.club_review.full_clean()
+        self.club_review.save()
 
-    Args:
-        test_case (TestCase): The test case instance calling this helper.
-        model (Model): The Django model class to test.
-        info_data (dict): Dictionary of valid model data.
-        field_name (str): The name of the field being tested.
-        max_length (int): The maximum allowed length of the field.
+    def test_string_representation(self):
+        """
+        Verify string representation shows reviewer, club name and score.
+        """
+        self.assertEqual(
+            str(self.club_review),
+            (
+                f"Review by {self.user.username} for {self.club.name} "
+                f"({self.club_review.score}★)"
+            ),
+        )
 
-    Raises:
-        ValidationError: If the field value exceeds the defined max_length.
-    """
-    # Create object
-    test_object = model.objects.create(**info_data)
+    # Multi-field tests
+    def test_required_fields(self):
+        """
+        Verify that required and optional fields behave as expected.
+        """
+        required_fields = {
+            "club": True,
+            "user": True,
+            "score": True,
+            "headline": True,
+            "review_text": True,
+            "created_on": False,
+            "updated_on": False,
+            "approved": False,
+        }
 
-    # Check valid at threshold
-    setattr(test_object, field_name, "a" * max_length)
-    test_object.full_clean()
+        test_object = ClubReview()
 
-    # Check invalid above threshold
-    setattr(test_object, field_name, "a" * (max_length + 1))
-    with test_case.assertRaises(ValidationError):
-        test_object.full_clean()
+        # Check each field
+        for field, is_required in required_fields.items():
+            helper_test_required_fields(self, test_object, field, is_required)
+
+    def test_max_lengths(self):
+        """
+        Verify fields with max length constraints are properly enforced.
+        """
+        fields = {
+            "headline": 100,
+        }
+        data = self.club_review_data
+        self.club_review.delete()  # To avoid meta constraint issues
+
+        # Check each field
+        for field, max_length in fields.items():
+            helper_test_max_length(self, ClubReview, data, field, max_length)
+
+    def test_boolean_field_defaults(self):
+        """Verify all boolean fields have the correct default values."""
+        boolean_fields = {
+            "approved": False,
+        }
+        data = self.club_review_data
+        self.club_review.delete()  # To avoid meta constraint issues
+
+        # Check each field
+        for field, default_value in boolean_fields.items():
+            result = helper_test_boolean_default(
+                field, default_value, ClubReview, data
+            )
+            self.assertTrue(
+                result, f"Default for {field} should be {default_value}"
+            )
+
+    # Tests for club field
+    def test_score_range_validation(self):
+        """
+        Verify that score must be an integer between 1 and 5.
+        """
+
+        # Below bottom of range should fail
+        self.club_review.score = 0
+        with self.assertRaises(ValidationError):
+            self.club_review.full_clean()
+
+        # Bottom of range should pass
+        self.club_review.score = 1
+        self.club_review.full_clean()
+
+        # Top of range should pass
+        self.club_review.score = 5
+        self.club_review.full_clean()
+
+        # Above top of range should fail
+        self.club_review.score = 6
+        with self.assertRaises(ValidationError):
+            self.club_review.full_clean()
+
+    def test_club_field_cascade_delete(self):
+        """
+        Verify that deleting a Club cascades and deletes associated ClubReview,
+        but deleting ClubReview does not delete the Club.
+        """
+        # Test correct behaviour
+        self.club.delete()
+        self.assertFalse(
+            ClubReview.objects.filter(id=self.club_review.id).exists()
+        )
+
+        # Set up new club to test opposite behaviour
+        club2 = create_club("My Second Club")
+        club_review2 = create_club_review(
+            club2, self.user, 4, "New Review", "Love it"
+        )
+        self.assertTrue(ClubReview.objects.filter(id=club_review2.id).exists())
+
+        # Test opposite behaviour
+        club_review2.delete()
+        self.assertTrue(Club.objects.filter(id=club2.id).exists())
+
+    def test_club_field_related_name(self):
+        """
+        Verify related_name 'club_reviews' correctly links Club to ClubReview.
+        """
+        self.assertEqual(self.club_review.club, self.club)
+        self.assertIn(self.club_review, self.club.reviews.all())
+
+    # Tests for autopopulated datetime fields
+    def test_created_on_field_is_not_none(self):
+        """
+        Verify created_on field is automatically populated.
+        """
+        self.assertIsNotNone(self.club_review.created_on)
+
+    def test_updated_on_field_is_not_none(self):
+        """
+        Verify updated_on field is automatically populated.
+        """
+        self.assertIsNotNone(self.club_review.updated_on)
+
+    # Test meta constraints and ordering
+    def test_unique_review_per_user_per_club(self):
+        """Ensure a user can't review the same club twice."""
+        with self.assertRaises(IntegrityError):
+            self.club_review = create_club_review(
+                self.club,
+                self.user,
+                4,
+                "A second review is not allowed",
+                "I have already reviewed this club",
+            )
+
+    def test_ordering_by_updated_on(self):
+        """
+        Verify that ClubReview instances are ordered by most recently updated.
+        """
+        # Create a second user and review
+        user2 = User.objects.create_user(
+            username="anotheruser",
+            email="another@example.com",
+            password="password456",
+        )
+        review2 = create_club_review(
+            self.club,
+            user2,
+            5,
+            "Amazing club",
+            "Best club experience ever!"
+        )
+
+        # Force first review to be more recently updated
+        self.club_review.review_text = "Updated review text"
+        self.club_review.save()
+
+        reviews = list(ClubReview.objects.all())
+        self.assertEqual(reviews[0], self.club_review)
+        self.assertEqual(reviews[1], review2)
+
+        # Add 20ms delay to ensure updated_on changes
+        time.sleep(0.02)
+
+        # Force second review to be more recently updated
+        review2.review_text = "Updated review2 now"
+        review2.save()
+
+        reviews = list(ClubReview.objects.all())
+        self.assertEqual(reviews[0], review2)
+        self.assertEqual(reviews[1], self.club_review)

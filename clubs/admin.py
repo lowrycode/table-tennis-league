@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubAdmin
+from .models import (
+    Club,
+    ClubInfo,
+    Venue,
+    VenueInfo,
+    ClubVenue,
+    ClubAdmin,
+    ClubReview,
+)
 
 # Register your models here.
 admin.site.register(Club)
@@ -23,3 +31,9 @@ class VenueInfoAdmin(admin.ModelAdmin):
 class ClubAdminAdmin(admin.ModelAdmin):
     list_display = ("user", "club")
     list_filter = ("club",)
+
+
+@admin.register(ClubReview)
+class ClubReviewAdmin(admin.ModelAdmin):
+    list_display = ("club", "user", "headline", "updated_on", "approved")
+    list_filter = ("approved",)

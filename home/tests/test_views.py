@@ -89,6 +89,21 @@ class HomePageStaticTests(TestCase):
         self.assertContains(response, "Latest News")
 
     # FAQ Section
+    def test_homepage_contains_useful_links_section(self):
+        """
+        Verify Useful Links section contains heading and card titles for
+        navigating to Clubs, League Tables, Fixtures and Results pages.
+        """
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, '<section id="useful-links"')
+        self.assertContains(response, "Useful Links</h2>")
+        self.assertContains(response, "card-title")
+        self.assertContains(response, "Find a Club</h3>")
+        self.assertContains(response, "League Tables</h3>")
+        self.assertContains(response, "Fixtures</h3>")
+        self.assertContains(response, "Results</h3>")
+
+    # FAQ Section
     def test_homepage_contains_faq_section(self):
         """
         Verify FAQ section contains the expected introductory text,

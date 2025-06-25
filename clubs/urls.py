@@ -4,6 +4,22 @@ from . import views
 
 urlpatterns = [
     path("", views.clubs, name="clubs"),
+    path("<int:club_id>/reviews/", views.club_reviews, name="club_reviews"),
+    path(
+        "<int:club_id>/reviews/create/",
+        views.create_club_review,
+        name="create_club_review",
+    ),
+    path(
+        "<int:club_id>/reviews/delete/",
+        views.delete_club_review,
+        name="delete_club_review",
+    ),
+    path(
+        "<int:club_id>/reviews/update/",
+        views.update_club_review,
+        name="update_club_review",
+    ),
     path(
         "admin-dashboard/",
         views.club_admin_dashboard,
@@ -43,5 +59,10 @@ urlpatterns = [
         "venue/<int:venue_id>/update/",
         views.update_venue_info,
         name="update_venue_info",
+    ),
+    path(
+        "venue/<int:venue_id>/modal/",
+        views.venue_modal,
+        name="venue_modal",
     ),
 ]

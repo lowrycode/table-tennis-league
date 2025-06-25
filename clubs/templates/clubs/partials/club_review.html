@@ -1,0 +1,17 @@
+<article class="club-review border my-4 py-2 px-3 text-center text-sm-start">
+  <div class="d-flex justify-content-center flex-wrap flex-sm-nowrap col-gap-4">
+    <h3 class="fs-5 w-100">{{ review.headline }}</h3>
+    <!-- Stars -->
+    <span class="visually-hidden">Rated {{ review.score }} out of 5 stars</span>
+    <div class="flex-shrink-0 mb-1" aria-hidden="true">
+      {% with review.score as star_rating%}
+        {% include "clubs/partials/star_rating.html" %}
+      {% endwith %}
+    </div>
+  </div>
+  <p>{{ review.review_text }}</p>
+  <p class="text-muted small fst-italic mb-0">
+    Review by <strong>{{ review.user }}</strong>
+    on <strong>{{ review.updated_on|date:"jS M Y" }}</strong>
+  </p>
+</article>

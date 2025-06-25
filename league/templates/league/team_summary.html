@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <!-- Venue Modal -->
+  {% include 'league/partials/venue_modal.html' %}
+  <!-- Team Summary -->
+  <div class="container container-max-7 my-5">
+    <!-- Team Details -->
+    <h1 class="h2-style text-center mb-3">{{ team.team_name }}</h1>
+    {% include 'league/partials/team_summary_details.html' %}
+
+    <!-- Go Back Button -->
+    <div class="d-flex justify-content-center my-4">
+      <a href="javascript:history.back()" class="btn btn-custom px-4">Go Back</a>
+    </div>
+
+    <!-- Player Summary -->
+    {% include 'league/partials/team_summary_players.html' %}
+    
+    <!-- Results Summary -->
+    {% include 'league/partials/team_summary_results.html' %}
+
+    <!-- Fixtures Summary -->
+    {% include 'league/partials/team_summary_fixtures.html' %}
+
+    <!-- Go Back Button -->
+    <div class="d-flex justify-content-center my-4">
+      <a href="javascript:history.back()" class="btn btn-custom px-4">Go Back</a>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <!-- Load HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  
+  <!-- Script for initialising modal -->
+  <script src="{% static 'js/league/init_venue_modal.js' %}"></script>
+  
+{% endblock %}

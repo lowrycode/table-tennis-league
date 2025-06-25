@@ -19,6 +19,9 @@
   --primary-5: #dfecfc;
   --secondary-1: #a62521;
   --secondary-2: #cd2f29;
+  --status-bg-1: #f1e7e7;
+  --status-bg-2: #f3f3d5;
+  --status-bg-3: #e2f0e2;
 }
 
 /* Global Element Styles */
@@ -51,20 +54,25 @@ h6 {
 }
 
 h1 {
-  font-size: 2.7rem;
+  font-size: calc(2.1rem + 0.9vw);
 }
 
 h2,
 .h2-style {
-  font-size: 2.2rem;
+  font-family: "PT Serif", serif;
+  font-size: calc(1.6rem + 0.9vw);
+  font-weight: 700;
 }
 
-h3 {
-  font-size: 1.6rem;
+h3,
+.h3-style {
+  font-family: "PT Serif", serif;
+  font-size: calc(1.2rem + 0.9vw);
+  font-weight: 700;
 }
 
 h4 {
-  font-size: 1.4rem;
+  font-size: calc(1.2rem + 0.4vw);
 }
 
 h5 {
@@ -104,7 +112,7 @@ h6 {
 
 /* Text Colour Utilities */
 .green {
-  color: green;
+  color: rgb(0, 94, 0);
 }
 
 .amber {
@@ -112,7 +120,7 @@ h6 {
 }
 
 .red {
-  color: red;
+  color: #a62521;
 }
 
 .blue {
@@ -123,21 +131,31 @@ h6 {
 .container-max-4 {
   max-width: 400px;
   margin: 0 1rem;
+  padding: 0 10px;
 }
 
 .container-max-5 {
   max-width: 500px;
   margin: 0 1rem;
+  padding: 0 10px;
 }
 
 .container-max-6 {
   max-width: 600px;
   margin: 0 1rem;
+  padding: 0 10px;
+}
+
+.container-max-7 {
+  max-width: 700px;
+  margin: 0 1rem;
+  padding: 0 10px;
 }
 
 .container-max-8 {
   max-width: 800px;
   margin: 0 1rem;
+  padding: 0 10px;
 }
 
 /* BASE COMPONENTS */
@@ -189,14 +207,22 @@ h6 {
 }
 
 /* Links */
-a {
+a,
+.a-style {
   text-decoration: none;
   color: var(--primary-2);
   font-weight: 600;
 }
 
-a:hover {
+a:hover,
+.a-style:hover {
   color: var(--primary-3);
+}
+
+a.disabled-link,
+.a-style.disabled-link {
+  color: var(--light-4);
+  cursor: not-allowed;
 }
 
 /* Form Info */
@@ -331,6 +357,25 @@ footer a:hover {
   position: static;
 }
 
+/* Useful Links Section */
+.fs-card {
+  font-size: clamp(0.7rem, 5vw, 1.2rem);
+}
+
+.card-img-top {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  width: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  transform: scale(1.05);
+}
+
+/* FAQ section */
 #faq {
   width: 100%;
   background-color: var(--light-2);
@@ -416,6 +461,77 @@ footer a:hover {
 
 #club-info-preview {
   background-color: var(--primary-1);
+}
+
+/* CLUB REVIEWS PAGE  */
+#club-reviews-header {
+  background-color: var(--primary-5);
+}
+
+#user-review {
+  background-color: var(--light-2);
+}
+
+.club-review {
+  background-color: var(--light-1);
+}
+
+/* FIXTURES PAGE */
+.fixture-status-box {
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--light-3);
+}
+
+.week-fixtures ul,
+.week-results ul,
+#results-breakdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.week-fixtures li,
+.week-results li,
+#results-breakdown li {
+  margin: 0.5rem 0;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--light-4);
+}
+
+.fixture-status-none,
+.fixture-scheduled,
+.result-played,
+.singles-match,
+.doubles-match {
+  background-color: var(--light-2);
+}
+
+.fixture-cancelled,
+.result-forfeited {
+  background-color: var(--status-bg-1);
+}
+
+.fixture-postponed {
+  background-color: var(--status-bg-2);
+}
+
+.fixture-completed {
+  background-color: var(--status-bg-3);
+}
+
+.fixture-date,
+.fixture-venue {
+  font-size: 0.8rem;
+}
+
+/* LEAGUE TABLES PAGE */
+.league-table th,
+#team-players th,
+#team-fixtures th,
+#team-results th {
+  background-color: var(--primary-2);
+  color: var(--light-2);
 }
 
 /* CLUB ADMIN PAGE */

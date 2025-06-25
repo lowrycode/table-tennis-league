@@ -2,6 +2,9 @@
 {% url 'home' as home_url %}
 {% url 'clubs' as clubs_url %}
 {% url 'contact' as contact_url %}
+{% url 'fixtures' as fixtures_url %}
+{% url 'results' as results_url %}
+{% url 'tables' as tables_url %}
 {% url 'account_login' as login_url %}
 {% url 'account_signup' as signup_url %}
 {% url 'account_logout' as logout_url %}
@@ -64,7 +67,7 @@
     <header>
       <!-- Navbar -->
       <nav
-        class="navbar fixed-top bg-dark navbar-expand-sm"
+        class="navbar fixed-top bg-dark navbar-expand-md"
         data-bs-theme="dark"
       >
         <div class="container-lg">
@@ -110,6 +113,25 @@
                   Clubs
                 </a>
               </li>
+              <!-- League Dropdown -->
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle{% if '/league/' in request.path %} active{% endif %}"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  League
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end mb-2">
+                    <li><a class="dropdown-item" href="{{ fixtures_url }}">Fixtures</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ results_url }}">Results</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ tables_url }}">Tables</a></li>
+                </ul>
+              </li>
               <!-- Contact -->
               <li class="nav-item">
                 <a
@@ -128,6 +150,7 @@
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
+                  aria-label="User menu"
                 >
                   <i class="fa-solid fa-user fs-4"></i>
                 </a>

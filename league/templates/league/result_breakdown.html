@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Results Breakdown -->
+  <section id="results-breakdown" class="container-max-8 w-100 pt-5">
+    <h2 class="visually-hidden">Match Breakdown</h2>
+
+    <!-- Fixture Details -->
+    <div class="row mx-2 small text-muted">
+      <div class="col-4 col-sm-3 text-center p-2">
+        <p class="m-0">SEASON</p>
+        <p class="m-0 fw-bold">{{ fixture.season.name }}</p>
+      </div>
+      <div class="col-4 col-sm-3 text-center p-2">
+        <p class="m-0">DATE</p>
+        <p class="m-0 fw-bold">{{ fixture.datetime|date:"D jS M" }}</p>
+      </div>
+      <div class="col-4 col-sm-3 text-center p-2">
+        <p class="m-0">TIME</p>
+        <p class="m-0 fw-bold">{{ fixture.datetime|date:"H:i" }}</p>
+      </div>
+      <div class="col-12 col-sm-3 text-center p-2">
+        <p class="m-0">VENUE</p>
+        <p class="m-0 fw-bold">{{ fixture.venue.name }}</p>
+      </div>
+    </div>
+
+    <!-- Match Score -->
+    <div class="row py-4 mb-5 mx-2 border-top border-bottom">
+      <!-- Home Team -->
+      <div class="col-12 col-sm-6 text-center text-sm-end px-3 h3-style">
+        {{ fixture.home_team.team_name }}
+      </div>
+      <div class="col-12 d-flex justify-content-center align-items-center gap-4 gap-sm-5 order-sm-1">
+        <!-- Team Scores -->
+        <span class="fw-bold fs-1">{{ fixture.result.home_score }}</span>
+        <span class="fs-4">vs</span>
+        <span class="fw-bold fs-1">{{ fixture.result.away_score }}</span>
+      </div>
+      <!-- Away Team -->
+      <div class="col-12 col-sm-6 text-center text-sm-start px-3 h3-style">
+        {{ fixture.away_team.team_name }}
+      </div>
+      <!-- Home Player Win Count -->
+      <div class="col-6 text-end px-3 px-sm-4 order-sm-2 mt-3">
+        {% for player, win_count in home_player_win_counts.items %}
+          <p class="mb-1">{{ player.full_name }} {{ win_count }}</p>
+        {% endfor %}
+        {% if doubles_winning_team == "home" %}
+          <p class="mb-1 fw-bold text-muted small">(DOUBLES 1)</p>
+        {% endif %}
+      </div>
+      <!-- Away Player Win Count -->
+      <div class="col-6 text-start px-3 px-sm-4 order-sm-2 mt-3">
+        {% for player, win_count in away_player_win_counts.items %}
+          <p class="mb-1">{{ player.full_name }} {{ win_count }}</p>
+        {% endfor %}
+        {% if doubles_winning_team == "away" %}
+          <p class="mb-1 fw-bold text-muted small">(DOUBLES 1)</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Breakdown -->
+    <div class="my-5">
+      <!-- Singles Matches -->
+      <h2 class="fs-5 text-center">Singles Matches</h2>
+      {% if fixture.result.singles_matches.all %}
+        <ul>
+          {% for sm in fixture.result.singles_matches.all %}
+            <li class="row singles-match">
+              <!-- Home player -->
+              <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-end align-items-center fs-5">
+                {{ sm.home_player.player.full_name }}  
+              </div>
+              <!-- Sets score -->
+              <div class="col-12 col-sm-2 d-flex justify-content-center align-items-center px-2 fw-semibold fs-4">
+                {{ sm.home_sets }} - {{ sm.away_sets }}
+              </div>
+              <!-- Game scores -->
+              {% if sm.singles_games %}
+                <div class="col-12 d-flex justify-content-center gap-2 small text-muted order-sm-1">
+                  {% for game in sm.singles_games.all %}
+                    <span>
+                      {{ game.home_points }}-{{ game.away_points }}
+                    </span>
+                  {% empty %}
+                    <span>No game scores recorded</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <!-- Away player -->
+              <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-start align-items-center fs-5">
+                {{ sm.away_player.player.full_name }}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-center">No scores for the singles matches have been recorded.</p>
+      {% endif %}
+    </div>
+    <div class="my-5">
+      <!-- Doubles Matches -->
+      <h2 class="fs-5 text-center">Doubles Match</h2>
+      {% if fixture.result.doubles_match %}
+        <ul>
+          {% with fixture.result.doubles_match as dm %}
+            <li class="row doubles-match">
+              <!-- Home players -->
+              <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-end align-items-center gap-2 text-center row-gap-2 fs-5">
+                {% for hp in dm.home_players.all %}
+                  <span>{{ hp.player.full_name }}</span>
+                  {% if not forloop.last %}<span>+</span>{% endif %}
+                {% endfor %}
+              </div>
+              <!-- Sets score -->
+              <div class="col-12 col-sm-2 d-flex justify-content-center align-items-center px-2 fw-semibold fs-4">
+                {{ dm.home_sets }} - {{ dm.away_sets }}
+              </div>
+              <!-- Game scores -->
+              {% if dm.doubles_games %}
+                <div class="col-12 d-flex justify-content-center gap-2 small text-muted order-sm-1">
+                  {% for game in dm.doubles_games.all %}
+                    <span>
+                      {{ game.home_points }}-{{ game.away_points }}
+                    </span>
+                  {% empty %}
+                    <span>No game scores recorded</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <!-- Away players -->
+              <div class="col-12 col-sm-5 d-flex justify-content-center justify-content-sm-start align-items-center gap-2 text-center row-gap-2 fs-5">
+                {% for ap in dm.away_players.all %}
+                  <span>{{ ap.player.full_name }}</span>
+                  {% if not forloop.last %}<span>+</span>{% endif %}
+                {% endfor %}
+              </div>
+            </li>
+          {% endwith %}
+        </ul>
+      {% else %}
+        <p class="text-center">No scores for the doubles match have been recorded.</p>
+      {% endif %}
+    </div>
+  </section>
+  <a href="javascript:history.back()" class="btn btn-custom px-4 mb-5">Go Back</a>
+{% endblock %}
