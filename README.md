@@ -6,7 +6,7 @@ The project was built using the **Python Django** framework and deployed using *
 
 You can visit the deployed website <a href="https://city-and-district-ff69b7e3e1fe.herokuapp.com/" target="_blank" rel="noopener">**here**</a>.
  
-![Responsive design screenshot of City and District website](readme-resources/images/responsive.jpg)
+![Responsive design screenshot of City and District website](readme-resources/images/home-responsive.jpg)
 
 
 # Project Planning
