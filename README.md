@@ -111,6 +111,8 @@ Wireframes were produced using <a href="https://balsamiq.com/" target="_blank" r
 
 *NOTE: During development, the navbar expand breakpoint was changed from `sm` to `md` due to overflow issues when the league dropdown was added to the navbar. The wireframes below show the original designs and therefore do not reflect this change.*
 
+*NOTE: The wireframe for the Account Settings page includes a section for Linked Players. This feature has not yet been implemented but the wireframe shows the original design.*
+
 ### Main Public Pages
 
 ![Wireframes for Homepage](readme-resources/images/wireframe-home.jpg)
@@ -139,6 +141,12 @@ Wireframes were produced using <a href="https://balsamiq.com/" target="_blank" r
 ![Wireframes for Update Venue Info page](readme-resources/images/wireframe-update-venue-info.jpg)
 ![Wireframes for Delete Venue page](readme-resources/images/wireframe-delete-venue.jpg)
 
+### League Pages
+![Wireframes for Fixtures page](readme-resources/images/wireframe-fixtures.jpg)
+![Wireframes for Results page](readme-resources/images/wireframe-results.jpg)
+![Wireframes for Result Breakdown page](readme-resources/images/wireframe-result-breakdown.jpg)
+![Wireframes for League Tables page](readme-resources/images/wireframe-league-tables.jpg)
+![Wireframes for Team Summary page](readme-resources/images/wireframe-team-summary.jpg)
 
 ## 6. Visual Design
 
