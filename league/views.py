@@ -1,5 +1,7 @@
 from datetime import timedelta
+from urllib.parse import urlparse
 from django.http import HttpResponseBadRequest
+from django.urls import reverse
 from django.db.models import Prefetch, Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
@@ -402,6 +404,7 @@ def fixtures(request):
         "fixture_status_key": fixture_status_key,
         "filter": fixture_filter,
         "filters_applied": filters_applied,
+        "filter_clear_url": reverse("fixtures"),
         "current_week_id": current_week_id,
     }
 
@@ -463,6 +466,7 @@ def results(request):
         "weeks": season_weeks,
         "filter": fixture_filter,
         "filters_applied": filters_applied,
+        "filter_clear_url": reverse("results"),
     }
 
     # If htmx request, return only the results_section partial template
@@ -678,9 +682,16 @@ def fixtures_filter(request):
         return HttpResponseBadRequest(
             "This endpoint is for HTMX requests only."
         )
+
+    # Extract base path from HTTP referer to determine current page
+    # - needed because filter is used in both Fixtures and Results pages
+    referer = request.META.get("HTTP_REFERER", "")
+    parsed_url = urlparse(referer)
+    clear_url = parsed_url.path  # Ensures query string is excluded
+
     fixture_filter = FixtureFilter(request.GET or None)
     return render(
         request,
         "league/partials/fixtures_filter_panel_inner.html",
-        {"filter": fixture_filter},
+        {"filter": fixture_filter, "filter_clear_url": clear_url},
     )
