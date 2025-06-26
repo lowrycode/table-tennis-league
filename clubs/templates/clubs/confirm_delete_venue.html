@@ -25,7 +25,17 @@
             </a>.
           </p>
         </div>
-        {% if is_shared_venue %}
+        {% if is_linked_to_team %}
+          <div class="form-info border p-3 mb-3">
+            <p class="fw-bold fs-5">
+              <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
+              This venue is linked to a team.</p>
+            <p class="fst-italic">
+              The venue cannot be deleted because it is assigned as a home venue
+              for at least one team in the league.
+            </p>
+          </div>
+        {% elif is_shared_venue %}
           <div class="form-info border p-3 mb-3">
             <p class="fw-bold fs-5">
               <i class="fa-solid fa-circle-exclamation me-2" aria-hidden="true"></i>
@@ -49,7 +59,7 @@
               </label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="delete_option" id="delete-venue-and-info" value="all" {% if is_shared_venue %}disabled{% endif %}>
+              <input class="form-check-input" type="radio" name="delete_option" id="delete-venue-and-info" value="all" {% if is_shared_venue or is_linked_to_team %}disabled{% endif %}>
               <label class="form-check-label" for="delete-venue-and-info">
                 Delete <strong>the venue</strong><br>
                 <em>(the venue will not exist and cannot be assigned to a club in the future)</em>

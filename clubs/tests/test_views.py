@@ -1,3 +1,4 @@
+from datetime import time
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -20,6 +21,9 @@ from test_utils.helpers import (
     create_club,
     create_club_review,
     delete_club_reviews,
+    create_team,
+    create_season,
+    create_division,
 )
 
 User = get_user_model()
@@ -2815,6 +2819,33 @@ class DeleteVenueTests(TestCase):
         self.assertContains(response, "Delete Venue")
 
     # GET Page Rendering
+    def test_notification_displays_when_venue_is_linked_to_team(self):
+        """
+        Verify a notification displays if the venue is linked to a league team.
+        """
+        self.client.force_login(self.user)
+
+        # Create team with venue as home venue
+        division1 = create_division("Division 1", 1)
+        season = create_season(
+            "2024-25", "24-25", "24-25", 2024, 2025, False, [division1]
+        )
+        create_team(
+            season,
+            division1,
+            self.club,
+            self.venue,
+            "Test Team",
+            "monday",
+            time(19, 0),
+        )
+        response = self.client.get(self.url)
+        self.assertTrue(response.context["is_linked_to_team"])
+        self.assertContains(
+            response,
+            "venue cannot be deleted because it is assigned as a home venue",
+        )
+
     def test_shared_venue_notification_displays_when_venue_is_shared(self):
         """
         Verify shared venue warning is shown when venue is used by multiple

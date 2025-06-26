@@ -10,6 +10,7 @@ from django.http import (
 from django.forms.models import model_to_dict
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from league.models import Team
 from .models import Club, ClubInfo, Venue, VenueInfo, ClubVenue, ClubReview
 from .forms import (
     UpdateClubInfoForm,
@@ -952,7 +953,8 @@ def delete_venue(request, venue_id):
     """
     Allows a club admin to delete a venue or unapproved venue info records.
 
-    Deletes the entire venue only if it is not shared and the admin confirms.
+    Deletes the entire venue only if it is not linked to a league team,
+    shared with another and confirmed by the user.
     Alternatively, can delete only unapproved venue info records.
 
     Args:
@@ -982,6 +984,9 @@ def delete_venue(request, venue_id):
     is_shared_venue = (
         ClubVenue.objects.filter(venue=venue).exclude(club=club).exists()
     )
+
+    # Assign is_linked_to_team context variable
+    is_linked_to_team = Team.objects.filter(home_venue=venue).exists()
 
     # Process delete request
     if request.method == "POST":
@@ -1047,5 +1052,9 @@ def delete_venue(request, venue_id):
     return render(
         request,
         "clubs/confirm_delete_venue.html",
-        {"venue": venue, "is_shared_venue": is_shared_venue},
+        {
+            "venue": venue,
+            "is_shared_venue": is_shared_venue,
+            "is_linked_to_team": is_linked_to_team,
+        },
     )
