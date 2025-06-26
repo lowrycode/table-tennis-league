@@ -1,6 +1,6 @@
 from django.urls import reverse
 from django.db import transaction
-from django.db.models import Prefetch, Avg, Count, Q
+from django.db.models import Prefetch, Avg, Count, Q, ProtectedError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import (
     HttpResponseForbidden,
@@ -592,10 +592,7 @@ def club_admin_dashboard(request):
     return render(
         request,
         "clubs/admin_dashboard.html",
-        {
-            "club": club_dict,
-            "from_admin": True
-        },
+        {"club": club_dict, "from_admin": True},
     )
 
 
@@ -1009,8 +1006,17 @@ def delete_venue(request, venue_id):
                 )
             else:
                 # Delete venue
-                Venue.objects.filter(id=venue.id).delete()
-                messages.success(request, "Venue has been deleted.")
+                try:
+                    Venue.objects.filter(id=venue.id).delete()
+                    messages.success(request, "Venue has been deleted.")
+                except ProtectedError:
+                    messages.warning(
+                        request,
+                        (
+                            "Venue could not be deleted because it is "
+                            "linked to protected league data."
+                        ),
+                    )
                 return redirect("club_admin_dashboard")
 
         elif option == "unapproved":

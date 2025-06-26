@@ -599,6 +599,8 @@ Since venues can be shared by multiple clubs:
 - A warning is displayed when a user tries to update venue information for shared venues.
 - Users are allowed to delete unapproved venue information but not to delete the venue itself if it is shared with other clubs.
 
+If a user tries to delete a venue that is linked to a team in the league, the venue will not be deleted, the user is redirected to the Club Admin page and a warning message displays "Venue could not be deleted because it is linked to protected league data".
+
 ### Preview Club and Venue Information
 
 By clicking on the Toggle Preview button, a club admin can see the information as it will appear on the Clubs page when all information is approved by the league administrator.

@@ -701,6 +701,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | If the user chooses to delete unapproved venue info and unapproved venue info exists, the unapproved venue info is deleted (as seen in Django Admin panel), the user is redirected to the club admin dashboard, a confirmation message displays and the new venue info status is reflected (either INFO REQUIRED or showing previously approved info) |
 | ✓ | If the user chooses to delete the venue entirely, a confirmation checkbox appears and the Delete button is disabled until it is checked |
 | ✓ | After ticking the confirmation checkbox and pressing the delete button, the venue is deleted (if not shared by other clubs) as verified by Django Admin panel, the user is redirected to the Club Admin page, a success message shows and the venue no longer appears in dropdowns for assigning a venue |
+| ✓ | If the venue is protected (as a team's home venue), the venue is not deleted and a warning message displays "Venue could not be deleted because it is linked to protected league data" |
 | ✓ | Other links on the page work correctly including the "Cancel" button and the link to the Update Venue Information page |
 | ✓ | The page is responsive across devices and themed consistently with the rest of the website |
 | ✓ | No console errors or warnings were caused by interacting with page elements |
