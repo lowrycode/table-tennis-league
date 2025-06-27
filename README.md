@@ -220,7 +220,7 @@ On tablet and larger screen sizes, the full navigation menu is shown. On mobile 
 
 ![Navigation bar](readme-resources/images/nav-bar.jpg)
 
-The items are listed in the order of priority that the users are likely to want to visit them. Clicking on the league logo provides an alternative method for navigating to the Homepage - this may be preferred by mobile users who would otherwise have to expand the navigation menu.
+The items are listed in the order of priority that the users are likely to want to visit them. Clicking on the league logo provides an alternative method for navigating to the Homepage - this may be preferred by mobile and tablet users who would otherwise have to expand the navigation menu.
 
 The default behaviour of the *Bootstrap Navbar* is retained (i.e. the hover effects and the lighter font showing the active page).
 
@@ -339,7 +339,7 @@ The display also varies according to whether optional data is provided. For exam
 
 Phone numbers and email addresses are interactive and launch the system's default calling or email app when clicked.
 
-Clicking on the Club Reviews information navigates to the **Club Review** page (more details below).
+Clicking on the club's review information navigates to the [**Club Review**](#club-reviews-page) page.
 
 If a club uses multiple venues, all associated venues are listed under that club. If a venue is shared across clubs, it appears in each relevant club entry.
 
@@ -635,17 +635,14 @@ If all information is approved, it will display exactly what is currently shown 
 
 If any information is not yet approved, a message appears above the preview to clarify that this is how the information will appear on the clubs page when it has been approved.
 
-The link to the Club Reviews page is disabled in the preview. The <a> element has been replaced with a <p> element to avoid confusing screen readers.
+The link to the Club Reviews page is disabled in the preview. The anchor element has been replaced with a paragraph element to avoid confusing screen readers.
 
 # Future Features
 
-So far, stage 1 has been completed.
+So far, stage 1 has been fully completed and stage 2 has been partly completed.
 
-The features planned for stage 2 relate to displaying league data. This includes:
-- Fixtures page: shows upcoming league matches
-- Results pages: shows match results and drilldown results for each individual game
-- League Tables page: shows league tables for each division
-- Analysis pages: for showing player and team stats
+The unfinished features from stage 2 include:
+- Player Analysis page: for showing stats for individual players, including a player rankings page
 - The option for a user to link to a league player for a more personalised experience on the site
 
 The features planned for stage 3 relate to league administration. This includes:
