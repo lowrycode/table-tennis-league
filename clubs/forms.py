@@ -133,6 +133,12 @@ class UpdateClubInfoForm(forms.ModelForm):
             "membership_required": "Membership is required",
             "free_taster": "Free taster sessions available",
         }
+        help_texts = {
+            "image": (
+                "Upload an image for your club. "
+                "Recommended format: landscape, 1200x800px, JPG or PNG."
+            ),
+        }
         widgets = {
             "contact_phone": forms.TextInput(
                 attrs={"placeholder": "(optional)"}

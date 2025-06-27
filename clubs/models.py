@@ -47,7 +47,11 @@ class ClubInfo(models.Model):
         Club, on_delete=models.CASCADE, related_name="club_infos"
     )
     website = models.URLField(null=True, blank=True)
-    image = CloudinaryField("image", default="placeholder")
+    image = CloudinaryField(
+        "image",
+        default="placeholder",
+        help_text="Recommended format: landscape, 1200x800px, JPG or PNG.",
+    )
     contact_name = models.CharField(max_length=100)
     contact_email = models.EmailField()
     contact_phone = PhoneNumberField(null=True, blank=True)
