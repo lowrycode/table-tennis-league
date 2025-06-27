@@ -53,7 +53,7 @@ The [**Sprints Log**](sprint_log.md) document contains more details about each u
 
 (ADDED LATER)
 
-- As a **prospective player**, I can **view the locations of club venues on a map** so that **I can easily find which clubs are closest to me**.
+- As a **prospective player**, I can **view all reviews and ratings for a club** so that **I can make an informed decision about the club**.
 - As a **logged-in user**, I can **submit a review with a star rating and comment for a club** so that **I can share my experience with others**.
 - As a **logged-in user**, I can **update or delete my own club review** so that **I can update or remove my feedback if needed**.
 
