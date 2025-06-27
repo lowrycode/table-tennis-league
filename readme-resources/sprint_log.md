@@ -1,4 +1,8 @@
+# SPRINT LOG
 
+This document records the development process and compliments the information in the [**GitHub Project**](https://github.com/users/lowrycode/projects/10/views/1) linked to this repository.
+
+Each sprint was 3 days long. It took me a while to gauge my personal velocity and, in practice, I was able to dedicate more working time to some sprints than others.
 
 # SPRINT 1 - SETUP
 
@@ -460,7 +464,7 @@ As a **registered user**, I can **log in using my username and password** so tha
     - Invalid credentials
     - Access control for already logged-in users
 
-### Add Remember Me Feature TO Login Page (SHOULD) 2SP
+### Add Remember Me Feature to Login Page (SHOULD) 2SP
 As a **registered user**, I can **log in using my username and password** so that **I can access secure and personalised content**.
 
 **Acceptance Criteria**
@@ -619,7 +623,7 @@ As a **new user**, I can **receive a confirmation email after registering** so t
 
 # SPRINT 4 - CLUBS PAGE & CLUB ADMIN PAGE
 
-Total Story Points: 22
+Total Story Points: 34
 
 | Priority | Story Points | Percentage |
 |----------|--------------|------------|
@@ -915,30 +919,9 @@ As a **club administrator**, I can **delete a venue (if unlinked from other club
     - Access control
     - Post-deletion database state
 
-### View Club Locations on a Map  (COULD) 5SP
-As a **prospective player**, I can **view the locations of club venues on a map** so that **I can easily find which clubs are closest to me**.
-
-**Acceptance Criteria**
-- A map is displayed at the top of the Clubs page showing markers for each approved club venue.
-- Each marker represents a venue and includes the venue name in a tooltip or info window.
-- If there are no venues to show, a message such as “No club locations available” is displayed.
-- The map adjusts its zoom level and center to include all visible venues.
-- The map is responsive and works correctly on mobile, tablet, and desktop devices.
-- Map and markers load without requiring the user to be logged in.
-
-**Tasks**
-- Use JavaScript (Google Maps API) to render map on the Clubs page.
-- In the Django view, serialize venue data with coordinates for the frontend.
-- Add logic to exclude venues with missing or null lat/lng.
-- Add map markers with tooltip/info window for each venue.
-- Center and zoom map to fit all markers dynamically.
-- Display fallback message if no coordinates exist.
-- Test map rendering and responsiveness across devices.
-
-
 # SPRINT 5 - CLUBS PAGE & CLUB ADMIN PAGE (PART 2)
 
-Total Story Points: 22
+Total Story Points: 33
 
 | Priority | Story Points | Percentage |
 |----------|--------------|------------|
@@ -1107,29 +1090,28 @@ As a **club administrator**, I can **assign an existing venue to my club** so th
     - Venue relationship logic
 
 ### Create Venue (MUST) – 3SP
-As a **club administrator**, I can **delete a venue (if unlinked from other clubs or history)** so that **it is permanently removed**.
+As a **club administrator**, I can **create a new venue** so that **I can assign it to my club**.
 
 **Acceptance Criteria**
-- "Delete Venue" button leads to a confirmation page.
-- Users can choose to delete unapproved venue info or the venue itself
-- Unapproved venue information can be deleted even if venue is shared with other clubs
-- Venue can only be deleted if not linked to other clubs (or historic data if added later).
-- A confirmation checkbox must be ticked before submitting the form
-- Upon successful deletion:
-    - Show: “Venue has been deleted.” or "Unapproved venue info has been deleted." as appropriate
-    - Venue is removed from all dropdowns and dashboards.
-- Only authenticated admins can access this feature.
+- "Create Venue" button is shown in Club Admin dashboard which leads to a separate page with a form.
+- The form is only accessible to users with club_admin status
+- Form includes: name, street_address, address_line2 (optional), city, county, postcode, num_tables, parking_info.
+- All fields are required except address_line2.
+- Form validation errors show next to the relevant field
+- A user cannot create a venue with the same name as an existing venue
+- On successful submission:
+    - A new Venue and related VenueInfo are created together in one transaction.
+    - A success message is shown: "Venue has been created and can now be assigned to a club."
+    - The user is redirected to the club admin dashboard.
 
 **Tasks**
-- Create route, view, and form to delete venue.
-- Implement irreversible confirmation step.
-- Ensure deletable condition (no club/historic linkage) is enforced.
-- Update UI after deletion.
+- Implement view, form, and dashboard button.
+- Add field validation.
+- Restrict access to club admins.
 - Write tests for:
-    - Deletion logic
-    - Access control
-    - Post-deletion database state
-
+    - Permissions
+    - Field validation
+    - Post-creation visibility
 
 ### Edit Venue Details (SHOULD) – 2SP
 As a **club administrator**, I can **edit venue details (if only linked to my club)** so that **the venue information remains accurate**.
@@ -1696,7 +1678,7 @@ As a **league player**, I can **filter fixtures by team** so that **I can easily
 
 # SPRINT 10 - CLUB REVIEW AND FIXTURE RESULT MODEL
 
-Total Story Points: 
+Total Story Points: 18
 
 | Priority | Story Points | Percentage |
 |----------|--------------|------------|
@@ -1784,7 +1766,7 @@ As a **league administrator**, I can **record and update fixture results** so th
 
 # SPRINT 11 - BUG FIXES AND RESULTS PAGE
 
-Total Story Points: 
+Total Story Points: 27
 
 | Priority | Story Points | Percentage |
 |----------|--------------|------------|
@@ -2044,7 +2026,7 @@ As a **league player**, I can **click on a match score to view detailed drilldow
 
 # SPRINT 12 - RESULTS BREAKDOWN AND LEAGUE TABLES
 
-Total Story Points: 
+Total Story Points: 22
 
 | Priority | Story Points | Percentage |
 |----------|--------------|------------|
@@ -2080,7 +2062,7 @@ As a **league player**, I can **view league tables** so that **I can see how tea
 - A "League Tables" page is accessible via the League dropdown in the navigation menu.
 - The page shows a table for each active division in the current season (by default).
 - Each table includes: Team name, Matches played (P), Wins (W), Losses (L), Draws (D), Points (Pts), and Position (Rank).
-- Teams are sorted by points (highest first); ties are broken using number of wins (team matches, team sets / indivudal matches then individual sets).
+- Teams are sorted by points (highest first); ties are broken using number of wins (team matches, team sets / individual matches then individual sets).
 - If no data is available for a division, a “No league table available” message is displayed.
 - Tables are responsive across mobile, tablet, and desktop devices.
 - Tables are visible to all users without requiring login.
@@ -2166,7 +2148,7 @@ As a **league player**, I can **view a player's summary page** so that **I can s
 
 # SPRINT 13 - TEAM SUMMARY PAGE AND TIDY UP
 
-Total Story Points: 
+Total Story Points: 13
 
 | Priority | Story Points | Percentage |
 |----------|--------------|------------|
