@@ -238,7 +238,7 @@ Links to external pages open in a new tab (to avoid taking users away from the m
 
 ### Containers
 
-To prevent content from stretching too wide on large screens, custom container classes are implemented which complement the bootstrap framework but add more customisation. A variety of different widths are used across the site depending on the context.
+To prevent content from stretching too wide on large screens, custom container classes are implemented which complement the Bootstrap framework but add more customisation. A variety of different widths are used across the site depending on the context.
 
 For example:
 - `.container-max-8`: Limits the width to 800px - used on Homepage and Contact page
@@ -309,9 +309,9 @@ It includes:
 - A Google Map showing the positions of the club venues.
 - Information about each club listed in alphabetical order (by club name) and a filter based on checklist criteria.
 
-All of the information on this page is dynamically populated from data in the database. The data itself is submitted by authenticated website users through restricted pages that are only accessible for users who have **Club Admin Status** on their account. All user submitted information must be approved by the league administrator before it appears on the clubs page. This approach ensures that the information is accurate and contains no offensive content.
+All of the information on this page is dynamically populated from data in the database. The data itself is submitted by authenticated website users through restricted pages that are only accessible to users who have **Club Admin Status** on their account. All user submitted information must be approved by the league administrator before it appears on the clubs page. This approach ensures that the information is accurate and contains no offensive content.
 
-*NOTE: More details about the Club Admin Dashboard are given below.*
+*NOTE: More details about the Club Admin Dashboard can be found [here](#club-admin-dashboard).*
 
 ### Find-A-Club Section
 
@@ -359,7 +359,7 @@ On applying a filter, only the club-info section is updated via HTMX. This appro
 
 ## Club Reviews page
 
-The Club Reviews page is where the CRUD functionality happens for a typical authenticated user.
+The Club Reviews page is where the CRUD functionality happens for a regular authenticated user.
 
 The page is accessed when a user clicks on the Club review information for a particular club on the Clubs page.
 
@@ -373,7 +373,7 @@ If the user *is not* logged in, they will see a grey banner prompting them to lo
 
 ![Club Reviews page - options for logged-in users](readme-resources/images/club-reviews-logged-in.jpg)
 
-The Create Club Review and Update Club Review pages contain a form with field validation. The Update Club Review page pre-populates using the information from the user's existing review.
+The Create Club Review and Update Club Review pages both include forms with field validation. The Update page is pre-populated with the user's existing review data.
 
 Clicking the Delete review button takes the user to a confirmation page.
 
@@ -458,7 +458,7 @@ The filtering functionality is similar to the Fixtures page.
 
 Just like on the Fixtures page, clicking on a team name redirects to the Team Summary page.
 
-Although the date of the fixture is still displayed, the time of the fixture has been replaced by the fixture result and the Venue button has been replaced by a Scores link. Clicking the scores link navigates to the Result Breakdown page.
+Although the date of the fixture is still displayed, the time of the fixture has been replaced by the fixture result and the Venue button has been replaced by a Scores link. Clicking the scores link navigates to the [Result Breakdown](#result-breakdown-page) page.
 
 ### Fallbacks for No Results
 
@@ -466,7 +466,7 @@ If there are no results to display, the following fallback messages may be shown
 - "Season not found" - when the league administrator has not marked any season as *current*.
 - "No results to display" - when no matches have yet been played.
 
-## Result Breakdown page
+## Result Breakdown Page
 
 This page displays the individual match scores for each singles and doubles match, and scores for individual games when available.
 
@@ -549,7 +549,7 @@ One of the key assessment criteria for the project related to user authenticatio
 ![Pages available for authenticated and unauthenticated users](readme-resources/images/user-authentication.jpg)
 
 The pages themselves have access restrictions:
-- If an authenticated user tries to access the Login or SignUp page, they are redirected to the Homepage.
+- If an authenticated user tries to access the Login or Signup page, they are redirected to the Homepage.
 - If an unauthenticated user tries to access the Logout page, they are redirected to the Homepage.
 
 These pages use custom templates while leveraging the functionality of the django-allauth library, such as form validation through enforcing username uniqueness, email uniqueness and strong passwords. The signup page was customized to make the email address a required field, ensuring the League Administrator can contact users if needed.
@@ -566,7 +566,7 @@ Once a user has logged in, they are reminded of their logged-in status immediate
 
 ## Account Management
 
-Another key assessment criteria for the project relates to CRUD functionality. We have already discussed how a typical user can create, read, edit and delete a review for a club.
+Another key assessment criteria for the project relates to CRUD functionality. We have already discussed how a regular user can create, read, edit and delete a review for a club.
 
 The Account Settings page also includes CRUD functionality. It allows users to:
 - View their email address.
@@ -587,7 +587,7 @@ Whenever a user carries out a delete action that is considered "serious" (irreve
 
 Users who have been assigned club admin status can access the Club Admin Dashboard page from the user dropdown menu. 
 
-*NOTE: This menu item will not appear for users who have not been assigned Club Admin status by the League Administrator.*
+*NOTE: This menu item will not appear for users who have not been assigned Club Admin status by the League Administrator. Assigning a user as a club admin is easily done in the Django Admin Panel using the ***Club admin*** model within the Clubs app. Phase 3 of project includes plans to develop a League Admin dashboard restricted page on the website itself; this page would include the ability to assign users as club admins.*
 
 The page allows a club admin to manage the club and venue information that will appear on the clubs page (after approval by the League Administrator).
 
@@ -635,6 +635,7 @@ If all information is approved, it will display exactly what is currently shown 
 
 If any information is not yet approved, a message appears above the preview to clarify that this is how the information will appear on the clubs page when it has been approved.
 
+The link to the Club Reviews page is disabled in the preview. The <a> element has been replaced with a <p> element to avoid confusing screen readers.
 
 # Future Features
 
@@ -661,7 +662,7 @@ Other useful features to be added include:
 
 ## Website Development
 
-For the front end, the website uses **HTML**, **CSS** and **Javascript**. Additional styling and functionality is provided by **BootStrap** framework. To update page content without full page reloads, **HTMX** is used for making AJAX requests.
+For the front end, the website uses **HTML**, **CSS** and **Javascript**. Additional styling and functionality is provided by the **BootStrap** framework. To update page content without full page reloads, **HTMX** is used for making AJAX requests.
 
 The following 3rd party APIs were used:
 - **Google Maps JavaScript API**: for showing venue locations on the Clubs page
@@ -707,7 +708,7 @@ The fonts were sourced from <a href="https://fonts.google.com/" target="_blank" 
 
 ## Planning and Code Review
 
-**ChatGPT** was used to speed up the planning aspects of the project. It was used cautiously, with all information verified from additional sources. Any generated content that was used was manually edited later to make it suitable for the exact use case.
+**ChatGPT** was used to speed up the planning aspects of the project. It was used cautiously, with all information verified from additional sources. Any generated content was manually edited later to make it suitable for the exact use case.
 
 Examples of how ChatGPT was used during planning include:
 - Researching the pros and cons for different Django approaches (e.g. custom user model vs related ClubAdmin model)
