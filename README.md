@@ -664,6 +664,8 @@ Other useful features to be added include:
 
 For the front end, the website uses **HTML**, **CSS** and **Javascript**. Additional styling and functionality is provided by the **BootStrap** framework. To update page content without full page reloads, **HTMX** is used for making AJAX requests.
 
+**PostgreSQL** was used for the relational database.
+
 The following 3rd party APIs were used:
 - **Google Maps JavaScript API**: for showing venue locations on the Clubs page
 - **Google Geolocation API**: for finding latitude and longitude coordinates for venue locations
@@ -677,11 +679,15 @@ In addition to the standard Django packages, the following Python packages were 
 - **django-filter**: for simplifying forms used for filtering querysets
 - **django-localflavor**: for validating postcodes
 - **django-phonenumber-field**: to provide phone number field support in Django models
+- **dj-database-url**: to simplify database configuration when deploying to Heroku
 - **gunicorn**: for running a WSGI-compatible web server in production on Heroku
 - **phonenumberslite**: for validating and formatting phone numbers (lightweight version)
 - **psycopg2**: PostgreSQL adapter for Python used by Django when using Postgres
 - **requests**: for making HTTP requests to Google GeoCode API on server side
 - **whitenoise**: for serving static files directly from Django in production
+
+The following package was used in development but not included in the requirements.txt:
+- **djhtml**: for formatting django templates
 
 Most of the code was written in a local copy of **Visual Studio Code**.
 
@@ -717,13 +723,11 @@ Examples of how ChatGPT was used during planning include:
 
 ChatGPT was also used to aid the code review process. Some of the suggestions were taken on board whilst others were not implemented.
 
- 
-
 # Testing
 
-Most of the project was developed using a Test-Driven Development (TDD) approach, with unit tests written using Django's TestCase. As a result, much of the codebase is covered by automated tests. In some instances, such as the integration of the Google Maps API, tests were added after the functionality was implemented. 
+Large sections of the project were developed using a Test-Driven Development (TDD) approach, with unit tests written using Django's TestCase. As a result, much of the codebase is covered by automated tests. In some instances, such as the integration of the Google Maps API, tests were added after the functionality was implemented. 
 
-Thorough manual testing was also conducted on the deployed site before marking a user story as *Done* in the GitHub projects board. These tests are documented [here](readme-resources/manual_testing.md).
+Thorough manual testing was also conducted on the deployed site before marking a user story as *Done* in the GitHub projects board. These tests are documented in the [Manual Testing](readme-resources/manual_testing.md) document.
 
 *NOTE: The tests have been ordered by website page rather than by user story, but tests covering each user story will be found in the relevant section.*
 
@@ -735,14 +739,11 @@ The following browsers were used during testing:
 - Mozilla Firefox
 - Apple Safari
 
-The following devices were used during testing:
+The following devices were used to test the website:
 - Laptops with different screen sizes
 - Various generations of iPads (1st, 8th and 9th generations)
-- Samsung Galaxy tablet
 - Various Android phones
 - Various iPhones (including a 1st generation iPhone 5)
-
-
 
 
 # Code Validation Tests
@@ -802,18 +803,22 @@ The custom stylesheet was tested using the <a href="https://jigsaw.w3.org/css-va
 
 The JavaScript code was validated using <a href="https://jshint.com/" target="_blank" rel="noopener">**JSHint**</a> and it **passed without any errors or warnings**. The validator was configured to assume **New JavaScript features (ES6)**.
 
+<details>
+<summary>Configuration settings used for JSHint</summary>
+
 ![Configuration settings used for JSHint](readme-resources/images/js-validator.jpg)
+</details>
 
 The table below explictly states which files were tested.
 
 | Status  | Test Description |
 | ---     | ---              |
-| ✓ | **enable_button_on_confirm** passed without errors or warnings |
-| ✓ | **toggle_btn** passed without errors or warnings |
-| ✓ | **delete_club_info** passed without errors or warnings |
-| ✓ | **delete_venue** passed without errors or warnings |
-| ✓ | **initialise_map** is called by the Google Maps API, so the google variable being undefined and the initMap function being unused were ignored (they are used later in the parent template) - no other errors or warnings were found |
-| ✓ | **init_venue_modal** passed without errors or warnings |
+| ✓ | **enable_button_on_confirm.js** passed without errors or warnings |
+| ✓ | **toggle_btn.js** passed without errors or warnings |
+| ✓ | **delete_club_info.js** passed without errors or warnings |
+| ✓ | **delete_venue.js** passed without errors or warnings |
+| ✓ | **initialise_map.js** is called by the Google Maps API, so the google variable being undefined and the initMap function being unused were ignored (they are used later in the parent template) - no other errors or warnings were found |
+| ✓ | **init_venue_modal.js** passed without errors or warnings |
 
 ## Testing with Chrome DevTools
 
