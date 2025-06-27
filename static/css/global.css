@@ -112,11 +112,11 @@ h6 {
 
 /* Text Colour Utilities */
 .green {
-  color: rgb(0, 94, 0);
+  color: #005e00;
 }
 
 .amber {
-  color: orange;
+  color: #ffa500;
 }
 
 .red {
