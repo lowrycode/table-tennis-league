@@ -1,6 +1,6 @@
 # City and District Table Tennis League
 
-**City and District** is a fictitious table tennis league based in York and the surrounding region. This website serves as a central hub for all league-related information.
+**City and District** is a fictitious table tennis league based in York and the surrounding region. This website serves as the central hub for all league-related information.
 
 The project was built using the **Python Django** framework and deployed using **Heroku**.
 
@@ -13,7 +13,7 @@ You can visit the deployed website <a href="https://city-and-district-ff69b7e3e1
 
 The [**Project Planning**](readme-resources/planning.md) document explains my rationale and personal goals for the project. It also includes Entity Relationship Diagrams (ERDs) to show the database design.
 
-Planning has been categorised into 3 distinct stages of development:
+Planning was categorised into three distinct stages of development. Each stage is outlined below, along with its rationale and completion status:
 
 **STAGE 1: Information and Contact (COMPLETED)**
 - Website displays key information about the league.
@@ -21,20 +21,24 @@ Planning has been categorised into 3 distinct stages of development:
 - Users can view information about table tennis clubs in the region.
 - Authenticated users can be assigned club admin status to manage club information (which is approved by the league secretary).
 
-*This stage ensures that all of the key assessment criteria are met, including user authentication and CRUD functionality.*
+*RATIONALE: This stage ensures that all of the key assessment criteria are met, including user authentication and CRUD functionality.*
 
-**STAGE 2: League Data (PLANNED)**
+*NOTE: In the mentor meeting that took place following the completion of stage 1, my mentor advised that more CRUD functionality should be included for regular users (not just those with Club Admin status). Therefore, the Club Review functionality was later developed to allow regular users to create, read, edit and delete club reviews.*
+
+**STAGE 2: League Data (PARTLY COMPLETED)**
 - Users can view fixtures, results, league tables, team stats and player stats.
 - Authenticated users can link their account to a player to more quickly view information that relates directly to them (upcoming fixtures, recent results, etc.).
 
-*This stage provides an opportunity for planning and implementing a relational database and also data analysis features.*
+*RATIONALE: This stage provides an opportunity to plan and implement a relational database, as well as data analysis features.*
+
+*NOTE: Pages for fixtures, results, league tables and team stats were developed. However, there was not enough time to implement the Player Stats page or the Player Dashboard where users link their account to a player.* 
 
 **STAGE 3: League Management (PLANNED)**
 - Authenticated users can be assigned permissions to submit match scores.
 - Club Admins can manage club players and register teams in the league.
 - League secretary can setup league seasons through the website, rather than the Django admin panel, for a more streamlined experience (e.g. generating fixtures rather than relying on manual data entry).
 
-*This stage provides an opportunity for demonstrating proficiency in problem solving and efficient design systems.*
+*RATIONALE: This stage provides an opportunity to demonstrate proficiency in problem solving and efficient design systems.*
 
 # Agile Approach and Sprints
 
@@ -63,6 +67,7 @@ The following features contribute to a good User Experience (UX):
 The website categorises information into the following pages:
 - **Homepage** - *Includes key information about the league. Accessible from Navbar.*
 - **Clubs Page** - *Displays key information about clubs in the region, including contact details for the club administrators. Accessible from Navbar.*
+- **League Pages** - *Display league data, including fixture information, match results, league tables and team stats. Accessible from Navbar or links within these pages.*
 - **Contact Page** - *Displays contact details for the league administrator and a contact form for submitting an enquiry. Accessible from Navbar and Footer.*
 - **User Account Pages** - *Pages relating to user authentication (Login, Logout, Signup, Change Password, Account Settings, etc.). Accessible under User Profile dropdown in Navbar.*
 - **Club Admin Dashboard** - *For managing club related information. Accessible under User Profile dropdown in Navbar but only accessible if user is granted "Club Admin Status".*
@@ -113,26 +118,38 @@ Wireframes were produced using <a href="https://balsamiq.com/" target="_blank" r
 
 *NOTE: The wireframe for the Account Settings page includes a section for Linked Players. This feature has not yet been implemented but the wireframe shows the original design.*
 
-### Main Public Pages
+<details>
+<summary>Main Public Pages</summary>
 
 ![Wireframes for Homepage](readme-resources/images/wireframe-home.jpg)
 ![Wireframes for Clubs page](readme-resources/images/wireframe-clubs.jpg)
 ![Wireframes for Contact page](readme-resources/images/wireframe-contact.jpg)
 ![Wireframes for custom Error pages](readme-resources/images/wireframe-error-pages.jpg)
+</details>
 
-### Authentication Pages
+<details>
+<summary>Authentication Pages</summary>
+
 ![Wireframes for Login page](readme-resources/images/wireframe-login.jpg)
 ![Wireframes for Logout page](readme-resources/images/wireframe-logout.jpg)
 ![Wireframes for Signup page](readme-resources/images/wireframe-signup.jpg)
 
-### Pages for Managing Account Settings
+</details>
+
+<details>
+<summary>Pages for Managing Account Settings</summary>
+
 ![Wireframes for Account Settings page](readme-resources/images/wireframe-account-settings.jpg)
 ![Wireframes for Change Email page](readme-resources/images/wireframe-change-email.jpg)
 ![Wireframes for Change Password page](readme-resources/images/wireframe-change-password.jpg)
 ![Wireframes for Drop Club Admin Status page](readme-resources/images/wireframe-drop-club-admin-status.jpg)
 ![Wireframes for Delete Account page](readme-resources/images/wireframe-delete-account.jpg)
 
-### Club Admin Pages
+</details>
+
+<details>
+<summary>Club Admin Pages</summary>
+
 ![Wireframes for Club Admin page](readme-resources/images/wireframe-club-admin.jpg)
 ![Wireframes for Create Venue page](readme-resources/images/wireframe-create-venue.jpg)
 ![Wireframes for Update Club Info page](readme-resources/images/wireframe-update-club-info.jpg)
@@ -141,12 +158,19 @@ Wireframes were produced using <a href="https://balsamiq.com/" target="_blank" r
 ![Wireframes for Update Venue Info page](readme-resources/images/wireframe-update-venue-info.jpg)
 ![Wireframes for Delete Venue page](readme-resources/images/wireframe-delete-venue.jpg)
 
-### League Pages
+</details>
+
+<details>
+<summary>League Pages</summary>
+
 ![Wireframes for Fixtures page](readme-resources/images/wireframe-fixtures.jpg)
 ![Wireframes for Results page](readme-resources/images/wireframe-results.jpg)
 ![Wireframes for Result Breakdown page](readme-resources/images/wireframe-result-breakdown.jpg)
 ![Wireframes for League Tables page](readme-resources/images/wireframe-league-tables.jpg)
 ![Wireframes for Team Summary page](readme-resources/images/wireframe-team-summary.jpg)
+
+</details>
+
 
 ## 6. Visual Design
 
