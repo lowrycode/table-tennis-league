@@ -722,7 +722,11 @@ ChatGPT was also used to aid the code review process. Some of the suggestions we
 
 # Testing
 
+## Automated Tests
+
 Large sections of the project were developed using a Test-Driven Development (TDD) approach, with unit tests written using Django's TestCase. As a result, much of the codebase is covered by automated tests. In some instances, such as the integration of the Google Maps API, tests were added after the functionality was implemented. 
+
+## Manual Testing
 
 Thorough manual testing was also conducted on the deployed site before marking a user story as *Done* in the GitHub projects board. These tests are documented in the [Manual Testing](readme-resources/manual_testing.md) document.
 
@@ -742,10 +746,134 @@ The following devices were used to test the website:
 - Various Android phones
 - Various iPhones (including a 1st generation iPhone 5)
 
+## Bug Fixes
 
-# Code Validation Tests
+A number of bugs were encountered during testing. Some of these are described below.
 
-## HTML - *PASSED*
+### Bug 1
+
+**Description:**
+Clubs without any approved information were appearing on the homepage
+
+**Cause:**
+The line for appending to club_dicts was under-indented and therefore out of the if block.
+
+```python
+if club.approved_club_infos:
+    # Create club_dict here ...
+
+# Append club data (is outside of the if block)
+clubs_dict.append(club_dict)
+```
+
+**Fix:**
+Indented the line for appending to clubs_dict to ensure it is contained in the if block
+
+### Bug 2
+
+**Description:**
+Image files were not being correctly uploaded via the form on the Club Info page.
+
+**Cause:**
+The form was missing `enctype` attribute and the files were not being passed to the form in the update_club_info view.
+
+```python
+# Problem line in update_club_info.html template
+<form method="POST" action="{% url "update_club_info" %}">
+
+# Problem line in update_club_info view
+form = UpdateClubInfoForm(request.POST)
+```
+
+**Fix:**
+Added `enctype="multipart/form-data"` to form element in the template and passed files to the form in the view.
+
+```python
+# Correction in template
+<form method="POST" action="{% url "update_club_info" %}" enctype="multipart/form-data">
+
+# Correction in view
+form = UpdateClubInfoForm(request.POST, request.FILES)
+```
+
+### Bug 3
+
+**Description:**
+The Cancel button on the Delete Club Info page was not returning the user to the club admin page after requesting to delete unapproved club information when none was found to exist.
+
+**Cause:**
+When no unapproved club information exists to delete, the view renders the same page with a warning. Clicking the button returned the user to the previous page, which in this case is the same page.
+
+**Fix:**
+The buttons href attribute was changed to point to the club admin page, rather than the previous page.
+
+```python
+# Changed from this
+<a href="javascript:history.back()" class="btn btn-custom2">Cancel</a>
+
+# to this
+<a href="{% url "club_admin_dashboard" %}" class="btn btn-custom2">Cancel</a>
+```
+
+### Bug 4
+
+**Description:**
+The number of away player wins on the Team Summary page was limited to a maximum of one win.
+
+**Cause:**
+The view was incorrectly updating the away_player_win_counts dictionary.
+
+**Fix:**
+Add the missing plus sign so the win count is incremented rather than being set as one.
+
+```python
+# Changed from this
+away_player_win_counts[player] = 1
+
+# to this
+away_player_win_counts[player] += 1
+```
+
+### Bug 5
+
+**Description:**
+Deleting a venue from the Club Admin dashboard caused a crash when the venue was assigned as the home venue for a league team.
+
+**Cause:**
+When the Team model was added later, the home_venue was assigned as a protected field so attempting to delete a linked venue raised a ProtectedError.
+
+**Fix:**
+Update delete_venue view to wrap the delete operation in a try/except block.
+
+```python
+# Changed from this
+Venue.objects.filter(id=venue.id).delete()
+messages.success(request, "Venue has been deleted.")
+
+# to this
+try:
+    Venue.objects.filter(id=venue.id).delete()
+    messages.success(request, "Venue has been deleted.")
+except ProtectedError:
+    messages.warning(
+        request,
+        (
+            "Venue could not be deleted because it is "
+            "linked to protected league data."
+        ),
+    )
+```
+
+It was later made more robust by not giving the user the option of deleting a linked venue at the template level as well.
+
+
+## Unresolved Bugs
+
+No known unresolved bugs remain.
+
+## Code Validation Tests
+
+### HTML - *PASSED*
 
 Each of the individual HTML pages were tested using the <a href="https://validator.w3.org/" target="_blank" rel="noopener">**W3C Markup Validator**</a> with the *Validate by Direct Input* option. All of the pages passed HTML validation.
 
@@ -789,14 +917,14 @@ The table below explicitly states which pages were tested.
 | ✓ | **500 Error Page** passed without errors or warnings |
 
 
-## CSS - *PASSED*
+### CSS - *PASSED*
 
 The custom stylesheet was tested using the <a href="https://jigsaw.w3.org/css-validator/" target="_blank" rel="noopener">**W3C CSS Jigsaw Validator**</a> and returned no errors or warnings.
 
 ![CSS Validation Results from W3C CSS Jigsaw Validator](readme-resources/images/css-validator.jpg)
 
 
-## JavaScript - *PASSED*
+### JavaScript - *PASSED*
 
 The JavaScript code was validated using <a href="https://jshint.com/" target="_blank" rel="noopener">**JSHint**</a> and it **passed without any errors or warnings**. The validator was configured to assume **New JavaScript features (ES6)**.
 
@@ -817,7 +945,7 @@ The table below explictly states which files were tested.
 | ✓ | **initialise_map.js** is called by the Google Maps API, so the google variable being undefined and the initMap function being unused were ignored (they are used later in the parent template) - no other errors or warnings were found |
 | ✓ | **init_venue_modal.js** passed without errors or warnings |
 
-## Testing with Chrome DevTools
+## Chrome DevTools Tests
 
 **Google Chrome's DevTools** was used to:
 - Verify no console errors were seen when browsing and interacting with the site.
