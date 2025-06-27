@@ -46,6 +46,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Fields are correctly assigned as whether they are required or not |
 | ✓ | Error message displayed when missing required fields |
 | ✓ | One-to-one relationship with Club is enforced with appropriate error message displayed |
+| ✓ | Helper text displayed for image field to recommend image format, resolution and orientation |
 | ✓ | Boolean fields are unchecked by default |
 
 ### ClubReview Model
@@ -72,7 +73,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | One-to-one relationship with Venue is enforced with appropriate error message displayed |
 | ✓ | Boolean fields are unchecked by default |
 | ✓ | Lattitude and Longitude fields are autopopulated from valid postcode if left blank |
-| ✓ | Invalid postcode does not autopoulate latitude and longitude fields but record is still saved without errors or crashes |
+| ✓ | Invalid postcode does not autopoulate latitude and longitude fields - record is still saved without errors or crashes but no location is added to the map |
 
 ### Division Model
 
@@ -412,7 +413,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | If there is no previous page (e.g. when browser is opened using change password link) the website does not crash when the Go Back button or Change Password button is clicked (the user remains on the Change Password page) |
 | ✓ | Clicking the link ("contact the league administrator") correctly takes the user to the contact page |
 | ✓ | Unauthenticated users are redirected to the login page and return to the change password page after logging in |
-| ✓ | Logout form is responsive across devices and themed consistently with the rest of the website |
+| ✓ | Form is responsive across devices and themed consistently with the rest of the website |
 | ✓ | No console errors or warnings were caused by interacting with page elements |
 
 ### Account Settings Page
@@ -633,7 +634,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ---     | ---              |
 | ✓ | If an unauthenticated user tries to access the Delete Club Info page (via direct url) they are redirected to the login page before another request to the page is made |
 | ✓ | If an authenticated user without Club Admin status tries to access the Delete Club Info page (via direct url) they are directed to a custom 403 (Forbidden) page |
-| ✓ | The Delete Club Info page includes a message warning that the action cannot be undone and a link to the Update Club Info page whcih correctly takes the user to that page when clicked |
+| ✓ | The Delete Club Info page includes a message warning that the action cannot be undone and a link to the Update Club Info page which correctly takes the user to that page when clicked |
 | ✓ | The Delete Club Info page includes radio buttons to allow the user to choose whether to delete unapproved information only or delete approved information as well |
 | ✓ | If the user chooses the option to delete all club info data (including approved version), a confirmation checkbox is displayed and the Delete Club Info button is disabled until they tick it |
 | ✓ | Clicking the Delete Club Info button (when enabled) successfully deletes the requested info, displays a success message and returns the user to the Club Admin dashboard |
@@ -712,7 +713,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ---     | ---              |
 | ✓ | The League nav item is highlighted when the fixtures page is active  |
 | ✓ | A list of Fixtures (grouped by week) is seen |
-| ✓ | Weeks are listed in chronological order (earilest first) with week name, start date and details (if provided) |
+| ✓ | Weeks are listed in chronological order (earliest first) with week name, start date and details (if provided) |
 | ✓ | Fixtures are listed within each week in chronological order (earliest first), by date and time |
 | ✓ | Each fixture includes required information (home team, away team, date and time of fixture, a button for showing venue information) |
 | ✓ | Fixtures are colour coded according to status and a key displays what the colours mean (when fixtures are present) |
