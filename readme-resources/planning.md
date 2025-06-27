@@ -35,8 +35,8 @@ The home of City and District Table Tennis League - a fictional table tennis lea
 The website will have the following types of users:
 - **Visitors:** who seek to learn about what table tennis clubs and competitions are available in the area 
 - **League Players:** who want to view information about fixtures, results, tables, stats and submit match results
-- **Club admins:** who want to manage club information, players and teams
-- **League admin:** the overall website administrator who wants to assign fixtures, approve results, approve club information and manage user permissions 
+- **Club Admins:** who want to manage club information, players and teams
+- **League Admin:** the overall website administrator who wants to assign fixtures, approve results, approve club information and manage user permissions 
 
 # Intended Features and Stages of Development
 
@@ -102,14 +102,15 @@ The project will include the following apps:
 
 # Entity Relationship Diagram
 
-The database design is summarised in the diagrams below. The first image presents the tables and their relationships using standard ERD symbols and notation. The second diagram includes Django ORM-specific details to help plan the models more precisely.
+The database design is summarised in the diagram below, which includes Django ORM-specific details to support precise model planning.
 
-![ERD diagram](images/erd-1.jpg)
-![ERD planning with Django ORM details](images/erd-2.jpg)
+![ERD diagram](images/erd-detailed.jpg)
 
 
 # User Stories and the Agile Approach
 
-User stories for each of the planned features have been written in the initial planning stages. These include acceptance criteria, tasks and a story point estimations. These are likely to be refined later when the capabilities of various technologies and python libraries becomes clearer.
+User stories for each of the planned features have been written at this initial planning stage. The [**User Stories**](user_stories.md) document lists the user stories under their relevant **themes** and **epics**.
 
-*NOTE: Rather than listing all the user stories here, they can be viewed as part of the [Sprints Log](sprint_log.md) document which records the MoSCoW prioritisation label given to each user story at specific moments in the development. They can also be viewed in the [GitHub Project](https://github.com/users/lowrycode/projects/10/views/1) linked to this repo.*
+The [**Sprints Log**](sprint_log.md) document contains the implementation details of each user story, such as the story point estimations, acceptance criteria and development tasks. It also shows the MoSCoW prioritisation labels that were assigned to each user story in each particular sprint.
+
+The user stories can also be viewed in the [**GitHub Project**](https://github.com/users/lowrycode/projects/10/views/1) linked to this repository.

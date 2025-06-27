@@ -1357,7 +1357,7 @@ As a **prospective player**, I can **view the locations of club venues on a map*
 
 
 
-# SPRINT 7 - CLUB ADMIN DASHBOARD AND ACCOUNT SETTINGS PAGE
+# SPRINT 7 - CLUBS PAGE, ACCOUNT SETTINGS PAGE & END OF STAGE 1
 
 Total Story Points: 
 
@@ -1469,5 +1469,777 @@ As a **prospective player**, I can **view the locations of club venues on a map*
 - Display fallback message if no coordinates exist.
 - Test map rendering and responsiveness across devices.
 
-# SPRINT 8
+
+# SPRINT 8 - MODELS FOR STORING LEAGUE DATA
+
+Total Story Points: 
+
+| Priority | Story Points | Percentage |
+|----------|--------------|------------|
+| MUST | 13 | 57 % |
+| SHOULD | 4 | 17 % |
+| COULD | 6 | 26 % |
+
+### Manage Divisions from Django Admin (MUST)  3SP
+As a **league administrator**, I can **create, update, or delete divisions (if not linked to archived data)** so that **teams can be grouped appropriately based on skill level**.
+
+**Acceptance Criteria**
+- The Django Admin includes a Division model with name and rank as required fields which must also be unique
+- The object can only be deleted if not linked to any archived seasons
+- If the administrator attempts to delete a division linked to archived data, a clear error message is shown
+- The admin can view a list of all divisions sorted by rank (lowest to highest).
+
+**Tasks**
+- Define the Division model with name and rank as required and unique fields
+- Register the Division model in the Django Admin with list view sorted by rank
+- Override the delete() method to block deletion if linked to archived seasons
+- Display the custom error message when deletion is blocked due to archived links
+- Write tests to check model validation
+
+### Manage Seasons from Django Admin (MUST)  5SP
+As a **league administrator**, I can **create and manage a season** so that **fixtures, divisions, and results can be organized independently from previous seasons**.
+
+**Acceptance Criteria**
+- The Django Admin includes a Season model with the fields prescribed in the database planning documents
+- All fields are required
+- Unique fields: name, short_name, slug
+- Start dates must be before end dates (for both season and registration)
+- registration_closes must be before start_date
+- Seasons are ordered by start_date (descending)
+
+**Tasks**
+- Create the Season model with all required fields and constraints (unique, blank, etc.)
+- Add validation for date logic and require at least one division
+- Register the model in Django Admin with a custom form to handle validation
+- Use prepopulated_fields to auto-fill the slug from the name
+- Configure the admin list view to order seasons by most recent creation date
+- Write tests to check model validation
+
+### Manage Weeks from Django Admin (MUST)  2SP
+As a **league administrator**, I can **create, update, or delete weeks (if not linked to archived data)** so that **each week in a season can be defined and referenced for fixtures and display**.
+
+**Acceptance Criteria**
+- The Django Admin includes a Week model with season, name, and start_date as required fields
+- The details field is optional and can include additional info like "No fixtures this
+- week"
+- Weeks are linked to a season via a foreign key
+- The weeks are order by start_date (ascending in model, descending in admin dashboard)
+- Season and name must be unique together
+
+**Tasks**
+- Define the Week model and register in Django Admin with list view sorted by start_date
+- Write tests to confirm validation (and for later, deletion behaviour)
+
+### Manage Player Profiles from Django Admin (MUST)  3SP
+As a league administrator, I can create, update, or delete base player profiles so that player information is maintained centrally and stays consistent across seasons.
+
+**Acceptance Criteria**
+- The Django Admin includes a Player model with fields for base player details (as described in database planning docs)
+- A player can only be deleted if not linked to a season player
+- If deletion is blocked, a clear error message is shown, e.g. "This player cannot be deleted because they are linked to season data"
+- Players are listed alphabetically by surname then forename in the Django Admin
+
+**Tasks**
+- Define the Player model and register in Django Admin with list and detail views
+- Override the delete() method to prevent deletion if linked to protected data
+- Display a clear error message if deletion is blocked
+- Write tests for validation and restricted deletion of player profiles
+
+### Manage Team Players from Django Admin (SHOULD)  4SP
+As a **league administrator**, I can **create, update, or delete TeamPlayer records** so that **season-specific details are tracked independently of general player information**.
+
+**Acceptance Criteria**
+- The Django Admin includes a TeamPlayer model with fields as described in the database planning documents
+- A TeamPlayer can only be deleted if not linked to protected match data
+- If deletion is blocked, a clear error message is shown
+- TeamPlayers are listed in the Django Admin ordered by player (surname asc) then team
+- Admin list includes player, team and 'paid fees' status and can be filtered by team and 'paid fees' status
+
+**Tasks**
+- Define the TeamPlayer model and register it in the Django Admin
+- Implement custom validation or override delete() to prevent deletion if linked to protected data
+- Display a clear error message when deletion is blocked
+- Ensure admin list view shows correct details, ordering and filters
+- Write tests for model validation, updates, and restricted deletion logic
+
+### Manage Teams from Django Admin (MUST)  6SP
+As a **league administrator**, I can **create, update, or delete Team records** so that **each team is correctly assigned to a division within a season**.
+
+**Acceptance Criteria**
+- The Django Admin includes a Team model with required fields as defined in the database planning documents
+- A Team can only be assigned to one division per season
+- Once the season has started, the team's division cannot be changed
+- User friendly validation errors are shown if assignment rules are broken
+
+**Tasks**
+- Define the Team model and register it in the Django Admin
+- Add model or form validation for division uniqueness per season
+- Prevent division reassignment if the season has started
+- Display appropriate success and error messages in the admin interface
+- Write tests to cover creation, validation, and update restrictions
+
+# SPRINT 9 - FIXTURES PAGE
+
+Total Story Points: 
+
+| Priority | Story Points | Percentage |
+|----------|--------------|------------|
+| MUST | 9 | 47 % |
+| SHOULD | 6 | 32 % |
+| COULD | 4 | 21 % |
+
+### View League Fixtures (MUST)  5SP
+As a **league player**, I can **view upcoming fixtures** so that **I know who, where, and when I'm playing**.
+
+**Acceptance Criteria**
+- The Fixtures page is available from the League menu
+- Each fixture includes home team, away team, date, time and venue.
+- Fixtures are colour-coding according to whether they are scheduled, postponed, cancelled or completed and a key shows what each colour means
+- Fixtures are grouped by week
+- Weeks are ordered in chronological order (earliest first)
+- Fixtures are sorted within weeks by date and time (earliest first).
+- If no fixtures exist, suitable placeholders are displayed.
+- The page is public and mobile responsive.
+
+**Tasks**
+- Add League > Fixtures link in the navigation menu.
+- Create fixtures view and template.
+- Sort fixtures by date and add status colour coding.
+- Write tests for models and views.
+
+### Link to Venue from Fixture (MUST)  3SP
+As a **league player**, I can **view venue details from a fixture** so that **I know where it's being held**.
+
+**Acceptance Criteria**
+- Each fixture shows a venue button styled as a link.
+- Clicking the button opens a modal showing fixture, venue name, address, parking, and table count.
+- Suitable placeholders are shown if the venue can't be found or it doesn't have any approved venue info.
+- While the information is loading, a suitable message or spinner is shown.
+- Venue modal is public (login not required)
+- Feature works across mobile, tablet, and desktop.
+
+**Tasks**
+- Add modal for venue details on fixtures page.
+- Populate modal with correct venue info.
+- Style button to look like a link.
+- Ensure responsive styling and test on all devices.
+
+### Filter Fixtures by Season (MUST)  3SP
+As a **league player**, I can **filter fixtures by season** so that **I can view matches from a specific season**.
+
+**Acceptance Criteria**
+- A season filter is shown on the Fixtures page, defaulting to the current season
+- Selecting a season filters the list to show only fixtures for that season.
+- A suitable placeholder displays if season information cannot be found.
+- The season list is sorted by start date (most recent first).
+- Filtering works across all screen sizes and optionally updates without a full page reload.
+
+**Tasks**
+- Add season filter dropdown to fixtures page.
+- Implement filtering logic in view.
+- Sort season list by start date (descending).
+- Show fallback message if no season data.
+- Test filtering across devices and screen sizes.
+
+### Filter Fixtures by Division (SHOULD)  3SP
+As a **league player**, I can **filter fixtures by division** so that **I can easily find relevant matches**.
+
+**Acceptance Criteria**
+- A division filter is shown on the Fixtures page, defaulting to "All Divisions".
+- Selecting a division filters the list to only show relevant fixtures.
+- If no fixtures exist for the selected division, an appropriate message is shown.
+- Division list is sorted by rank (lowest rank number first).
+- Filtering works on all screen sizes and optionally updates without full page reload.
+
+**Tasks**
+- Add division filter dropdown to fixtures page.
+- Implement dynamic filtering logic in view or frontend.
+- Sort division list by rank.
+- Display fallback message if no fixtures found.
+- Test filter behaviour on various devices.
+
+### Filter Fixtures by Club (SHOULD)  2SP
+As a **league player**, I can **filter fixtures by club** so that **I can quickly find matches involving a specific club**.
+
+**Acceptance Criteria**
+- A club filter is shown on the Fixtures page, defaulting to "All Clubs".
+- Selecting a club filters the list to show only fixtures where the club is either the home or away team.
+- If no fixtures exist for the selected club, a suitable placeholder is displayed (e.g. "No fixtures this week.").
+- The club list is sorted alphabetically by name.
+- Filtering works across all screen sizes and optionally updates without a full page reload.
+
+**Tasks**
+- Add club filter dropdown to fixtures page.
+- Implement logic to filter fixtures where selected club is either home or away team.
+- Sort club list alphabetically.
+- Display fallback message if no fixtures match the selected club.
+- Test filtering responsiveness across devices.
+
+### Filter Fixtures by Team (COULD)  2SP
+As a **league player**, I can **filter fixtures by team** so that **I can easily see matches involving a specific team**.
+
+**Acceptance Criteria**
+- A team filter is available on the Fixtures page, defaulting to "All Teams".
+- Selecting a team filters the list to show fixtures where the team is either the home or away team.
+- If no fixtures exist for the selected team, a message like "No fixtures found" is displayed.
+- The team list is sorted alphabetically by name.
+- Filtering works smoothly on mobile, tablet, and desktop.
+
+**Tasks**
+- Add team filter dropdown to the fixtures page.
+- Implement filtering logic for home or away team matches.
+- Sort the team list alphabetically.
+- Show appropriate message if no fixtures match the selected team.
+- Test filter functionality across screen sizes.
+
+
+
+# SPRINT 10 - CLUB REVIEW AND FIXTURE RESULT MODEL
+
+Total Story Points: 
+
+| Priority | Story Points | Percentage |
+|----------|--------------|------------|
+| MUST | 10 | 55 % |
+| SHOULD | 3 | 17 % |
+| COULD | 5 | 28 % |
+
+## View Club Reviews (MUST) 5SP
+As a **club visitor**, I can **view all reviews and ratings for a club** so that **I can make an informed decision about the club**.
+
+**Acceptance Criteria**
+- The Clubs page shows each club's average rating and total number of reviews as a link (if it has reviews).
+- If no reviews exist, a suitable placeholder link is shown
+- Clicking the link navigates to the club's dedicated Reviews page.
+- The Reviews page lists all reviews for that club, showing star rating, headline, review text, the date it was last modified and the username for the user who posted it.
+- Reviews are sorted by most recent first.
+- The Reviews page is publicly accessible and mobile responsive.
+- Authenticated users who have not made a review see a button for creating a review
+- Authenticated users who have made a review see their review above the others with buttons for editing or deleting their review
+
+**Tasks**
+- Update Clubs page template and view to display average rating and review count with link.
+- Create a new Reviews page view and template.
+- Implement sorting and display of reviews.
+- Add placeholder for no reviews case.
+- Write tests for views and templates.
+
+## Submit Club Review (MUST) 5SP
+As a **logged-in user**, I can **submit a review with a star rating and comment for a club** so that **I can share my experience with others**.
+
+**Acceptance Criteria**
+- A review submission form is available on the club's Reviews page for logged-in users only.
+- The form requires a star rating (1 to 5), a headline and review text.
+- Users can submit only one review per club.
+- Upon successful submission, the review is saved, and the average rating and review count updates (when approved).
+- After submitting, the user is redirected to the Club Reviews page and the new review shows as awaiting approval.
+- Validation errors are shown if the input is invalid.
+
+**Tasks**
+- Add review submission form to the Reviews page template.
+- Create review model and implement validation constraints.
+- Update average rating calculation on review creation.
+- Write tests for model, form validation, and view behavior.
+
+## Update or Delete Own Review (SHOULD) 3SP
+As a **logged-in user**, I can **update or delete my own club review** so that **I can update or remove my feedback if needed**.
+
+**Acceptance Criteria**
+- Logged-in users see update and delete options next to their own reviews.
+- Updating a review allows changing the star rating, title and comment.
+- Deleting a review removes it permanently after confirmation.
+- Average rating reflects updates or deletions (if previous review was approved).
+- Changes are reflected immediately in the UI.
+
+**Tasks**
+- Add update and delete buttons for user's own reviews.
+- Create update and delete review views and templates/modals.
+- Implement confirmation for deletion.
+- Update average rating after changes.
+- Write tests for update and delete functionality.
+
+## Manage Fixture Results from Django Admin (COULD) 5SP  
+As a **league administrator**, I can **record and update fixture results** so that **match outcomes are accurately captured and reflected in the system**.
+
+**Acceptance Criteria**  
+- The FixtureResult model includes the following fields:
+  - **Fixture** (link to a scheduled fixture; one-to-one relationship)  
+  - **Home Score** (non-negative integer)  
+  - **Away Score** (non-negative integer)  
+  - **Winner** (select: "home", "away" or "draw")  
+  - **Status** (select: "played" or "forfeited")  
+- Validation ensures:
+  - A result cannot be entered for a fixture already completed  
+  - Winner must match the higher score (or say draw if scores are equal)  
+  - Only one result can be recorded per fixture  
+- Admins can edit or delete a result if corrections are needed.  
+
+**Tasks**  
+- Create the `FixtureResult` model and link it via a one-to-one relationship to `Fixture`.  
+- Add the model to Django Admin with custom validation.  
+- Display inline or related fixture info in the admin form for context.  
+- Write tests for result creation, validation, and update behavior.
+
+
+
+# SPRINT 11 - BUG FIXES AND RESULTS PAGE
+
+Total Story Points: 
+
+| Priority | Story Points | Percentage |
+|----------|--------------|------------|
+| MUST | 12 | 44 % |
+| SHOULD | 9 | 33 % |
+| COULD | 6 | 22 % |
+
+## COMPLETED
+
+### Bug Fix - Preview on Club Admin Page Displays Review Data as Disabled Link (MUST) 2SP
+### Acceptance Criteria
+- The average review score and number of reviews displays in the preview on the club admin page as a disabled link
+- To communicate that the link is disabled
+    - aria-label and aria-disabled attributes are used to assist screen readers
+    - text is muted to assist users on mobile and tablet devices 
+    - cursor 'not-allowed' and title on hover to assist laptop users 
+
+### Tasks
+- Adjust views to include review summary data and from_admin as context variable
+- Adjust admin_dashboard template to make link disabled if from_admin
+
+### Bug Fix - Return to correct section of Clubs Page from Club Reviews page (MUST) 1SP
+### Acceptance Criteria
+- Clicking 'Return to Clubs page' button on Club Reviews page navigates the user to the section of the page which displays information for that club
+
+### Tasks
+- Adjust button URL to include id of clubs article 
+
+### Bug Fix - Autoassign Fixture Venue (MUST) 1SP
+### Acceptance Criteria
+- The venue field autopopulates on save if the the venue field is left blank
+
+### Tasks
+- Add logic in save method
+
+### Jump to Current Week (MUST) 3SP
+As a **fixtures page user**, I can **quickly jump to the current week's fixtures** so that **I don't have to scroll through past weeks manually**.
+
+**Acceptance Criteria**
+- A “Jump to Current Week” button is displayed above the fixtures list when a current week exists.
+- Clicking the button scrolls to the current week's section.
+- If no current week exists (e.g. offseason), the button is not shown.
+
+**Tasks**
+- Identify and pass the current week as context to the fixtures template based on today's date.
+- Add conditional `id="current-week"` to the relevant fixture section in the template.
+- Add a “Jump to Current Week” link to `#current-week`.
+- Write tests for current week detection and button visibility.
+
+### Manage Fixture Results from Django Admin (MUST) 5SP  
+As a **league administrator**, I can **record and update fixture results** so that **match outcomes are accurately captured and reflected in the system**.
+
+**Acceptance Criteria**
+- The FixtureResult model includes the following fields:
+  - **Fixture** (link to a scheduled fixture; one-to-one relationship)
+  - **Home Score** (non-negative integer)
+  - **Away Score** (non-negative integer)
+  - **Winner** (auto-populated: "home", "away" or "draw")
+  - **Status** (select: "played" or "forfeited")
+- Validation ensures:
+  - A result cannot be entered for a fixture already completed
+  - Home and away scores must add up to 10
+  - Only one result can be recorded per fixture
+- Admins can edit or delete a result if corrections are needed.
+
+**Tasks**  
+- Create the `FixtureResult` model and link it via a one-to-one relationship to `Fixture`.
+- Add the model to Django Admin with custom validation.
+- Display inline or related fixture info in the admin form for context.
+- Write tests for result creation and validation behaviour.
+
+### Manage Singles Matches from Django Admin (SHOULD) 5SP
+As a **league administrator**, I can **record and update singles match results within a fixture result** so that **individual player match outcomes are accurately captured and reflected**.
+
+**Acceptance Criteria**
+- The `SinglesMatch` model includes the following fields:
+  - **Fixture Result** (foreign key to `FixtureResult`)
+  - **Home Player** (foreign key to `Player`)
+  - **Away Player** (foreign key to `Player`)
+  - **Home Sets** (non-negative integer)
+  - **Away Sets** (non-negative integer)
+  - **Winner** (select: "home" or "away", auto-calculated based on sets)
+- Validation ensures:
+  - Sets cannot be equal (no draws allowed)
+  - Unique constraint on combination of fixture result and players
+  - Scores must be consistent with best of 5
+  - Players cannot play against themselves
+  - Players must be registered for that season
+  - Players must be team players for the same club as the home/away team (but not necessarily the same team to allow for reserves)
+- League Admin can create, edit and delete singles matches linked to fixture results.
+
+**Tasks**
+- Create the `SinglesMatch` model with appropriate fields and constraints.
+- Add the model to Django Admin.
+- Implement validation logic and winner auto-population.
+- Write tests.
+
+### Manage Doubles Matches from Django Admin (SHOULD) 4SP
+As a **league administrator**, I can **record and update doubles match results within a fixture result** so that **pairs of players' match outcomes are tracked correctly**.
+
+**Acceptance Criteria**  
+- The `DoublesMatch` model includes the following fields:
+  - **Fixture Result** (one-to-one link to `FixtureResult`)
+  - **Home Players** (exactly 2 players selected via ManyToMany to `TeamPlayer`)
+  - **Away Players** (exactly 2 players selected via ManyToMany to `TeamPlayer`)
+  - **Home Sets** (non-negative integer)
+  - **Away Sets** (non-negative integer)
+  - **Winner** (select: "home" or "away", auto-calculated based on sets)
+- Validation ensures:
+  - Only one doubles match is allowed per fixture
+  - Exactly 2 home and 2 away players selected
+  - The same player cannot play in both doubles teams
+  - No draws allowed (home sets cannot equal away sets)
+  - Scores must be consistent with best of 5
+  - All team players must be registered for a team associated with that club and season
+
+**Tasks**  
+- Create `DoublesMatch` model.
+- Add model to Django Admin.
+- Implement validation.
+- Write tests.
+
+### Manage Singles Games (Sets) from Django Admin (COULD) 3SP
+As a **league administrator**, I can **record individual sets within a singles match** so that **detailed scoring per set is captured**.
+
+**Acceptance Criteria**
+- The `SinglesGame` model includes the following fields:
+  - **Singles Match** (foreign key to `SinglesMatch`)
+  - **Set Number** (integer)
+  - **Home Points** (integer)
+  - **Away Points** (integer)
+  - **Winner** (select: "home" or "away")
+- Validation ensures:
+  - At least one player scores 11 or more points
+  - Winner leads by at least 2 points
+  - Extended play rules enforced (if either player >11, margin must be exactly 2)
+  - Unique constraint on set number per singles match
+
+**Tasks**  
+- Create the `SinglesGame` model with the fields and constraints.
+- Add the model to Django Admin.
+- Implement scoring validation and winner auto-population.
+- Write tests for validation and CRUD operations.
+
+### Manage Doubles Games (Sets) from Django Admin (COULD) 3SP
+As a **league administrator**, I can **record individual sets within a doubles match** so that **detailed scoring per set for doubles is accurately captured**.
+
+**Acceptance Criteria**
+- The `DoublesGame` model includes the following fields:
+  - **Doubles Match** (foreign key to `DoublesMatch`)
+  - **Set Number** (integer)
+  - **Home Points** (integer)
+  - **Away Points** (integer)
+  - **Winner** (select: "home" or "away")
+- Validation ensures the same scoring rules as singles games:
+  - At least one team scores 11 or more points
+  - Winner leads by at least 2 points
+  - Extended play rules enforced for scores >11
+  - Unique constraint on set number per doubles match
+
+**Tasks**  
+- Create the `DoublesGame` model with fields and constraints.
+- Add the model to Django Admin.
+- Implement validation for scoring rules and winner assignment.
+- Write tests for creation, update, deletion, and validation.
+
+## ADDED LATER AND COMPLETED
+
+### View League Results (COULD)  5SP
+As a **league player**, I can **view completed or forfeited match results** so that **I know the outcomes of recent matches**.
+
+**Acceptance Criteria**
+- The Results page is available from the League menu and shows only played or forfeited matches.
+- Each fixture result displays home team, away team, their scores, date and a link to view a breakdown of individual match scores.
+- Weeks are sorted by most recent date first but fixture results within a week are sorted in asc chronological order.
+- If no results exist, a “No results to display.” message is shown.
+- The page is publicly visible and mobile responsive.
+
+**Tasks**
+- Define or reuse Fixture model with result data.
+- Add League > Results link in the navigation menu.
+- Create results view and template.
+- Filter fixtures by status (with associated fixture result - completed or forfeited).
+- Sort weeks by most recent date first.
+- Write tests for filtering, sorting, and public access.
+
+### Filter Results by Division (COULD)  3SP
+As a **league player**, I can **filter results by division** so that **I can find relevant match outcomes more easily**.
+
+**Acceptance Criteria**
+- A division filter appears on the Results page, defaulting to “All Divisions”.
+- Selecting a division filters the results list accordingly.
+- If no results exist for the selected division, a message like "No results found" is shown.
+- Division list is sorted by rank (lowest rank number first).
+- Filtering is responsive and may update without a full page reload.
+
+**Tasks**
+- Add division filter dropdown to Results page.
+- Filter results by division.
+- Sort division list by rank.
+- Display fallback message for empty filter result.
+- Write tests and test responsiveness.
+
+### Filter Results by Season (COULD)  3SP
+As a **league player**, I can **filter results by season** so that **I can view outcomes from a specific season**.
+
+**Acceptance Criteria**
+- Season filter appears on the Results page, defaulting to current season.
+- Selecting a season filters the list accordingly.
+- “No results found” message is shown if needed.
+- Season list is sorted by start date (most recent first).
+- Filtering is responsive and may update dynamically.
+
+**Tasks**
+- Add season filter dropdown to Results page.
+- Implement backend or frontend filtering by season.
+- Sort season list by date descending.
+- Test across screen sizes and edge cases.
+
+### Filter Results by Club (COULD)  2SP
+As a **league player**, I can **filter results by club** so that **I can quickly find outcomes involving a particular club**.
+
+**Acceptance Criteria**
+- Club filter is available and defaults to “All Clubs”.
+- Filters results where selected club is home or away.
+- “No results found” shown when applicable.
+- Club list is sorted alphabetically.
+- Filtering works across devices and screen sizes.
+
+**Tasks**
+- Add club filter dropdown to Results page.
+- Filter results where selected club is either home or away.
+- Alphabetically sort club list.
+- Display fallback when no matching results.
+- Write tests and ensure responsiveness.
+
+## ADDED LATER AND NOT COMPLETED
+
+### View Match Drilldown Scores (COULD)  5SP
+As a **league player**, I can **click on a match score to view detailed drilldown scores** so that **I can see how the overall match result was achieved**.
+
+**Acceptance Criteria**  
+- Match scores on the results page are clickable links.  
+- Clicking a match score opens a detailed drilldown view showing individual game/set scores and player performance.
+- The drilldown view includes home and away team scores for each segment of the match.  
+- Forfeited matches are handled appropriately, e.g. "Detailed scores not available" or link not active.  
+- The drilldown display is responsive and works well on mobile, tablet, and desktop devices.
+
+**Tasks**  
+- Add clickable links to match scores in the results list.  
+- Create a drilldown view/template to display detailed score breakdowns.  
+- Implement data retrieval for detailed scores from the database.  
+- Handle cases where detailed scores are missing.  
+- Ensure responsive design for the drilldown view.  
+- Write tests for link functionality, data display, and fallback scenarios.
+
+
+# SPRINT 12 - RESULTS BREAKDOWN AND LEAGUE TABLES
+
+Total Story Points: 
+
+| Priority | Story Points | Percentage |
+|----------|--------------|------------|
+| MUST | 10 | 45 % |
+| SHOULD | 7 | 32 % |
+| COULD | 5 | 23 % |
+
+## COMPLETED
+
+### View Match Drilldown Scores (MUST)  5SP
+As a **league player**, I can **click on a match score to view detailed drilldown scores** so that **I can see how the overall match result was achieved**.
+
+**Acceptance Criteria**  
+- The results page includes a clickable "score" link.  
+- Clicking the score link opens a detailed drilldown view showing individual game/set scores and player performance.
+- The drilldown view displays summary data about the fixture (date, time, venue, team names) and match result (team scores, summary of player match wins).
+- The drilldown view shows set scores for each singles/doubles match and game scores when available. 
+- Missing match/game scores are handled appropriately.
+- The drilldown display is responsive and works well on mobile, tablet, and desktop devices.
+
+**Tasks**  
+- Add clickable links to match scores in the results list.  
+- Create a drilldown view/template to display detailed score breakdowns.  
+- Implement data retrieval for detailed scores from the database.  
+- Handle cases where detailed scores are missing.  
+- Ensure responsive design for the drilldown view.  
+- Write tests for link functionality, data display, and fallback scenarios.
+
+### View League Tables (MUST)  5SP
+As a **league player**, I can **view league tables** so that **I can see how teams are performing in the league**.
+
+**Acceptance Criteria**
+- A "League Tables" page is accessible via the League dropdown in the navigation menu.
+- The page shows a table for each active division in the current season (by default).
+- Each table includes: Team name, Matches played (P), Wins (W), Losses (L), Draws (D), Points (Pts), and Position (Rank).
+- Teams are sorted by points (highest first); ties are broken using number of wins (team matches, team sets / indivudal matches then individual sets).
+- If no data is available for a division, a “No league table available” message is displayed.
+- Tables are responsive across mobile, tablet, and desktop devices.
+- Tables are visible to all users without requiring login.
+
+**Tasks**
+- Define models or queries to build tables.
+- Create League Tables page and link it in the navigation menu.
+- Render league tables grouped by division.
+- Implement sorting logic (points, then wins).
+- Add fallback message for divisions with no data.
+- Ensure layout is responsive.
+- Write tests for table rendering, sorting, and visibility logic.
+
+### Filter League Tables by Season (SHOULD)  2SP
+As a **league player**, I can **filter league tables by season** so that **I can view standings from past or current seasons**.
+
+**Acceptance Criteria**
+- A season filter is available on the League Tables page, defaulting to current season.
+- The filter is a dropdown listing all visible seasons, sorted by start date (most recent first).
+- Selecting a season shows league tables for that season's divisions.
+- If no data exists for the selected season, a “No league tables available” message is shown.
+- Optional: Filtering updates dynamically without requiring a full page reload
+- Filter is responsive and works on all screen sizes.
+
+**Tasks**
+- Add season filter dropdown to League Tables page.
+- Implement logic to fetch and display tables based on selected season.
+- Sort season list by start date descending.
+- Display fallback message for empty season.
+- Ensure dynamic filtering and mobile responsiveness.
+- Write tests for filter logic, fallback behavior and season navigation.
+
+## NOT COMPLETED
+
+### View Team Summary Page (SHOULD) 5SP  
+As a **league player**, I can **view a team's summary page** so that **I can see details about their players, recent results, and upcoming fixtures**.
+
+**Acceptance Criteria**  
+- Team names shown in league tables, results, or fixtures link to their respective Team Summary pages (`/teams/<team-id>/summary`).  
+- The Team Summary page includes:
+  - **Team Info**: Team name, club, season, division, summary data.  
+  - **Player Summary**: List of players and reserves who played for the team in the season. For each player: name, matches played (P), wins (W), and win percentage (%). Reserves are marked with "(RESERVE)". Players sorted by percentage wins then wins. Zero values shown if a player hasn’t played yet.  
+  - **Recent Results**: Table listing past fixtures. Each entry shows week, opponent team (linked), venue (home/away), result (win/loss/draw), and score (e.g. 7–3). Sorted chronologically (earliest first). Show “No results to display” if none.  
+  - **Upcoming Fixtures**: Section showing upcoming matches for the team, including week, date, opponent team (linked), and venue (with link, if available). Sorted chronologically. Show “No upcoming fixtures” if none.  
+- The page is responsive across mobile, tablet, and desktop devices.  
+- No login is required to view the Team Summary page.
+
+**Tasks**  
+- Create Team Summary page and route using team ID.  
+- Add links to team names throughout league tables, fixtures, and results.  
+- Build queries for player stats, past results, and upcoming fixtures.  
+- Display sections with placeholder messages where data is missing.  
+- Add opponent team and venue linking.  
+- Ensure the layout is responsive.  
+- Write tests for team data queries, display logic, and routing.
+
+### View Player Summary Page (COULD) – 5SP
+As a **league player**, I can **view a player's summary page** so that **I can see their key stats and match history**.
+
+**Acceptance Criteria**
+- Player names on relevant pages (e.g., Results, Team Summary) link to their summary page.
+- The Player Summary page includes:
+  - **Player Info**: Full name and team affiliation.
+  - **Key Stats**: Matches played, wins, losses, win percentage (0% if no matches).
+  - **Singles Matches**: List of singles matches with opponent team/player, result, score, and sets.
+  - **Doubles Matches**: List with partner, opponents, result, score, and sets.
+  - Display "No match data available" if no results.
+- Data auto-updates on page refresh.
+- Page is responsive on mobile, tablet, and desktop.
+- Page is publicly viewable (no login required).
+- Easy navigation back to the player’s team summary page.
+
+**Tasks**
+- Create player summary route and template.
+- Add links to player names in results and team pages.
+- Build queries for player stats, singles, and doubles history.
+- Display fallback messages when match data is missing.
+- Implement win percentage calculation logic.
+- Ensure layout is responsive and styled for all devices.
+- Add a back link to the team summary page.
+- Write tests for data queries, display logic, and routing.
+
+
+# SPRINT 13 - TEAM SUMMARY PAGE AND TIDY UP
+
+Total Story Points: 
+
+| Priority | Story Points | Percentage |
+|----------|--------------|------------|
+| MUST | 7 | 54 % |
+| SHOULD | 3 | 23 % |
+| COULD | 3 | 23 % |
+
+### View Team Summary Page (MUST) 5SP  
+As a **league player**, I can **view a team's summary page** so that **I can see details about their players, recent results, and upcoming fixtures**.
+
+**Acceptance Criteria**  
+- Team names shown in league tables, results, or fixtures link to their respective Team Summary pages (`/teams/<team-id>/summary`).  
+- The Team Summary page includes:
+  - **Team Info**: Team name, club, season, division, summary data.  
+  - **Player Summary**: List of players and reserves who played for the team in the season. For each player: name, matches played (P), wins (W), and win percentage (%). Reserves are marked with "(RESERVE)". Players sorted by percentage wins then wins. If a player hasn't played any matches, a zero value is shown in the played column but a dash is shown in the win and percentage win columns.  
+  - **Recent Results**: Table listing past fixtures. Each entry shows week, opponent team (linked), venue (home/away), result (win/loss/draw), and score (e.g. 7–3). Sorted chronologically (earliest first). Show “No results to display” if none.  
+  - **Upcoming Fixtures**: Section showing upcoming matches for the team, including week, date, opponent team (linked), and venue (with link, if available). Sorted chronologically. Show “No upcoming fixtures” if none.  
+- The page is responsive across mobile, tablet, and desktop devices.  
+- No login is required to view the Team Summary page.
+
+**Tasks**  
+- Create Team Summary page and route using team ID.  
+- Add links to team names throughout league tables, fixtures, and results.  
+- Build queries for player stats, past results, and upcoming fixtures.  
+- Display sections with placeholder messages where data is missing.  
+- Add opponent team and venue linking.  
+- Ensure the layout is responsive.  
+- Write tests for team data queries, display logic, and routing.
+
+### Useful Links on Home Page (MUST) 2SP
+As a **site visitor**, I can **see a section with useful links on the home page** so that **I can easily navigate to important areas of the site**.
+
+**Acceptance Criteria**
+- A "Useful Links" section is visible on the homepage.
+- The section contains clearly labeled links to key pages (Clubs, League Tables, Fixtures and Results).
+- Each link is styled consistently and behaves like a button or card.
+- Clicking a link takes the user to the corresponding page.
+- The links are responsive across different screen sizes.
+- The section is accessible without login.
+
+**Tasks**
+
+- Design and implement a layout (e.g. Bootstrap grid or flexbox) for the "Useful Links" section.
+- Create link components or cards for each key page (Clubs, Fixtures, Results, League Tables).
+- Style links with consistent spacing, typography, and hover effects.
+- Ensure full responsiveness on mobile, tablet, and desktop.
+- Test navigation behavior and accessibility compliance (e.g. keyboard focus, aria labels).
+
+### Code Validation Phase 2  (SHOULD) 3SP
+As a **QA**, I can **validate the codebase using code validation tools** so that **I can catch errors early and ensure code quality**.
+
+**Acceptance Criteria:**
+- No major errors shown when passed through a validator
+- Warnings are documented.
+
+**Tasks:**
+- Run code validators.
+- Fix any identified problems.
+- Document issues that need further discussion.
+
+### Manual Testing Phase 2  (COULD) 3SP
+As a **tester**, I can **manually test website features** so that **I can ensure a smooth and bug-free experience for users**.
+
+**Acceptance Criteria:**
+- Key user flows are manually tested on various devices/browsers.
+- Pass/fail results documented.
+
+**Tasks:**
+- Run through test checklist to ensure features are still working
+- Fix any issues found
+
+
+# TESTING AND PROJECT SUBMISSION
+
+*Thorough testing phase to ensure project is ready for submission*
 

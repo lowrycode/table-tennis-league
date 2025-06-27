@@ -11,7 +11,7 @@ You can visit the deployed website <a href="https://city-and-district-ff69b7e3e1
 
 # Project Planning
 
-The [**Project Planning**](readme-resources/planning.md) document explains my rationale and personal goals for the project. It also includes Entity Relationship Diagrams (ERDs) to show the database design.
+The [**Project Planning**](readme-resources/planning.md) document explains my rationale and personal goals for the project. It also includes the Entity Relationship Diagram (ERD) to show the database design.
 
 Planning was categorised into three distinct stages of development. Each stage is outlined below, along with its rationale and completion status:
 
