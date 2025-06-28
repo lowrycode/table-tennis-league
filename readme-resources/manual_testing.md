@@ -24,7 +24,6 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Error message displayed when missing required fields |
 | ✓ | Error message displayed when invalid email |
 | ✓ | Error message displayed when invalid UK phone number |
-| ✓ | Error message displayed when active_to is not in the future |
 | ✓ | Form data submitted by POST request immediately visible in Admin Panel on page reload |
 | ✓ | Default fields (User, Is Actioned) correctly populated |
 
@@ -72,8 +71,8 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Error message displayed when missing required fields |
 | ✓ | One-to-one relationship with Venue is enforced with appropriate error message displayed |
 | ✓ | Boolean fields are unchecked by default |
-| ✓ | Lattitude and Longitude fields are autopopulated from valid postcode if left blank |
-| ✓ | Invalid postcode does not autopoulate latitude and longitude fields - record is still saved without errors or crashes but no location is added to the map |
+| ✓ | Latitude and Longitude fields are autopopulated from valid postcode if left blank |
+| ✓ | Invalid postcode does not autopopulate latitude and longitude fields - record is still saved without errors or crashes but no location is added to the map |
 
 ### Division Model
 
@@ -84,11 +83,11 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Division model contains all expected fields |
 | ✓ | Fields are correctly assigned as whether they are required or not |
 | ✓ | Error message displayed when missing required fields |
-| ✓ | Error message displayed when non-unique value entered for name, short_name and slug fields |
-| ✓ | Error message shows when start date is after end date |
-| ✓ | Error message shows when registration opens is after registration closes |
-| ✓ | Error message shows when registration closes is after start date |
-| ✓ | When 'is current' status is set to true for a season, all other seasons have 'is current' status set to false |
+| ✓ | Error message displayed when non-unique value entered for either field |
+| ✓ | Delete button is missing from detail view if division is linked to a season but shows for unlinked divisions |
+| ✓ | List view shows custom bulk action 'Delete unlinked divisions' |
+| ✓ | 'Delete unlinked divisions' action deletes unlinked divisions (with success message) but shows warning for linked divisions and does not delete these |
+
 
 ### Season Model
 
@@ -100,10 +99,12 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Season model contains all expected fields |
 | ✓ | Fields are correctly assigned as whether they are required or not |
 | ✓ | Error message displayed when missing required fields |
-| ✓ | Error message displayed when non-unique value entered for either field |
-| ✓ | Delete button is missing from detail view if club is linked to season but shows for unlinked divisions |
-| ✓ | List view shows custom bulk action 'Delete unlinked divisions' |
-| ✓ | 'Delete unlinked divisions' action deletes unlinked divisions (with success message) but shows warning for linked divisions and does not delete these |
+| ✓ | Error message displayed when non-unique value entered for name, short_name and slug fields |
+| ✓ | Error message shows when start date is after end date |
+| ✓ | Error message shows when registration opens is after registration closes |
+| ✓ | Error message shows when registration closes is after start date |
+| ✓ | When 'is current' status is set to true for a season and the record is saved, all other seasons have 'is current' status set to false |
+
 
 ### Week Model
 
@@ -148,7 +149,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | Status  | Test Description |
 | ---     | ---              |
 | ✓ | Admin Panel shows Team model under League app |
-| ✓ | Teams are listed with team name, club division and season |
+| ✓ | Teams are listed with team name, club, division and season |
 | ✓ | Teams are listed in order of team name (asc) then season (most recent first) |
 | ✓ | Team model contains all expected fields |
 | ✓ | All fields are required and missing fields display error messages |
@@ -331,7 +332,6 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | Clicking on sponsor logo navigates to the correct website |
 | ✓ | Clicking on sponsor logo opens external website in a new browser tab |
 | ✓ | Hovering over sponsor logo with a mouse shows the correct tooltip |
-
 | ✓ | No console errors or warnings were caused by interacting with page elements |
 
 ### Contact Page
@@ -593,7 +593,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | If an authenticated user without Club Admin status tries to access the Club Admin Dashboard (via direct url) they are directed to a custom 403 (Forbidden) page |
 | ✓ | The Club Admin page includes a section for managing club and venue information |
 | ✓ | The Club Admin page includes a section displaying the current status of information (missing, pending approval or approved) |
-| ✓ | The Toggle Preview button correctly allows the user to toggle a view of the most recent data as it appears on the clubs page (or will appear when approved) |
+| ✓ | The Toggle Preview button correctly allows the user to toggle a view of the most recent data as it appears on the clubs page (or as it will appear when approved) |
 | ✓ | If not all data is approved, a message is displayed above the preview to clarify that this is how the data will appear on the clubs page once approved |
 | ✓ | The preview shows review summary data as a disabled link with muted text and hover effects to show it is disabled (also works after unassigning a venue) |
 | ✓ | If no club information exists (even if venues have been assigned), the Toggle Preview button is not displayed and a status message displays "(Club Information REQUIRED)" with the red label |
@@ -621,7 +621,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | The form shows error message when invalid email address is provided |
 | ✓ | The form shows error message when invalid phone number is given (not a UK region phone number) alongside a warning alert |
 | ✓ | The form submits Club Info successfully (including image upload) and can be viewed in the Django Admin Panel (upon page refresh) and Club Admin dashboard immediately |
-| ✓ | Any outdated records are deleted from the CubInfo database (as verified in the Django Admin Panel) |
+| ✓ | Any outdated records are deleted from the ClubInfo database (as verified in the Django Admin Panel) |
 | ✓ | A success alert message displays at the top of the page when the form is submitted successfully |
 | ✓ | Club Admins can only update club information for the club they are assigned to |
 | ✓ | Other links on the page work correctly (the "Cancel" button) |
@@ -654,7 +654,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | If there are no possible venues to assign (because they don't exist or are already assigned), the page shows a "There are no available venues to assign." message, a link to the Create Venue page and a button to return to the Club Admin page |
 | ✓ | If there are possible venues to assign they are shown in a dropdown (venues which are already assigned are not shown) |
 | ✓ | Choosing a venue and clicking the Assign Venue button correctly assigns the venue to the club (a new ClubVenue object is seen in Django Admin panel and it displays on Club Admin dashboard), the user is redirected back to the Club Admin dashboard and a confirmation message is seen |
-| ✓ | The latitude and longitude fields are autopopulated correctly |
+| ✓ | The latitude and longitude fields are autopopulated correctly for valid postcodes |
 | ✓ | Club Admins can only Assign Venues for the club they are assigned to |
 | ✓ | Other links on the page work correctly including the "Cancel" button and the link to the "Create New Venue" page |
 | ✓ | The page is responsive across devices and themed consistently with the rest of the website |
@@ -698,7 +698,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 | ✓ | If an authenticated user without Club Admin status tries to access the Delete Venue page (via direct url) they are directed to a custom 403 (Forbidden) page |
 | ✓ | A user can choose between deleting unapproved venue info or deleting the venue entirely |
 | ✓ | If the venue is shared with another club, the second option is disabled and the page informs the user that the venue is shared |
-| ✓ | If the user chooses to delete unapproved venue info and there is no unapproved venue info to delete, a message informs the user of this when when the delete button is pressed |
+| ✓ | If the user chooses to delete unapproved venue info and there is no unapproved venue info to delete, a message informs the user of this when the delete button is pressed |
 | ✓ | If the user chooses to delete unapproved venue info and unapproved venue info exists, the unapproved venue info is deleted (as seen in Django Admin panel), the user is redirected to the club admin dashboard, a confirmation message displays and the new venue info status is reflected (either INFO REQUIRED or showing previously approved info) |
 | ✓ | If the user chooses to delete the venue entirely, a confirmation checkbox appears and the Delete button is disabled until it is checked |
 | ✓ | After ticking the confirmation checkbox and pressing the delete button, the venue is deleted (if not shared by other clubs) as verified by Django Admin panel, the user is redirected to the Club Admin page, a success message shows and the venue no longer appears in dropdowns for assigning a venue |
@@ -832,7 +832,7 @@ These tests cover all of the implemented User Stories and were carried out at va
 
 | Status  | Test Description |
 | ---     | ---              |
-| ✓ | A season filter is displayed and defauts to the current season |
+| ✓ | A season filter is displayed and defaults to the current season |
 | ✓ | Season filter is a dropdown listing all visible seasons and is sorted by start date (most recent first) |
 | ✓ | Season data updates correctly when filter is applied |
 | ✓ | Suitable placeholders show if no season data is available |
