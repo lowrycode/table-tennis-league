@@ -116,8 +116,8 @@ class TeamPlayerAdmin(admin.ModelAdmin):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ("team_name", "club", "division", "season")
-    list_filter = ("season", "division", "club")
+    list_display = ("team_name", "club", "division", "season", "approved")
+    list_filter = ("approved", "season", "division", "club")
     ordering = ("team_name", "season")
 
 
