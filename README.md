@@ -375,7 +375,7 @@ If the user *is not* logged in, they will see a grey banner prompting them to lo
 
 The Create Club Review and Update Club Review pages both include forms with field validation. The Update page is pre-populated with the user's existing review data.
 
-Clicking the Delete review button takes the user to a confirmation page.
+Clicking the Delete Review button takes the user to a confirmation page.
 
 Clicking on a Return to Clubs page button takes the user back to the section they were last viewing on the Clubs page (rather than the top of the page).
 
@@ -667,6 +667,8 @@ The features planned for **Stage 3** relate to **league administration through t
 - A **League Administrator dashboard** to manage enquiries and club information approvals 
 - A **Fixtures Generator** to streamline the process of setting up a league season
 
+During development, a number of helper functions were written to make test writing more efficient and maintainable. Older tests have not been refactored yet to use these helper functions. 
+
 Other useful features to be added include:
 - Email verification on account signup.
 - Email integration with procedures for changing passwords.
@@ -709,6 +711,9 @@ Most of the code was written in a local copy of **Visual Studio Code**.
 **GitHub** was used to host the Git repository. **GitHub projects** was also used for planning and monitoring the development process using an *Agile* approach.
 
 The wireframes were created using a local copy of **Balsamiq** (which was downloaded from <a href="https://balsamiq.com/" target="_blank" rel="noopener">**here**</a>).
+
+The Entity Relationship Diagram was designed using <a href="https://www.drawio.com/" target="_blank" rel="noopener">**draw.io**</a>.
+
 
 ## Image Generation and Design
 
