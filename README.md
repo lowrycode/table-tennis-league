@@ -56,7 +56,7 @@ The website aims to meet the needs of the following users:
 - **Visitors** seeking to learn about what table tennis clubs and competitions are available in the area.
 - **League Players** who want to view information about fixtures, results, tables, stats and possibly submit match results.
 - **Club Admins** who want to manage club information, players and teams.
-- **League Admin** who is the overall website administrator and wants to assign fixtures, approve results, approve club information and manage user permissions
+- **League Admin** who is the overall website administrator and wants to assign fixtures, approve results, approve club information and manage user permissions.
 
 # User Experience Design
 
@@ -70,7 +70,7 @@ The website categorises information into the following pages:
 - **League Pages** - *Display league data, including fixture information, match results, league tables and team stats. Accessible from Navbar or links within these pages.*
 - **Contact Page** - *Displays contact details for the league administrator and a contact form for submitting an enquiry. Accessible from Navbar and Footer.*
 - **User Account Pages** - *Pages relating to user authentication (Login, Logout, Signup, Change Password, Account Settings, etc.). Accessible under User Profile dropdown in Navbar.*
-- **Club Admin Dashboard** - *For managing club related information. Accessible under User Profile dropdown in Navbar but only accessible if user is granted "Club Admin Status".*
+- **Club Admin Dashboard** - *For managing club-related information. Accessible under User Profile dropdown in Navbar but only accessible if user is granted "Club Admin Status".*
 
 The *top navigation bar* and *footer* are both consistently shown on every page of the website. Since the main Call To Action (CTA) is contacting the league administrator, a link to the contact page is included in both of these sections.
 
@@ -258,7 +258,7 @@ The *hero overlay* includes the league logo and is positioned at the bottom of t
 
 ### About Section
 
-The next section provides a friendly welcome to the website and background information about the league. It was placed just above the fold (to prompt users to scroll down) and immediately after the *Hero* section (to inform new users as to the websites content).
+The next section provides a friendly welcome to the website and background information about the league. It was placed just above the fold (to prompt users to scroll down) and immediately after the *Hero* section (to inform new users as to the website's content).
 
 ![About section](readme-resources/images/about.jpg)
 
@@ -298,7 +298,7 @@ This section displays the logos for the league sponsors.
 
 ![Sponsors section](readme-resources/images/sponsors.jpg)
 
-Title and aria labels are included for each link. Clicking on a logo opens the sponsors website in another tab. The rel="noopener noreferrer" attribute is used for increased security when navigating to these sites.
+Title and aria labels are included for each link. Clicking on a logo opens the sponsor's website in another tab. The rel="noopener noreferrer" attribute is used for increased security when navigating to these sites.
 
 
 ## Clubs Page
@@ -383,7 +383,7 @@ Clicking on a Return to Clubs page button takes the user back to the section the
 
 ## Contact Page
 
-When users click on the **Contact Us** link in the footer or the **Contact** item in the top navigation bar they are directed to this page. Here they can view contact information for the League Administrator or make an enquiry by filling in a form. 
+When users click on the **Contact Us** link in the footer or the **Contact** item in the top navigation bar they are directed to this page. Here they can view contact information for the league administrator or make an enquiry by filling in a form. 
 
 ![Contact page](readme-resources/images/contact.jpg)
 
@@ -396,7 +396,7 @@ If a user is logged in, the email field auto-populates with the email address sp
 
 Upon successful submission, the user is given feedback via a confirmation message (displayed at the top of the page) and the form resets. If the phone number is invalid, a warning message is displayed and an inline field error is displayed in the form.
 
-The League Administrator can view all submitted enquiries in the Django Admin Panel which displays the Subject, Name, Submission Date and Is Actioned status for each enquiry in a table. Enquiries can also be filtered according to the "Is Actioned" status.
+The league administrator can view all submitted enquiries in the Django Admin Panel which displays the Subject, Name, Submission Date and Is Actioned status for each enquiry in a table. Enquiries can also be filtered according to the "Is Actioned" status.
 
 ![Enquiries as viewed in the Django Admin Panel](readme-resources/images/dj-admin-enquiry.jpg)
 
@@ -544,7 +544,7 @@ The pages are styled in a similar way to other pages on the website and include 
 
 ## User Authentication Pages
 
-One of the key assessment criteria for the project related to user authentication. These features can be accessed via the user profile dropdown in the far right of the navigation bar. The dropdown shows different options for unauthenticated users and authenticated users.
+One of the key assessment criterion for the project relates to user authentication. These features can be accessed via the user profile dropdown in the far right of the navigation bar. The dropdown shows different options for unauthenticated users and authenticated users.
 
 ![Pages available for authenticated and unauthenticated users](readme-resources/images/user-authentication.jpg)
 
@@ -552,7 +552,7 @@ The pages themselves have access restrictions:
 - If an authenticated user tries to access the Login or Signup page, they are redirected to the Homepage.
 - If an unauthenticated user tries to access the Logout page, they are redirected to the Homepage.
 
-These pages use custom templates while leveraging the functionality of the django-allauth library, such as form validation through enforcing username uniqueness, email uniqueness and strong passwords. The signup page was customized to make the email address a required field, ensuring the League Administrator can contact users if needed.
+These pages use custom templates while leveraging the functionality of the django-allauth library, such as form validation through enforcing username uniqueness, email uniqueness and strong passwords. The signup page was customized to make the email address a required field, ensuring the league administrator can contact users if needed.
 
 Django messages are used to provide users with feedback following form submissions.
 
@@ -566,7 +566,7 @@ Once a user has logged in, they are reminded of their logged-in status immediate
 
 ## Account Management
 
-Another key assessment criteria for the project relates to CRUD functionality. We have already discussed how a regular user can create, read, edit and delete a review for a club.
+Another key assessment criterion for the project relates to CRUD functionality. We have already discussed how a regular user can create, read, edit and delete a review for a club.
 
 The Account Settings page also includes CRUD functionality. It allows users to:
 - View their email address.
@@ -587,9 +587,9 @@ Whenever a user carries out a delete action that is considered "serious" (irreve
 
 Users who have been assigned club admin status can access the Club Admin Dashboard page from the user dropdown menu. 
 
-*NOTE: This menu item will not appear for users who have not been assigned Club Admin status by the League Administrator. Assigning a user as a club admin is easily done in the Django Admin Panel using the ***Club admin*** model within the Clubs app. Stage 3 of project includes plans to develop a League Admin dashboard restricted page on the website itself; this page would include the ability to assign users as club admins.*
+*NOTE: This menu item will not appear for users who have not been assigned Club Admin status by the league administrator. Assigning a user as a club admin is easily done in the Django Admin Panel using the ***Club admin*** model within the Clubs app. Stage 3 of project includes plans to develop a League Admin dashboard restricted page on the website itself; this page would include the ability to assign users as club admins.*
 
-The page allows a club admin to manage the club and venue information that will appear on the clubs page (after approval by the League Administrator).
+The page allows a club admin to manage the club and venue information that will appear on the clubs page (after approval by the league administrator).
 
 The CRUD functionality on this page also implements a form of version control whereby old approved information is retained. This means that any previously approved club information will continue to display on the Clubs page whilst the new information is awaiting approval by the league administrator.
 
@@ -605,7 +605,7 @@ Club admins can add, edit and delete club information by clicking on the relevan
 
 The same page is used for adding new club information and updating club information but when updating information the most recent version of the club information is pre-populated in the form.
 
-*NOTE: Since every update needs approval by the league administrator before being shown on the clubs page, updating club information actually creates a new ClubInfo record rather than updating an existing record. This approach ensures that older approved information is retained and the club remains visible on the clubs page while updates await approval. Any outdated records are also deleted every time a new ClubInfo record is created (on the front end website, not Django Admin Panel).*
+*NOTE: Since every update needs approval by the league administrator before being shown on the clubs page, updating club information actually creates a new ClubInfo record rather than updating an existing record. This approach ensures that older approved information is retained and the club remains visible on the clubs page while updates await approval. Any outdated records are also deleted every time a new ClubInfo record is created (on the front-end website, not Django Admin Panel).*
 
 When deleting club information, users can choose between deleting unapproved information only (to revert back to previously approved information) or to delete both approved and unapproved information (effectively removing all associated ClubInfo records for that club). Users have to tick a confirmation checkbox before doing the latter.
 
@@ -651,6 +651,8 @@ During the development of this project, JSON fixture data was generated and used
 
 These issues are discussed in more detail in the [**Data Management**](readme-resources/data_management.md) document, which also explains how the fixtures data can be loaded to the database.
 
+*NOTE: The sample data uses 2024-25 as the current season and assumes that the current date is somewhere around 14th Oct 2024 (Week 7 of that season). This date was chosen because it includes enough results data to analyse but also shows what the Fixtures, Results and League pages would look like in the middle of a season (which is when most users would be looking at it).*
+
 # Future Features
 
 So far, **Stage 1** has been fully completed although in the future I intend to add **validation to postcode fields**, particularly in the Update Venue Info form.
@@ -673,7 +675,7 @@ Other useful features to be added include:
 
 ## Website Development
 
-For the front end, the website uses **HTML**, **CSS** and **Javascript**. Additional styling and functionality is provided by the **BootStrap** framework. To update page content without full page reloads, **HTMX** is used for making AJAX requests.
+For the front-end, the website uses **HTML**, **CSS** and **JavaScript**. Additional styling and functionality is provided by the **Bootstrap** framework. To update page content without full page reloads, **HTMX** is used for making AJAX requests.
 
 **PostgreSQL** was used for the relational database.
 
@@ -694,7 +696,7 @@ In addition to the standard Django packages, the following Python packages were 
 - **gunicorn**: for running a WSGI-compatible web server in production on Heroku
 - **phonenumberslite**: for validating and formatting phone numbers (lightweight version)
 - **psycopg2**: PostgreSQL adapter for Python used by Django when using Postgres
-- **requests**: for making HTTP requests to Google GeoCode API on server side
+- **requests**: for making HTTP requests to Google Geocoding API on server side
 - **whitenoise**: for serving static files directly from Django in production
 
 The following package was used in development but not included in the requirements.txt:
@@ -704,7 +706,7 @@ Most of the code was written in a local copy of **Visual Studio Code**.
 
 **Git** was used as the version control system.
 
-**Github** was used to host the Git repository. **Github projects** was also used for planning and monitoring the development process using an *Agile* approach.
+**GitHub** was used to host the Git repository. **GitHub projects** was also used for planning and monitoring the development process using an *Agile* approach.
 
 The wireframes were created using a local copy of **Balsamiq** (which was downloaded from <a href="https://balsamiq.com/" target="_blank" rel="noopener">**here**</a>).
 
@@ -754,11 +756,23 @@ The following browsers were used during testing:
 - Mozilla Firefox
 - Apple Safari
 
+The website was found to function correctly on all of these browsers.
+
 The following devices were used to test the website:
 - Laptops with different screen sizes
 - Various generations of iPads (1st, 8th and 9th generations)
 - Various Android phones
 - Various iPhones (including a 1st generation iPhone 5)
+
+In designing the website, I favoured the use of new technologies rather than seeking to accommodate very old devices, so it is no surprise that there were some issues in using the website with legacy devices.
+
+There were many layout issues with both the 1st generation iPhone and iPad since the website uses flexbox styles extensively. The Google Map didn't load on the Clubs page on either device.
+
+The JavaScript functionality did not function correctly on the 1st generation iPhone. The venue modals did not display and the filter forms did not work correctly. This was to be expected because ES6 features were used. However, the user was able to login and manage their account settings.
+
+The 1st generation iPad performed much better and much of the JavaScript functionality did work correctly on the iPad. The filters on the Clubs, Fixtures, Results and League Tables pages all worked correctly and the Venue Modals also displayed correctly. Users could signup, login, logout, change email, change password, do the Club Admin CRUD functionality and delete their account.
+
+The website performed well on the more modern devices without any observable issues.
 
 ## Bug Fixes
 
@@ -1015,7 +1029,7 @@ Before submitting the final project, the setting was changed to `DEBUG = False`.
 
 If you don't already have an account then you'll need to create one. Heroku have stopped offering their free tier service so you will also be required to enter your bank details and choose a payment plan.
 
-The website also requires 2-factor authentication (e.g. using an authenticator app on your smartphone).
+The website also requires two-factor authentication (e.g. using an authenticator app on your smartphone).
 
 ## 3. Create app
 
@@ -1057,7 +1071,7 @@ The following environment variable keys were used in this project:
 
 
 ## 5. Deploy App
-Navigate to the **Deployment** tab, choose Github as deployment method, connect to the relevent repository and choose your preferred method of deployment.
+Navigate to the **Deployment** tab, choose GitHub as deployment method, connect to the relevant repository and choose your preferred method of deployment.
 
 ***NOTE:*** *Manual deployment was chosen in my case to avoid redeployments for README updates.*
 
@@ -1077,10 +1091,10 @@ Navigate to the **Deployment** tab, choose Github as deployment method, connect 
 
 # Forking and Cloning
 
-**Forking** refers to making a copy of the repository in your own Github account.
+**Forking** refers to making a copy of the repository in your own GitHub account.
 
 To fork this repository:
-1. Log in to your Github account
+1. Log in to your GitHub account
 2. Navigate to the repository page, click the caret (down arrow) next to the fork button and choose **Create a new fork**.
 
 ![Steps to fork the repository](readme-resources/images/fork.jpg)
