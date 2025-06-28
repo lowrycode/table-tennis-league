@@ -1,0 +1,422 @@
+[
+  {
+    "model": "league.team",
+    "pk": 1,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "club": 1,
+      "home_venue": 1,
+      "team_name": "Ashmere A Prem 22",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 2,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "club": 1,
+      "home_venue": 1,
+      "team_name": "Ashmere B Prem 22",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 3,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "club": 3,
+      "home_venue": 3,
+      "team_name": "Dunnington Div1 22",
+      "home_day": "tuesday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 4,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "club": 4,
+      "home_venue": 4,
+      "team_name": "Huntington Div1 22",
+      "home_day": "wednesday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 5,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "club": 5,
+      "home_venue": 5,
+      "team_name": "Net Ninjas A Prem 22",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 6,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "club": 5,
+      "home_venue": 5,
+      "team_name": "Net Ninjas B Div1 22",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 7,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "club": 7,
+      "home_venue": 7,
+      "team_name": "Ping Pong Div1 22",
+      "home_day": "thursday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 8,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "club": 8,
+      "home_venue": 8,
+      "team_name": "UoY Prem 22",
+      "home_day": "tuesday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 9,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "club": 9,
+      "home_venue": 9,
+      "team_name": "Smash Div1 22",
+      "home_day": "wednesday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 10,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "club": 10,
+      "home_venue": 10,
+      "team_name": "Edge Prem 22",
+      "home_day": "monday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 11,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "club": 1,
+      "home_venue": 1,
+      "team_name": "Ashmere A Prem 23",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 12,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "club": 1,
+      "home_venue": 1,
+      "team_name": "Ashmere B Prem 23",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 13,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "club": 3,
+      "home_venue": 3,
+      "team_name": "Dunnington Div1 23",
+      "home_day": "tuesday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 14,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "club": 4,
+      "home_venue": 4,
+      "team_name": "Huntington Div1 23",
+      "home_day": "wednesday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 15,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "club": 5,
+      "home_venue": 5,
+      "team_name": "Net Ninjas A Prem 23",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 16,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "club": 5,
+      "home_venue": 5,
+      "team_name": "Net Ninjas B Div1 23",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 17,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "club": 7,
+      "home_venue": 7,
+      "team_name": "Ping Pong Div1 23",
+      "home_day": "thursday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 18,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "club": 8,
+      "home_venue": 8,
+      "team_name": "UoY Prem 23",
+      "home_day": "tuesday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 19,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "club": 9,
+      "home_venue": 9,
+      "team_name": "Smash Div1 23",
+      "home_day": "wednesday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 20,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "club": 10,
+      "home_venue": 10,
+      "team_name": "Edge Prem 23",
+      "home_day": "monday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 21,
+    "fields": {
+      "season": 3,
+      "division": 1,
+      "club": 1,
+      "home_venue": 1,
+      "team_name": "Ashmere A Prem 24",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 22,
+    "fields": {
+      "season": 3,
+      "division": 1,
+      "club": 1,
+      "home_venue": 1,
+      "team_name": "Ashmere B Prem 24",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 23,
+    "fields": {
+      "season": 3,
+      "division": 2,
+      "club": 3,
+      "home_venue": 3,
+      "team_name": "Dunnington Div1 24",
+      "home_day": "tuesday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 24,
+    "fields": {
+      "season": 3,
+      "division": 2,
+      "club": 4,
+      "home_venue": 4,
+      "team_name": "Huntington Div1 24",
+      "home_day": "wednesday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 25,
+    "fields": {
+      "season": 3,
+      "division": 1,
+      "club": 5,
+      "home_venue": 5,
+      "team_name": "Net Ninjas A Prem 24",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 26,
+    "fields": {
+      "season": 3,
+      "division": 2,
+      "club": 5,
+      "home_venue": 5,
+      "team_name": "Net Ninjas B Div1 24",
+      "home_day": "monday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 27,
+    "fields": {
+      "season": 3,
+      "division": 2,
+      "club": 7,
+      "home_venue": 7,
+      "team_name": "Ping Pong Div1 24",
+      "home_day": "thursday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 28,
+    "fields": {
+      "season": 3,
+      "division": 1,
+      "club": 8,
+      "home_venue": 8,
+      "team_name": "York University Prem 24",
+      "home_day": "tuesday",
+      "home_time": "19:00:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 29,
+    "fields": {
+      "season": 3,
+      "division": 2,
+      "club": 9,
+      "home_venue": 9,
+      "team_name": "Smash Div1 24",
+      "home_day": "wednesday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  },
+  {
+    "model": "league.team",
+    "pk": 30,
+    "fields": {
+      "season": 3,
+      "division": 1,
+      "club": 10,
+      "home_venue": 10,
+      "team_name": "Edge Prem 24",
+      "home_day": "monday",
+      "home_time": "19:15:00",
+      "approved": true
+    }
+  }
+]

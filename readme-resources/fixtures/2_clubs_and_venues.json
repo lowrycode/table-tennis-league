@@ -1,0 +1,831 @@
+[
+  {
+    "model": "clubs.club",
+    "pk": 1,
+    "fields": {
+      "name": "Ashmere Table Tennis Club"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 1,
+    "fields": {
+      "club": 1,
+      "website": "https://example.com",
+      "image": "club1_pgthrn",
+      "contact_name": "Barry Norman",
+      "contact_email": "barry.norman@ashmere-ttc.co.uk",
+      "contact_phone": "+447452635123",
+      "description": "We are a large and well-established club with three fantastic venues in York and the surrounding areas. We pride ourselves on excellent facilities and have many players with high England rankings. Whether you're a beginner or a seasoned competitor, you'll find a friendly and competitive environment here. Join us to enjoy coaching, league play, and regular practice sessions every day of the week!",
+      "session_info": "Monday (Sports Village): 6pm - 9pm\nTuesday (Nestlé): 4pm - 7pm\nWednesday (Sports Village): 7pm - 10pm\nThursday (Poppleton): 6pm - 9pm\nFriday (Nestlé): 5pm - 8pm\nSaturday (Sports Village): 10am - 1pm\nSunday (Nestlé): 2pm - 4pm",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": true,
+      "kids": true,
+      "adults": true,
+      "coaching": true,
+      "league": true,
+      "equipment_provided": false,
+      "membership_required": true,
+      "free_taster": false,
+      "created_on": "2025-05-16T10:30:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 2,
+    "fields": {
+      "name": "Haxby TTC"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 2,
+    "fields": {
+      "club": 2,
+      "website": "https://example.com",
+      "image": "club5_f3kd1z",
+      "contact_name": "Tom Jenkins",
+      "contact_email": "tom.jenkins@haxbyttc.co.uk",
+      "contact_phone": "+447755443322",
+      "description": "We're a small, friendly group of local players who meet twice a week in a recreational hall for social play. We don't compete in the league but warmly welcome new members of all abilities who want to enjoy some relaxed table tennis and good company.",
+      "session_info": "Tuesday and Thursday: 7pm - 9pm\nSocial and informal sessions focused on enjoyment and improving skills.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": false,
+      "kids": false,
+      "adults": true,
+      "coaching": false,
+      "league": false,
+      "equipment_provided": false,
+      "membership_required": false,
+      "free_taster": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 3,
+    "fields": {
+      "name": "Dunnington TTC"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 3,
+    "fields": {
+      "club": 3,
+      "website": "https://example.com",
+      "image": "",
+      "contact_name": "Susan Clark",
+      "contact_email": "susan.clark@outlook.com",
+      "contact_phone": "+447700123456",
+      "description": "We're a small, friendly club on the outskirts of York, mostly made up of retired members. Our sessions are relaxed and held during the daytime, with a welcoming atmosphere where tea and biscuits are part of the package. If you want to enjoy table tennis in a social setting, we'd love to have you join us!",
+      "session_info": "Monday to Friday: 10am - 2pm\nEach session costs £5 and includes tea and biscuits.",
+      "beginners": true,
+      "intermediates": false,
+      "advanced": false,
+      "kids": false,
+      "adults": true,
+      "coaching": false,
+      "league": true,
+      "equipment_provided": true,
+      "membership_required": false,
+      "free_taster": false,
+      "created_on": "2025-05-16T10:40:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 4,
+    "fields": {
+      "name": "Huntington Club"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 4,
+    "fields": {
+      "club": 4,
+      "website": "https://example.com",
+      "image": "club3_ugthfq",
+      "contact_name": "Emma Harris",
+      "contact_email": "emma.harris@huntington-ttc.co.uk",
+      "contact_phone": "+447700134234",
+      "description": "We are a moderately sized club that meet in the school. We focus on creating a friendly and inclusive environment for all levels. We host social and competitive play regularly and love welcoming new members into our community.",
+      "session_info": "Tuesday and Thursday: 6pm - 9pm\nRegular sessions with a mix of social and competitive play.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": false,
+      "kids": true,
+      "adults": true,
+      "coaching": true,
+      "league": true,
+      "equipment_provided": true,
+      "membership_required": false,
+      "free_taster": true,
+      "created_on": "2025-05-16T10:50:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 5,
+    "fields": {
+      "name": "Net Ninjas"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 5,
+    "fields": {
+      "club": 5,
+      "website": "https://example.com",
+      "image": "",
+      "contact_name": "Jake Turner",
+      "contact_email": "jake.turner@netninjas-ttc.co.uk",
+      "contact_phone": "+447766554433",
+      "description": "We're an established club known for our lively in-house competitions and social events all year round. Whether you're into serious play or just having fun, there's something for everyone here.",
+      "session_info": "Monday: 7pm - 10pm\nWednesday: 6pm - 8pm\n Saturday: 7pm - 10pm\n\nCompetitive and social sessions with a great community feel.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": true,
+      "kids": true,
+      "adults": true,
+      "coaching": true,
+      "league": true,
+      "equipment_provided": false,
+      "membership_required": true,
+      "free_taster": false,
+      "created_on": "2025-05-16T10:55:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 6,
+    "fields": {
+      "name": "Redeness Racket Sports"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 6,
+    "fields": {
+      "club": 6,
+      "website": "",
+      "image": "",
+      "contact_name": "Margaret White",
+      "contact_email": "margaret.white@example.com",
+      "contact_phone": "+447733221144",
+      "description": "We're a group of enthusiastic players who just love the sport! Most members are retired, and we enjoy a relaxed, social atmosphere with plenty of laughs.",
+      "session_info": "Monday, Wednesday, Friday: 10am - 12pm\n\nPerfect for a gentle game and good company.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": false,
+      "kids": false,
+      "adults": true,
+      "coaching": false,
+      "league": false,
+      "equipment_provided": false,
+      "membership_required": true,
+      "free_taster": false,
+      "created_on": "2025-05-16T11:00:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 7,
+    "fields": {
+      "name": "Ping Pong Club"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 7,
+    "fields": {
+      "club": 7,
+      "website": "https://example.com",
+      "image": "club4_kgzyf0",
+      "contact_name": "Alex Foster",
+      "contact_email": "alex.foster@pingpong-ttc.co.uk",
+      "contact_phone": "+447711223344",
+      "description": "We are a large club focused on youth and young adults, offering coaching at two venues throughout the week. Many of our players are highly ranked, and we aim to help all members develop their skills in a supportive environment.",
+      "session_info": "Tuesday (Ping Pong): 6pm - 9pm\nThursday (Redeness): 6pm - 9pm\nFriday (Ping Pong): 6pm - 9pm\n\nMultiple sessions with coaching and competitive play.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": true,
+      "kids": true,
+      "adults": true,
+      "coaching": true,
+      "league": true,
+      "equipment_provided": false,
+      "membership_required": true,
+      "free_taster": false,
+      "created_on": "2025-05-16T11:05:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 8,
+    "fields": {
+      "name": "University of York TTC"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 8,
+    "fields": {
+      "club": 8,
+      "website": "",
+      "image": "club2_z1hn1q",
+      "contact_name": "Mark Stevens",
+      "contact_email": "mark.stevens@example.com",
+      "contact_phone": "+447799887766",
+      "description": "Our club is mainly made up of university students and staff but all are welcome to join. We have players of different abilities who enjoy training and friendly competition. Feel free to join us.",
+      "session_info": "Tuesday and Thursday: 7pm - 9pm\nRelaxed sessions open to players of all skill levels.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": true,
+      "kids": false,
+      "adults": true,
+      "coaching": true,
+      "league": true,
+      "equipment_provided": false,
+      "membership_required": true,
+      "free_taster": true,
+      "created_on": "2025-05-16T11:10:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 9,
+    "fields": {
+      "name": "Smash TTC"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 9,
+    "fields": {
+      "club": 9,
+      "website": "https://example.com",
+      "image": "club6_lw8wbu",
+      "contact_name": "Jasmine Patel",
+      "contact_email": "jasmine.patel@smash-ttc.co.uk",
+      "contact_phone": "+447712345678",
+      "description": "We're popular with youth players and offer coaching sessions multiple times a week to help you improve your skills in a fun and supportive environment. Whether you're just starting or want to compete, you'll find plenty of opportunities here.",
+      "session_info": "Tuesday: 6pm - 8pm\nThursday: 6pm - 8pm\nSaturday: 10am - 12pm\nCoaching sessions tailored for youth players of all levels.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": false,
+      "kids": true,
+      "adults": false,
+      "coaching": true,
+      "league": true,
+      "equipment_provided": false,
+      "membership_required": true,
+      "free_taster": true,
+      "created_on": "2025-05-16T11:20:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 10,
+    "fields": {
+      "name": "The Edge TTC"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 10,
+    "fields": {
+      "club": 10,
+      "website": "https://example.com",
+      "image": "",
+      "contact_name": "David Morgan",
+      "contact_email": "david.morgan@theedge-ttc.co.uk",
+      "contact_phone": "+447755667788",
+      "description": "Founded in 2002, we're a large club with two venues and multiple teams competing in the local league. We offer a vibrant atmosphere with opportunities for players of all abilities to train, compete, and grow.",
+      "session_info": "Monday (Edge): 6pm - 9pm\nWednesday (Sport Village): 6pm - 9pm\nFriday (Edge): 7pm - 10pm\nLeague matches and training sessions held regularly at both venues.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": true,
+      "kids": true,
+      "adults": true,
+      "coaching": true,
+      "league": true,
+      "equipment_provided": true,
+      "membership_required": true,
+      "free_taster": false,
+      "created_on": "2025-05-16T11:30:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.club",
+    "pk": 11,
+    "fields": {
+      "name": "Queen's Table Tennis Club"
+    }
+  },
+  {
+    "model": "clubs.clubinfo",
+    "pk": 11,
+    "fields": {
+      "club": 11,
+      "website": "",
+      "image": "",
+      "contact_name": "Emma Collins",
+      "contact_email": "emma.collins@example.com",
+      "contact_phone": "",
+      "description": "We're a small, close-knit club on the outskirts of York. Our sessions are relaxed and welcoming, perfect for those looking to enjoy table tennis in a friendly environment.",
+      "session_info": "Tuesday and Thursday: 7pm - 9pm\nCasual sessions aimed at social play and improving skills at your own pace.",
+      "beginners": true,
+      "intermediates": true,
+      "advanced": false,
+      "kids": false,
+      "adults": true,
+      "coaching": false,
+      "league": false,
+      "equipment_provided": false,
+      "membership_required": false,
+      "free_taster": true,
+      "created_on": "2025-05-16T11:35:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 1,
+    "fields": {
+      "name": "Poppleton Road Memorial Hall"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 1,
+    "fields": {
+      "venue": 1,
+      "street_address": "Poppleton Road Memorial Hall",
+      "address_line_2": "Oak Street",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO26 4SE",
+      "num_tables": 2,
+      "parking_info": "On-street parking available nearby.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.961029,
+      "longitude": -1.112994
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 11,
+    "fields": {
+      "name": "Queen's Sports Club"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 11,
+    "fields": {
+      "venue": 11,
+      "street_address": "Queen Street",
+      "address_line_2": "",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO24 1AD",
+      "num_tables": 2,
+      "parking_info": "Limited on-site parking available.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.95608,
+      "longitude": -1.09249
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 2,
+    "fields": {
+      "name": "Wigginton Recreation Hall"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 2,
+    "fields": {
+      "venue": 2,
+      "street_address": "Wigginton Recreation Hall",
+      "address_line_2": "The Village",
+      "city": "Wigginton",
+      "county": "Yorkshire",
+      "postcode": "YO32 2LL",
+      "num_tables": 2,
+      "parking_info": "Free parking available at the hall.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 54.01935,
+      "longitude": -1.08187
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 3,
+    "fields": {
+      "name": "Dunnington Sports Centre"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 3,
+    "fields": {
+      "venue": 3,
+      "street_address": "Common Road",
+      "address_line_2": "",
+      "city": "Dunnington",
+      "county": "Yorkshire",
+      "postcode": "YO19 5NG",
+      "num_tables": 4,
+      "parking_info": "On-site parking available for club members.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": false,
+      "latitude": 53.96423,
+      "longitude": -0.97813
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 4,
+    "fields": {
+      "name": "Huntington School"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 4,
+    "fields": {
+      "venue": 4,
+      "street_address": "Huntington Road",
+      "address_line_2": "",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO32 9WT",
+      "num_tables": 6,
+      "parking_info": "School parking available after hours.",
+      "meets_league_standards": false,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.99019,
+      "longitude": -1.06584
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 5,
+    "fields": {
+      "name": "Net Ninjas TTC"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 5,
+    "fields": {
+      "venue": 5,
+      "street_address": "17-21 Piccadilly",
+      "address_line_2": "",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO1 9PB",
+      "num_tables": 11,
+      "parking_info": "No dedicated parking; nearby city centre options.",
+      "meets_league_standards": false,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.95800,
+      "longitude": -1.07900
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 6,
+    "fields": {
+      "name": "Redeness Sports Centre"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 6,
+    "fields": {
+      "venue": 6,
+      "street_address": "6 Redeness Street",
+      "address_line_2": "",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO31 7UU",
+      "num_tables": 8,
+      "parking_info": "Free parking available for customers.",
+      "meets_league_standards": false,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.96179,
+      "longitude": -1.07089
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 7,
+    "fields": {
+      "name": "Ping Pong Centre"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 7,
+    "fields": {
+      "venue": 7,
+      "street_address": "Kathryn Avenue",
+      "address_line_2": "Monks Cross",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO32 9AF",
+      "num_tables": 6,
+      "parking_info": "Large on-site car park available.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.98345,
+      "longitude": -1.05332
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 8,
+    "fields": {
+      "name": "York West Campus"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 8,
+    "fields": {
+      "venue": 8,
+      "street_address": "James Way",
+      "address_line_2": "Heslington",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO10 5NA",
+      "num_tables": 4,
+      "parking_info": "Ample parking available for visitors.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.94487,
+      "longitude": -1.05667
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 9,
+    "fields": {
+      "name": "Smash Table Tennis Club"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 9,
+    "fields": {
+      "venue": 9,
+      "street_address": "White Rose Avenue",
+      "address_line_2": "",
+      "city": "New Earswick",
+      "county": "Yorkshire",
+      "postcode": "YO32 4AG",
+      "num_tables": 9,
+      "parking_info": "On-site parking for members and guests.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.98973,
+      "longitude": -1.07651
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 10,
+    "fields": {
+      "name": "The Edge Table Tennis Club"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 10,
+    "fields": {
+      "venue": 10,
+      "street_address": "Main Street",
+      "address_line_2": "Upper Poppleton",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO26 6JT",
+      "num_tables": 12,
+      "parking_info": "Small car park available at the venue. Lots of on-street parking available nearby",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.9850625,
+      "longitude": -1.1655603
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 12,
+    "fields": {
+      "name": "York Sport Village"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 12,
+    "fields": {
+      "venue": 12,
+      "street_address": "Lakeside Way",
+      "address_line_2": "Heslington",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO10 5FG",
+      "num_tables": 9,
+      "parking_info": "On-site parking available; open to the public.",
+      "meets_league_standards": true,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.95112,
+      "longitude": -1.01827
+    }
+  },
+  {
+    "model": "clubs.venue",
+    "pk": 13,
+    "fields": {
+      "name": "Nestlé York Sports Centre"
+    }
+  },
+  {
+    "model": "clubs.venueinfo",
+    "pk": 13,
+    "fields": {
+      "venue": 13,
+      "street_address": "Haxby Road",
+      "address_line_2": "",
+      "city": "York",
+      "county": "Yorkshire",
+      "postcode": "YO31 8TA",
+      "num_tables": 8,
+      "parking_info": "100-space car park on-site; disabled access available.",
+      "meets_league_standards": false,
+      "created_on": "2025-05-16T10:35:00Z",
+      "approved": true,
+      "latitude": 53.97563,
+      "longitude": -1.07670
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 1,
+    "fields": {
+      "club": 1,
+      "venue": 1
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 2,
+    "fields": {
+      "club": 2,
+      "venue": 2
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 3,
+    "fields": {
+      "club": 3,
+      "venue": 3
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 4,
+    "fields": {
+      "club": 4,
+      "venue": 4
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 5,
+    "fields": {
+      "club": 5,
+      "venue": 5
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 6,
+    "fields": {
+      "club": 6,
+      "venue": 6
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 7,
+    "fields": {
+      "club": 7,
+      "venue": 7
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 8,
+    "fields": {
+      "club": 8,
+      "venue": 8
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 9,
+    "fields": {
+      "club": 9,
+      "venue": 9
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 10,
+    "fields": {
+      "club": 10,
+      "venue": 10
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 11,
+    "fields": {
+      "club": 11,
+      "venue": 11
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 12,
+    "fields": {
+      "club": 1,
+      "venue": 12
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 13,
+    "fields": {
+      "club": 1,
+      "venue": 13
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 14,
+    "fields": {
+      "club": 10,
+      "venue": 12
+    }
+  },
+  {
+    "model": "clubs.clubvenue",
+    "pk": 19,
+    "fields": {
+      "club": 7,
+      "venue": 6
+    }
+  },
+  {
+    "model": "clubs.clubadmin",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "club": 2
+    }
+  }
+]

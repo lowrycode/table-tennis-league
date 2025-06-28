@@ -637,6 +637,20 @@ If any information is not yet approved, a message appears above the preview to c
 
 The link to the Club Reviews page is disabled in the preview. The anchor element has been replaced with a paragraph element to avoid confusing screen readers.
 
+# Database Data and Design
+
+The project relies on a large amount of interrelated data across multiple models. The image below shows the database design, which was also included in the planning document.
+
+![ERD diagram](readme-resources/images/erd-detailed.jpg)
+
+The database was designed with scalability in mind. For example, there are separate models representing fixture results, singles matches, singles games, doubles matches and doubles games. However, this approach means that inputting data through the Django Admin is laborious, to put it mildly.
+
+The long-term intention is that some of the data entry would be automated (e.g. through a *Fixtures Generator*) and some would be submitted via the front-end website (e.g. match results). This would allow for creating forms which could populate multiple models at the same time.
+
+During the development of this project, JSON fixture data was generated and used to load sample data into the database.
+
+These issues are discussed in more detail in the [**Data Management**](readme-resources/data_management.md) document, which also explains how the fixtures data can be loaded to the database.
+
 # Future Features
 
 So far, **Stage 1** has been fully completed although in the future I intend to add **validation to postcode fields**, particularly in the Update Venue Info form.

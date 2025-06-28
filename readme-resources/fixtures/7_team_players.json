@@ -1,0 +1,821 @@
+[
+  {
+    "model": "league.teamplayer",
+    "pk": 1,
+    "fields": {
+      "player": 1,
+      "team": 1,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 2,
+    "fields": {
+      "player": 2,
+      "team": 1,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 3,
+    "fields": {
+      "player": 3,
+      "team": 1,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 4,
+    "fields": {
+      "player": 4,
+      "team": 2,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 5,
+    "fields": {
+      "player": 5,
+      "team": 2,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 6,
+    "fields": {
+      "player": 6,
+      "team": 2,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 11,
+    "fields": {
+      "player": 11,
+      "team": 3,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 12,
+    "fields": {
+      "player": 12,
+      "team": 3,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 13,
+    "fields": {
+      "player": 13,
+      "team": 3,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 21,
+    "fields": {
+      "player": 21,
+      "team": 4,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 22,
+    "fields": {
+      "player": 22,
+      "team": 4,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 23,
+    "fields": {
+      "player": 23,
+      "team": 4,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 31,
+    "fields": {
+      "player": 31,
+      "team": 5,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 32,
+    "fields": {
+      "player": 32,
+      "team": 5,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 33,
+    "fields": {
+      "player": 33,
+      "team": 5,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 34,
+    "fields": {
+      "player": 34,
+      "team": 6,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 35,
+    "fields": {
+      "player": 35,
+      "team": 6,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 36,
+    "fields": {
+      "player": 36,
+      "team": 6,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 41,
+    "fields": {
+      "player": 41,
+      "team": 7,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 42,
+    "fields": {
+      "player": 42,
+      "team": 7,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 43,
+    "fields": {
+      "player": 43,
+      "team": 7,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 51,
+    "fields": {
+      "player": 51,
+      "team": 8,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 52,
+    "fields": {
+      "player": 52,
+      "team": 8,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 53,
+    "fields": {
+      "player": 53,
+      "team": 8,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 61,
+    "fields": {
+      "player": 61,
+      "team": 9,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 62,
+    "fields": {
+      "player": 62,
+      "team": 9,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 63,
+    "fields": {
+      "player": 63,
+      "team": 9,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 71,
+    "fields": {
+      "player": 71,
+      "team": 10,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 72,
+    "fields": {
+      "player": 72,
+      "team": 10,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 73,
+    "fields": {
+      "player": 73,
+      "team": 10,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 101,
+    "fields": {
+      "player": 1,
+      "team": 11,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 102,
+    "fields": {
+      "player": 2,
+      "team": 11,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 103,
+    "fields": {
+      "player": 3,
+      "team": 11,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 104,
+    "fields": {
+      "player": 4,
+      "team": 12,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 105,
+    "fields": {
+      "player": 5,
+      "team": 12,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 106,
+    "fields": {
+      "player": 6,
+      "team": 12,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 111,
+    "fields": {
+      "player": 11,
+      "team": 13,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 112,
+    "fields": {
+      "player": 12,
+      "team": 13,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 113,
+    "fields": {
+      "player": 13,
+      "team": 13,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 121,
+    "fields": {
+      "player": 21,
+      "team": 14,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 122,
+    "fields": {
+      "player": 22,
+      "team": 14,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 123,
+    "fields": {
+      "player": 23,
+      "team": 14,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 131,
+    "fields": {
+      "player": 31,
+      "team": 15,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 132,
+    "fields": {
+      "player": 32,
+      "team": 15,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 133,
+    "fields": {
+      "player": 33,
+      "team": 15,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 134,
+    "fields": {
+      "player": 34,
+      "team": 16,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 135,
+    "fields": {
+      "player": 35,
+      "team": 16,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 136,
+    "fields": {
+      "player": 36,
+      "team": 16,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 141,
+    "fields": {
+      "player": 41,
+      "team": 17,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 142,
+    "fields": {
+      "player": 42,
+      "team": 17,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 143,
+    "fields": {
+      "player": 43,
+      "team": 17,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 151,
+    "fields": {
+      "player": 51,
+      "team": 18,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 152,
+    "fields": {
+      "player": 52,
+      "team": 18,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 153,
+    "fields": {
+      "player": 53,
+      "team": 18,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 161,
+    "fields": {
+      "player": 61,
+      "team": 19,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 162,
+    "fields": {
+      "player": 62,
+      "team": 19,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 163,
+    "fields": {
+      "player": 63,
+      "team": 19,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 171,
+    "fields": {
+      "player": 71,
+      "team": 20,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 172,
+    "fields": {
+      "player": 72,
+      "team": 20,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 173,
+    "fields": {
+      "player": 73,
+      "team": 20,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 201,
+    "fields": {
+      "player": 1,
+      "team": 21,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 202,
+    "fields": {
+      "player": 2,
+      "team": 21,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 203,
+    "fields": {
+      "player": 3,
+      "team": 21,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 204,
+    "fields": {
+      "player": 4,
+      "team": 22,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 205,
+    "fields": {
+      "player": 5,
+      "team": 22,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 206,
+    "fields": {
+      "player": 6,
+      "team": 22,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 211,
+    "fields": {
+      "player": 11,
+      "team": 23,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 212,
+    "fields": {
+      "player": 12,
+      "team": 23,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 213,
+    "fields": {
+      "player": 13,
+      "team": 23,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 221,
+    "fields": {
+      "player": 21,
+      "team": 24,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 222,
+    "fields": {
+      "player": 22,
+      "team": 24,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 223,
+    "fields": {
+      "player": 23,
+      "team": 24,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 231,
+    "fields": {
+      "player": 31,
+      "team": 25,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 232,
+    "fields": {
+      "player": 32,
+      "team": 25,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 233,
+    "fields": {
+      "player": 33,
+      "team": 25,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 234,
+    "fields": {
+      "player": 34,
+      "team": 26,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 235,
+    "fields": {
+      "player": 35,
+      "team": 26,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 236,
+    "fields": {
+      "player": 36,
+      "team": 26,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 241,
+    "fields": {
+      "player": 41,
+      "team": 27,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 242,
+    "fields": {
+      "player": 42,
+      "team": 27,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 243,
+    "fields": {
+      "player": 43,
+      "team": 27,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 251,
+    "fields": {
+      "player": 51,
+      "team": 28,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 252,
+    "fields": {
+      "player": 52,
+      "team": 28,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 253,
+    "fields": {
+      "player": 53,
+      "team": 28,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 261,
+    "fields": {
+      "player": 61,
+      "team": 29,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 262,
+    "fields": {
+      "player": 62,
+      "team": 29,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 263,
+    "fields": {
+      "player": 63,
+      "team": 29,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 271,
+    "fields": {
+      "player": 71,
+      "team": 30,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 272,
+    "fields": {
+      "player": 72,
+      "team": 30,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 273,
+    "fields": {
+      "player": 73,
+      "team": 30,
+      "paid_fees": true
+    }
+  },
+  {
+    "model": "league.teamplayer",
+    "pk": 274,
+    "fields": {
+      "player": 74,
+      "team": 30,
+      "paid_fees": true
+    }
+  }
+]

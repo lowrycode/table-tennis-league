@@ -1,0 +1,562 @@
+[
+  {
+    "model": "league.fixture",
+    "pk": 101,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 11,
+      "datetime": "2023-09-04T19:00:00Z",
+      "home_team": 11,
+      "away_team": 18,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 102,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 11,
+      "datetime": "2023-09-04T19:00:00Z",
+      "home_team": 12,
+      "away_team": 15,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 103,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 12,
+      "datetime": "2023-09-11T19:00:00Z",
+      "home_team": 15,
+      "away_team": 11,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 104,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 12,
+      "datetime": "2023-09-12T19:00:00Z",
+      "home_team": 18,
+      "away_team": 20,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 105,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 13,
+      "datetime": "2023-09-18T19:00:00Z",
+      "home_team": 20,
+      "away_team": 15,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 106,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 13,
+      "datetime": "2023-09-18T19:00:00Z",
+      "home_team": 11,
+      "away_team": 12,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 107,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 14,
+      "datetime": "2023-09-25T19:00:00Z",
+      "home_team": 12,
+      "away_team": 20,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 108,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 14,
+      "datetime": "2023-09-26T19:00:00Z",
+      "home_team": 15,
+      "away_team": 18,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 109,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 15,
+      "datetime": "2023-10-02T19:00:00Z",
+      "home_team": 18,
+      "away_team": 12,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 110,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 15,
+      "datetime": "2023-10-02T19:15:00Z",
+      "home_team": 20,
+      "away_team": 11,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 111,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 16,
+      "datetime": "2023-10-09T19:00:00Z",
+      "home_team": 18,
+      "away_team": 11,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 112,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 16,
+      "datetime": "2023-10-09T19:00:00Z",
+      "home_team": 15,
+      "away_team": 12,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 113,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 17,
+      "datetime": "2023-10-16T19:00:00Z",
+      "home_team": 11,
+      "away_team": 15,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 114,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 17,
+      "datetime": "2023-10-16T19:15:00Z",
+      "home_team": 20,
+      "away_team": 18,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 115,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 18,
+      "datetime": "2023-10-23T19:00:00Z",
+      "home_team": 15,
+      "away_team": 20,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 116,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 18,
+      "datetime": "2023-10-23T19:00:00Z",
+      "home_team": 12,
+      "away_team": 11,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 117,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 19,
+      "datetime": "2023-10-30T19:15:00Z",
+      "home_team": 20,
+      "away_team": 12,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 118,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 19,
+      "datetime": "2023-10-31T19:00:00Z",
+      "home_team": 18,
+      "away_team": 15,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 119,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 20,
+      "datetime": "2023-11-06T19:00:00Z",
+      "home_team": 12,
+      "away_team": 18,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 120,
+    "fields": {
+      "season": 2,
+      "division": 1,
+      "week": 20,
+      "datetime": "2023-11-06T19:15:00Z",
+      "home_team": 11,
+      "away_team": 20,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 121,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 11,
+      "datetime": "2023-09-07T19:15:00Z",
+      "home_team": 13,
+      "away_team": 17,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 122,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 11,
+      "datetime": "2023-09-06T19:00:00Z",
+      "home_team": 14,
+      "away_team": 16,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 123,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 12,
+      "datetime": "2023-09-11T19:15:00Z",
+      "home_team": 16,
+      "away_team": 13,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 124,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 12,
+      "datetime": "2023-09-14T19:15:00Z",
+      "home_team": 17,
+      "away_team": 19,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 125,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 13,
+      "datetime": "2023-09-20T19:15:00Z",
+      "home_team": 19,
+      "away_team": 16,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 126,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 13,
+      "datetime": "2023-09-19T19:15:00Z",
+      "home_team": 13,
+      "away_team": 14,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 127,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 14,
+      "datetime": "2023-09-26T19:00:00Z",
+      "home_team": 14,
+      "away_team": 19,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 128,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 14,
+      "datetime": "2023-09-27T19:15:00Z",
+      "home_team": 16,
+      "away_team": 17,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 129,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 15,
+      "datetime": "2023-10-04T19:15:00Z",
+      "home_team": 17,
+      "away_team": 14,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 130,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 15,
+      "datetime": "2023-10-02T19:15:00Z",
+      "home_team": 19,
+      "away_team": 13,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 131,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 16,
+      "datetime": "2023-10-11T19:15:00Z",
+      "home_team": 17,
+      "away_team": 13,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 132,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 16,
+      "datetime": "2023-10-09T19:15:00Z",
+      "home_team": 16,
+      "away_team": 14,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 133,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 17,
+      "datetime": "2023-10-16T19:15:00Z",
+      "home_team": 13,
+      "away_team": 16,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 134,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 17,
+      "datetime": "2023-10-19T19:15:00Z",
+      "home_team": 19,
+      "away_team": 17,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 135,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 18,
+      "datetime": "2023-10-23T19:15:00Z",
+      "home_team": 16,
+      "away_team": 19,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 136,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 18,
+      "datetime": "2023-10-25T19:00:00Z",
+      "home_team": 14,
+      "away_team": 13,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 137,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 19,
+      "datetime": "2023-10-30T19:15:00Z",
+      "home_team": 19,
+      "away_team": 14,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 138,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 19,
+      "datetime": "2023-10-30T19:15:00Z",
+      "home_team": 17,
+      "away_team": 16,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 139,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 20,
+      "datetime": "2023-11-06T19:00:00Z",
+      "home_team": 14,
+      "away_team": 17,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 140,
+    "fields": {
+      "season": 2,
+      "division": 2,
+      "week": 20,
+      "datetime": "2023-11-07T19:15:00Z",
+      "home_team": 13,
+      "away_team": 19,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  }
+]

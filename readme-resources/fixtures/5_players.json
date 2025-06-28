@@ -1,0 +1,882 @@
+[
+  {
+    "model": "league.player",
+    "pk": 1,
+    "fields": {
+      "forename": "Alice",
+      "surname": "Smith",
+      "date_of_birth": "2005-03-15",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 2,
+    "fields": {
+      "forename": "Ben",
+      "surname": "Johnson",
+      "date_of_birth": "2004-07-21",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 3,
+    "fields": {
+      "forename": "Chloe",
+      "surname": "Williams",
+      "date_of_birth": "2003-11-30",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 4,
+    "fields": {
+      "forename": "David",
+      "surname": "Brown",
+      "date_of_birth": "2006-01-12",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 5,
+    "fields": {
+      "forename": "Ella",
+      "surname": "Jones",
+      "date_of_birth": "2005-06-05",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 6,
+    "fields": {
+      "forename": "Frank",
+      "surname": "Miller",
+      "date_of_birth": "2004-08-19",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 7,
+    "fields": {
+      "forename": "Grace",
+      "surname": "Davis",
+      "date_of_birth": "2003-12-25",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 8,
+    "fields": {
+      "forename": "Harry",
+      "surname": "Wilson",
+      "date_of_birth": "2006-02-17",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 9,
+    "fields": {
+      "forename": "Isla",
+      "surname": "Moore",
+      "date_of_birth": "2005-09-09",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 10,
+    "fields": {
+      "forename": "Jack",
+      "surname": "Taylor",
+      "date_of_birth": "2004-05-03",
+      "current_club": 1,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 11,
+    "fields": {
+      "forename": "Liam",
+      "surname": "Evans",
+      "date_of_birth": "2000-04-10",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 12,
+    "fields": {
+      "forename": "Mia",
+      "surname": "Clark",
+      "date_of_birth": "1999-11-23",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 13,
+    "fields": {
+      "forename": "Noah",
+      "surname": "Wright",
+      "date_of_birth": "2001-06-15",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 14,
+    "fields": {
+      "forename": "Olivia",
+      "surname": "King",
+      "date_of_birth": "1998-02-28",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 15,
+    "fields": {
+      "forename": "Paul",
+      "surname": "Scott",
+      "date_of_birth": "2000-12-05",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 16,
+    "fields": {
+      "forename": "Quinn",
+      "surname": "Hughes",
+      "date_of_birth": "1997-07-20",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 17,
+    "fields": {
+      "forename": "Rachel",
+      "surname": "Mitchell",
+      "date_of_birth": "1999-03-14",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 18,
+    "fields": {
+      "forename": "Sam",
+      "surname": "Bennett",
+      "date_of_birth": "2001-09-01",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 19,
+    "fields": {
+      "forename": "Tara",
+      "surname": "Cooper",
+      "date_of_birth": "1998-05-30",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 20,
+    "fields": {
+      "forename": "Umar",
+      "surname": "Bell",
+      "date_of_birth": "2000-08-18",
+      "current_club": 3,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 21,
+    "fields": {
+      "forename": "Victor",
+      "surname": "Reed",
+      "date_of_birth": "1970-04-22",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 22,
+    "fields": {
+      "forename": "Wendy",
+      "surname": "Foster",
+      "date_of_birth": "1985-09-14",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 23,
+    "fields": {
+      "forename": "Xander",
+      "surname": "Hall",
+      "date_of_birth": "2007-11-30",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 24,
+    "fields": {
+      "forename": "Yara",
+      "surname": "Gibson",
+      "date_of_birth": "1993-06-18",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 25,
+    "fields": {
+      "forename": "Zane",
+      "surname": "Morgan",
+      "date_of_birth": "1960-02-03",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 26,
+    "fields": {
+      "forename": "Amy",
+      "surname": "Collins",
+      "date_of_birth": "2004-08-10",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 27,
+    "fields": {
+      "forename": "Brian",
+      "surname": "Stewart",
+      "date_of_birth": "1955-12-25",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 28,
+    "fields": {
+      "forename": "Clara",
+      "surname": "Hughes",
+      "date_of_birth": "1999-04-02",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 29,
+    "fields": {
+      "forename": "Derek",
+      "surname": "Palmer",
+      "date_of_birth": "1975-07-07",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 30,
+    "fields": {
+      "forename": "Emily",
+      "surname": "Wright",
+      "date_of_birth": "2006-03-21",
+      "current_club": 4,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 31,
+    "fields": {
+      "forename": "Oliver",
+      "surname": "Grant",
+      "date_of_birth": "1970-05-15",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 32,
+    "fields": {
+      "forename": "Sophia",
+      "surname": "Bennett",
+      "date_of_birth": "1982-11-03",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 33,
+    "fields": {
+      "forename": "Ethan",
+      "surname": "Brooks",
+      "date_of_birth": "1995-08-22",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 34,
+    "fields": {
+      "forename": "Mia",
+      "surname": "Watson",
+      "date_of_birth": "1978-03-10",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 35,
+    "fields": {
+      "forename": "Liam",
+      "surname": "Turner",
+      "date_of_birth": "1965-07-18",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 36,
+    "fields": {
+      "forename": "Grace",
+      "surname": "Reid",
+      "date_of_birth": "1990-01-25",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 37,
+    "fields": {
+      "forename": "Noah",
+      "surname": "Fisher",
+      "date_of_birth": "1988-12-09",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 38,
+    "fields": {
+      "forename": "Ella",
+      "surname": "Harrison",
+      "date_of_birth": "1984-09-30",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 39,
+    "fields": {
+      "forename": "James",
+      "surname": "Cole",
+      "date_of_birth": "1950-06-04",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 40,
+    "fields": {
+      "forename": "Isabella",
+      "surname": "Clark",
+      "date_of_birth": "1983-04-12",
+      "current_club": 5,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 41,
+    "fields": {
+      "forename": "Aiden",
+      "surname": "Walker",
+      "date_of_birth": "2014-04-15",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 42,
+    "fields": {
+      "forename": "Chloe",
+      "surname": "Mitchell",
+      "date_of_birth": "2008-09-22",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 43,
+    "fields": {
+      "forename": "Lucas",
+      "surname": "James",
+      "date_of_birth": "1995-12-11",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 44,
+    "fields": {
+      "forename": "Emily",
+      "surname": "Baker",
+      "date_of_birth": "2013-07-29",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 45,
+    "fields": {
+      "forename": "Ethan",
+      "surname": "Collins",
+      "date_of_birth": "2003-02-18",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 46,
+    "fields": {
+      "forename": "Lily",
+      "surname": "Morgan",
+      "date_of_birth": "2012-10-05",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 47,
+    "fields": {
+      "forename": "James",
+      "surname": "Brooks",
+      "date_of_birth": "1999-05-30",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 48,
+    "fields": {
+      "forename": "Sophia",
+      "surname": "Evans",
+      "date_of_birth": "2011-08-17",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 49,
+    "fields": {
+      "forename": "Oliver",
+      "surname": "Hughes",
+      "date_of_birth": "2005-11-25",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 50,
+    "fields": {
+      "forename": "Grace",
+      "surname": "Stewart",
+      "date_of_birth": "2010-06-14",
+      "current_club": 7,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 51,
+    "fields": {
+      "forename": "Daniel",
+      "surname": "Foster",
+      "date_of_birth": "1985-03-12",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 52,
+    "fields": {
+      "forename": "Emma",
+      "surname": "Reid",
+      "date_of_birth": "1997-11-08",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 53,
+    "fields": {
+      "forename": "Matthew",
+      "surname": "Campbell",
+      "date_of_birth": "1982-06-22",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 54,
+    "fields": {
+      "forename": "Olivia",
+      "surname": "Turner",
+      "date_of_birth": "1995-02-15",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 55,
+    "fields": {
+      "forename": "James",
+      "surname": "Morgan",
+      "date_of_birth": "1970-09-30",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 56,
+    "fields": {
+      "forename": "Isabella",
+      "surname": "Coleman",
+      "date_of_birth": "1988-12-05",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 57,
+    "fields": {
+      "forename": "Andrew",
+      "surname": "Mitchell",
+      "date_of_birth": "1990-07-20",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 58,
+    "fields": {
+      "forename": "Sophia",
+      "surname": "James",
+      "date_of_birth": "1987-04-10",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 59,
+    "fields": {
+      "forename": "Benjamin",
+      "surname": "Harris",
+      "date_of_birth": "1999-01-25",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 60,
+    "fields": {
+      "forename": "Grace",
+      "surname": "Turner",
+      "date_of_birth": "1984-08-18",
+      "current_club": 8,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 61,
+    "fields": {
+      "forename": "Liam",
+      "surname": "Walker",
+      "date_of_birth": "2007-05-12",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 62,
+    "fields": {
+      "forename": "Chloe",
+      "surname": "Baker",
+      "date_of_birth": "2005-11-23",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 63,
+    "fields": {
+      "forename": "Ethan",
+      "surname": "Price",
+      "date_of_birth": "2004-02-18",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 64,
+    "fields": {
+      "forename": "Mia",
+      "surname": "Griffin",
+      "date_of_birth": "2008-07-30",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 65,
+    "fields": {
+      "forename": "Noah",
+      "surname": "Scott",
+      "date_of_birth": "2006-12-14",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 66,
+    "fields": {
+      "forename": "Ella",
+      "surname": "Hughes",
+      "date_of_birth": "2007-09-21",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 67,
+    "fields": {
+      "forename": "Jack",
+      "surname": "Reynolds",
+      "date_of_birth": "2003-04-10",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 68,
+    "fields": {
+      "forename": "Sophie",
+      "surname": "King",
+      "date_of_birth": "2005-08-05",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 69,
+    "fields": {
+      "forename": "Lucas",
+      "surname": "Wright",
+      "date_of_birth": "2006-03-27",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 70,
+    "fields": {
+      "forename": "Amelia",
+      "surname": "Evans",
+      "date_of_birth": "2004-10-16",
+      "current_club": 9,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 71,
+    "fields": {
+      "forename": "Oliver",
+      "surname": "Harrison",
+      "date_of_birth": "1950-06-12",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 72,
+    "fields": {
+      "forename": "Isabella",
+      "surname": "Morgan",
+      "date_of_birth": "2008-09-23",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 73,
+    "fields": {
+      "forename": "Henry",
+      "surname": "Clark",
+      "date_of_birth": "1975-04-10",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 74,
+    "fields": {
+      "forename": "Emma",
+      "surname": "Turner",
+      "date_of_birth": "1990-11-05",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 75,
+    "fields": {
+      "forename": "James",
+      "surname": "Phillips",
+      "date_of_birth": "1982-03-14",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 76,
+    "fields": {
+      "forename": "Sophia",
+      "surname": "White",
+      "date_of_birth": "2009-07-21",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 77,
+    "fields": {
+      "forename": "Thomas",
+      "surname": "King",
+      "date_of_birth": "1955-01-02",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 78,
+    "fields": {
+      "forename": "Mia",
+      "surname": "Scott",
+      "date_of_birth": "2007-05-18",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 79,
+    "fields": {
+      "forename": "Daniel",
+      "surname": "Baker",
+      "date_of_birth": "1985-08-30",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  },
+  {
+    "model": "league.player",
+    "pk": 80,
+    "fields": {
+      "forename": "Charlotte",
+      "surname": "Adams",
+      "date_of_birth": "2006-12-11",
+      "current_club": 10,
+      "club_status": "confirmed"
+    }
+  }
+]

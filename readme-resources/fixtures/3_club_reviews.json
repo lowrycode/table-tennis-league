@@ -1,0 +1,170 @@
+[
+  {
+    "model": "clubs.clubreview",
+    "pk": 1,
+    "fields": {
+      "club": 1,
+      "user": 2,
+      "score": 5,
+      "headline": "Best training facility I've seen",
+      "review_text": "This table tennis club exceeded my expectations. The equipment was top-notch, the tables were in excellent condition, and there was ample space around each table. Coaches were very knowledgeable and friendly. I've made huge progress thanks to the structured sessions.",
+      "created_on": "2024-09-01T10:00:00Z",
+      "updated_on": "2024-09-01T10:00:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 2,
+    "fields": {
+      "club": 1,
+      "user": 3,
+      "score": 4,
+      "headline": "Excellent but crowded at peak hours",
+      "review_text": "I love coming here for practice. The coaches are passionate and helpful. The only downside is that evenings can get quite busy, which sometimes means waiting to use a table. Still, the overall vibe is great and players of all levels are welcome.",
+      "created_on": "2024-09-02T18:00:00Z",
+      "updated_on": "2024-09-02T18:00:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 3,
+    "fields": {
+      "club": 6,
+      "user": 4,
+      "score": 3,
+      "headline": "Good for beginners",
+      "review_text": "If you're new to table tennis, this club is a decent starting point. There's a friendly community and the beginner classes are well-structured. Advanced players might find the sessions too basic, though. Equipment quality could also be better maintained.",
+      "created_on": "2024-09-03T14:30:00Z",
+      "updated_on": "2024-09-03T14:30:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 4,
+    "fields": {
+      "club": 6,
+      "user": 5,
+      "score": 2,
+      "headline": "Needs better maintenance",
+      "review_text": "The club has potential but it's not being realized. Several tables had broken nets, and the lighting was uneven across the hall. Some sessions started late due to poor scheduling. Disappointing experience for someone looking for serious practice.",
+      "created_on": "2024-09-04T09:15:00Z",
+      "updated_on": "2024-09-04T10:45:00Z",
+      "approved": false
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 5,
+    "fields": {
+      "club": 3,
+      "user": 6,
+      "score": 4,
+      "headline": "Welcoming and professional",
+      "review_text": "This club strikes a perfect balance between professionalism and friendliness. I joined as a recreational player but quickly improved thanks to the structured training and peer feedback. Their weekend tournaments are fun and well-organized.",
+      "created_on": "2024-09-05T11:45:00Z",
+      "updated_on": "2024-09-05T11:45:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 6,
+    "fields": {
+      "club": 3,
+      "user": 2,
+      "score": 5,
+      "headline": "Incredible coaching staff",
+      "review_text": "The level of coaching here is phenomenal. Every session is structured with drills, match play, and analysis. Coaches pay attention to detail and help you refine technique step-by-step. It's rare to find such committed staff who genuinely care.",
+      "created_on": "2024-09-06T16:30:00Z",
+      "updated_on": "2024-09-06T16:30:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 7,
+    "fields": {
+      "club": 11,
+      "user": 3,
+      "score": 3,
+      "headline": "Friendly players but small space",
+      "review_text": "The club community is very warm and inclusive. However, the space is quite limited and only allows for a few tables. If you're looking for casual play, it's great. For competitive practice, maybe not ideal.",
+      "created_on": "2024-09-07T13:20:00Z",
+      "updated_on": "2024-09-07T13:20:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 8,
+    "fields": {
+      "club": 4,
+      "user": 4,
+      "score": 4,
+      "headline": "Cozy and well-run",
+      "review_text": "Though it's not the largest facility, this club is impressively managed. They keep the schedule tight and make sure sessions run smoothly. I especially enjoy the weekly ladder matches, which keep things competitive but friendly.",
+      "created_on": "2024-09-08T20:00:00Z",
+      "updated_on": "2024-09-08T20:00:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 9,
+    "fields": {
+      "club": 6,
+      "user": 2,
+      "score": 1,
+      "headline": "Poorly organized sessions",
+      "review_text": "Unfortunately, this was one of the more chaotic clubs I've attended. Sessions often start late, there's no real training plan, and it's hard to get individual attention. Might be okay for social play, but not for serious improvement.",
+      "created_on": "2024-09-09T09:00:00Z",
+      "updated_on": "2024-09-09T11:00:00Z",
+      "approved": false
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 10,
+    "fields": {
+      "club": 7,
+      "user": 6,
+      "score": 5,
+      "headline": "Professional-level training",
+      "review_text": "This club is the real deal for competitive players. The advanced group training is intense and focused, and training partners are high level. Facility is clean, well-lit, and spacious. You can tell they care about developing athletes.",
+      "created_on": "2024-09-10T17:15:00Z",
+      "updated_on": "2024-09-10T17:15:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 11,
+    "fields": {
+      "club": 3,
+      "user": 3,
+      "score": 3,
+      "headline": "Decent community club",
+      "review_text": "It's a decent place for weekend games and meeting other local enthusiasts. Don't expect elite-level coaching, but for keeping your skills sharp and enjoying the game, it does the job. Affordable too, which is a bonus.",
+      "created_on": "2024-09-11T08:45:00Z",
+      "updated_on": "2024-09-11T08:45:00Z",
+      "approved": true
+    }
+  },
+  {
+    "model": "clubs.clubreview",
+    "pk": 12,
+    "fields": {
+      "club": 5,
+      "user": 5,
+      "score": 4,
+      "headline": "Great weekend tournaments",
+      "review_text": "Joined a weekend tournament here and was impressed by the level of play and organization. They kept matches running on time and created a welcoming atmosphere for both seasoned and new players. Will definitely join again.",
+      "created_on": "2024-09-11T19:45:00Z",
+      "updated_on": "2024-09-11T19:45:00Z",
+      "approved": true
+    }
+  }
+]

@@ -1,0 +1,571 @@
+[
+  {
+    "model": "league.fixture",
+    "pk": 1,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 1,
+      "datetime": "2022-09-05T19:00:00Z",
+      "home_team": 1,
+      "away_team": 8,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 2,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 1,
+      "datetime": "2022-09-05T19:00:00Z",
+      "home_team": 2,
+      "away_team": 5,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 3,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 2,
+      "datetime": "2022-09-12T19:00:00Z",
+      "home_team": 5,
+      "away_team": 1,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 4,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 2,
+      "datetime": "2022-09-13T19:00:00Z",
+      "home_team": 8,
+      "away_team": 10,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 5,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 3,
+      "datetime": "2022-09-19T19:00:00Z",
+      "home_team": 10,
+      "away_team": 5,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 6,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 3,
+      "datetime": "2022-09-19T19:00:00Z",
+      "home_team": 1,
+      "away_team": 2,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 7,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 4,
+      "datetime": "2022-09-26T19:00:00Z",
+      "home_team": 2,
+      "away_team": 10,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 8,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 4,
+      "datetime": "2022-09-27T19:00:00Z",
+      "home_team": 5,
+      "away_team": 8,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 9,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 5,
+      "datetime": "2022-10-03T19:00:00Z",
+      "home_team": 8,
+      "away_team": 2,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 10,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 5,
+      "datetime": "2022-10-03T19:15:00Z",
+      "home_team": 10,
+      "away_team": 1,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 11,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 6,
+      "datetime": "2022-10-10T19:00:00Z",
+      "home_team": 8,
+      "away_team": 1,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 12,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 6,
+      "datetime": "2022-10-10T19:00:00Z",
+      "home_team": 5,
+      "away_team": 2,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 13,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 7,
+      "datetime": "2022-10-17T19:00:00Z",
+      "home_team": 1,
+      "away_team": 5,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 14,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 7,
+      "datetime": "2022-10-17T19:15:00Z",
+      "home_team": 10,
+      "away_team": 8,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 15,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 8,
+      "datetime": "2022-10-24T19:00:00Z",
+      "home_team": 5,
+      "away_team": 10,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 16,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 8,
+      "datetime": "2022-10-24T19:00:00Z",
+      "home_team": 2,
+      "away_team": 1,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 17,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 9,
+      "datetime": "2022-10-31T19:15:00Z",
+      "home_team": 10,
+      "away_team": 2,
+      "venue": 10,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 18,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 9,
+      "datetime": "2022-11-01T19:00:00Z",
+      "home_team": 8,
+      "away_team": 5,
+      "venue": 8,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 19,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 10,
+      "datetime": "2022-11-07T19:00:00Z",
+      "home_team": 2,
+      "away_team": 8,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 20,
+    "fields": {
+      "season": 1,
+      "division": 1,
+      "week": 10,
+      "datetime": "2022-11-07T19:15:00Z",
+      "home_team": 1,
+      "away_team": 10,
+      "venue": 1,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 21,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 1,
+      "datetime": "2022-09-08T19:15:00Z",
+      "home_team": 3,
+      "away_team": 7,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 22,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 1,
+      "datetime": "2022-09-07T19:00:00Z",
+      "home_team": 4,
+      "away_team": 6,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 23,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 2,
+      "datetime": "2022-09-12T19:15:00Z",
+      "home_team": 6,
+      "away_team": 3,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 24,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 2,
+      "datetime": "2022-09-15T19:15:00Z",
+      "home_team": 7,
+      "away_team": 9,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 25,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 3,
+      "datetime": "2022-09-21T19:15:00Z",
+      "home_team": 9,
+      "away_team": 6,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 26,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 3,
+      "datetime": "2022-09-20T19:15:00Z",
+      "home_team": 3,
+      "away_team": 4,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 27,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 4,
+      "datetime": "2022-09-27T19:00:00Z",
+      "home_team": 4,
+      "away_team": 9,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 28,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 4,
+      "datetime": "2022-09-28T19:15:00Z",
+      "home_team": 6,
+      "away_team": 7,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 29,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 5,
+      "datetime": "2022-10-05T19:15:00Z",
+      "home_team": 7,
+      "away_team": 4,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 30,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 5,
+      "datetime": "2022-10-03T19:15:00Z",
+      "home_team": 9,
+      "away_team": 3,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 31,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 6,
+      "datetime": "2022-10-12T19:15:00Z",
+      "home_team": 7,
+      "away_team": 3,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 32,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 6,
+      "datetime": "2022-10-10T19:15:00Z",
+      "home_team": 6,
+      "away_team": 4,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 33,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 7,
+      "datetime": "2022-10-17T19:15:00Z",
+      "home_team": 3,
+      "away_team": 6,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 34,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 7,
+      "datetime": "2022-10-20T19:15:00Z",
+      "home_team": 9,
+      "away_team": 7,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 35,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 8,
+      "datetime": "2022-10-24T19:15:00Z",
+      "home_team": 6,
+      "away_team": 9,
+      "venue": 5,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 36,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 8,
+      "datetime": "2022-10-26T19:00:00Z",
+      "home_team": 4,
+      "away_team": 3,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 37,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 9,
+      "datetime": "2022-10-31T19:15:00Z",
+      "home_team": 9,
+      "away_team": 4,
+      "venue": 9,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 38,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 9,
+      "datetime": "2022-10-31T19:15:00Z",
+      "home_team": 7,
+      "away_team": 6,
+      "venue": 7,
+      "status": "scheduled"
+    }
+  },
+
+  {
+    "model": "league.fixture",
+    "pk": 39,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 10,
+      "datetime": "2022-11-07T19:00:00Z",
+      "home_team": 4,
+      "away_team": 7,
+      "venue": 4,
+      "status": "scheduled"
+    }
+  },
+  {
+    "model": "league.fixture",
+    "pk": 40,
+    "fields": {
+      "season": 1,
+      "division": 2,
+      "week": 10,
+      "datetime": "2022-11-08T19:15:00Z",
+      "home_team": 3,
+      "away_team": 9,
+      "venue": 3,
+      "status": "scheduled"
+    }
+  }
+]

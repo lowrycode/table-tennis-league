@@ -1,0 +1,442 @@
+[
+  {
+    "model": "league.fixtureresult",
+    "pk": 1,
+    "fields": {
+      "fixture": 1,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 2,
+    "fields": {
+      "fixture": 2,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 3,
+    "fields": {
+      "fixture": 3,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 4,
+    "fields": {
+      "fixture": 4,
+      "home_score": 7,
+      "away_score": 3,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 5,
+    "fields": {
+      "fixture": 5,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 6,
+    "fields": {
+      "fixture": 6,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 7,
+    "fields": {
+      "fixture": 7,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 8,
+    "fields": {
+      "fixture": 8,
+      "home_score": 3,
+      "away_score": 7,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 9,
+    "fields": {
+      "fixture": 9,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 10,
+    "fields": {
+      "fixture": 10,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 11,
+    "fields": {
+      "fixture": 11,
+      "home_score": 2,
+      "away_score": 8,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 12,
+    "fields": {
+      "fixture": 12,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 13,
+    "fields": {
+      "fixture": 13,
+      "home_score": 8,
+      "away_score": 2,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 14,
+    "fields": {
+      "fixture": 14,
+      "home_score": 3,
+      "away_score": 7,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 15,
+    "fields": {
+      "fixture": 15,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 16,
+    "fields": {
+      "fixture": 16,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 17,
+    "fields": {
+      "fixture": 17,
+      "home_score": 7,
+      "away_score": 3,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 18,
+    "fields": {
+      "fixture": 18,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 19,
+    "fields": {
+      "fixture": 19,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 20,
+    "fields": {
+      "fixture": 20,
+      "home_score": 2,
+      "away_score": 8,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 21,
+    "fields": {
+      "fixture": 21,
+      "home_score": 7,
+      "away_score": 3,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 22,
+    "fields": {
+      "fixture": 22,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 23,
+    "fields": {
+      "fixture": 23,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 24,
+    "fields": {
+      "fixture": 24,
+      "home_score": 3,
+      "away_score": 7,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 25,
+    "fields": {
+      "fixture": 25,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 26,
+    "fields": {
+      "fixture": 26,
+      "home_score": 7,
+      "away_score": 3,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 27,
+    "fields": {
+      "fixture": 27,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 28,
+    "fields": {
+      "fixture": 28,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 29,
+    "fields": {
+      "fixture": 29,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 30,
+    "fields": {
+      "fixture": 30,
+      "home_score": 2,
+      "away_score": 8,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 31,
+    "fields": {
+      "fixture": 31,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 32,
+    "fields": {
+      "fixture": 32,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 33,
+    "fields": {
+      "fixture": 33,
+      "home_score": 7,
+      "away_score": 3,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 34,
+    "fields": {
+      "fixture": 34,
+      "home_score": 3,
+      "away_score": 7,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 35,
+    "fields": {
+      "fixture": 35,
+      "home_score": 5,
+      "away_score": 5,
+      "winner": "draw",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 36,
+    "fields": {
+      "fixture": 36,
+      "home_score": 8,
+      "away_score": 2,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 37,
+    "fields": {
+      "fixture": 37,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 38,
+    "fields": {
+      "fixture": 38,
+      "home_score": 6,
+      "away_score": 4,
+      "winner": "home",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 39,
+    "fields": {
+      "fixture": 39,
+      "home_score": 4,
+      "away_score": 6,
+      "winner": "away",
+      "status": "played"
+    }
+  },
+  {
+    "model": "league.fixtureresult",
+    "pk": 40,
+    "fields": {
+      "fixture": 40,
+      "home_score": 7,
+      "away_score": 3,
+      "winner": "home",
+      "status": "played"
+    }
+  }
+]
