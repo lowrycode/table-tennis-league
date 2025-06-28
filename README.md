@@ -587,7 +587,7 @@ Whenever a user carries out a delete action that is considered "serious" (irreve
 
 Users who have been assigned club admin status can access the Club Admin Dashboard page from the user dropdown menu. 
 
-*NOTE: This menu item will not appear for users who have not been assigned Club Admin status by the League Administrator. Assigning a user as a club admin is easily done in the Django Admin Panel using the ***Club admin*** model within the Clubs app. Phase 3 of project includes plans to develop a League Admin dashboard restricted page on the website itself; this page would include the ability to assign users as club admins.*
+*NOTE: This menu item will not appear for users who have not been assigned Club Admin status by the League Administrator. Assigning a user as a club admin is easily done in the Django Admin Panel using the ***Club admin*** model within the Clubs app. Stage 3 of project includes plans to develop a League Admin dashboard restricted page on the website itself; this page would include the ability to assign users as club admins.*
 
 The page allows a club admin to manage the club and venue information that will appear on the clubs page (after approval by the League Administrator).
 
@@ -639,17 +639,17 @@ The link to the Club Reviews page is disabled in the preview. The anchor element
 
 # Future Features
 
-So far, stage 1 has been fully completed and stage 2 has been partly completed.
+So far, **Stage 1** has been fully completed although in the future I intend to add **validation to postcode fields**, particularly in the Update Venue Info form.
 
-The unfinished features from stage 2 include:
-- Player Analysis page: for showing stats for individual players, including a player rankings page
-- The option for a user to link to a league player for a more personalised experience on the site
+**Stage 2** has been partly completed. The unfinished features from stage 2 include:
+- **Player Analysis pages** for showing stats for individual players and player rankings
+- The ability for a user to **link to a league player** and see a **personalised dashboard** page which summarises the fixtures, results and stats that are most relevant to them 
 
-The features planned for stage 3 relate to league administration. This includes:
-- Submitting match scores via the website
-- Registering club players and teams
-- A League Administrator dashboard to manage enquiries and club information approvals 
-- A Fixtures Generator to streamline the process of setting up a league season
+The features planned for **Stage 3** relate to **league administration through the website** rather than via the Django Admin panel. This includes:
+- **Submitting match scores**
+- **Registering club players and teams**
+- A **League Administrator dashboard** to manage enquiries and club information approvals 
+- A **Fixtures Generator** to streamline the process of setting up a league season
 
 Other useful features to be added include:
 - Email verification on account signup.
@@ -869,7 +869,11 @@ It was later made more robust by not giving the user the option of deleting a li
 
 ## Unresolved Bugs
 
-No known unresolved bugs remain.
+When testing the Google Map on the Clubs page with the iPad (9th generation), clicking on a map marker opened the venue information window as expected but sometimes the page scrolled down to the club information without waiting for the user to click the club link in the information window. On scrolling back to the top of the page, the venue information window remained open and can be closed in the normal way. This bug is slightly annoying for the user and is likely an issue with the way the Google Map API integrates with Apple products but since it doesn't break the website's functionality the issue has not been investigated in any detail.
+
+ *NOTE: A 'long-touch' on the map marker didn't suffer from this issue.*
+
+No other known bugs remain.
 
 ## Code Validation Tests
 
