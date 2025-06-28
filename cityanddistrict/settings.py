@@ -18,7 +18,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 GOOGLE_GEOCODE_API_KEY = os.environ.get('GOOGLE_GEOCODE_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG_MODE", "False") == "True"
+DEBUG = False
 
 ALLOWED_HOSTS = [".herokuapp.com", "127.0.0.1"]
 
