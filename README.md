@@ -78,7 +78,7 @@ Links to related pages are commonly included (e.g. the Login page links to the S
 
 ## 2. Information Architecture
 
-In addition to categorising information on different pages, the information is also prioritised with the most important information appearing first.
+In addition to categorising information on different pages, the information is also *prioritised* with the most important information appearing first.
 
 For example:
 - The ordering of items within the *top navigation bar* reflects the order in which users are likely to be looking for information
@@ -220,7 +220,7 @@ On tablet and larger screen sizes, the full navigation menu is shown. On mobile 
 
 ![Navigation bar](readme-resources/images/nav-bar.jpg)
 
-The items are listed in the order of priority that the users are likely to want to visit them. Clicking on the league logo provides an alternative method for navigating to the Homepage - this may be preferred by mobile and tablet users who would otherwise have to expand the navigation menu.
+The items are listed in the *order of priority* that the users are likely to want to visit them. Clicking on the league logo provides an alternative method for navigating to the Homepage - this may be preferred by mobile and tablet users who would otherwise have to expand the navigation menu.
 
 The default behaviour of the *Bootstrap Navbar* is retained (i.e. the hover effects and the lighter font showing the active page).
 
@@ -232,7 +232,7 @@ Clicking on "Contact Us" links to the Contact page. Clicking on a social media i
 
 ![Footer section ](readme-resources/images/footer.jpg)
 
-All links have hover effects (brighter white), a title (which is displayed on hover) and an aria-label (to assist screen readers).
+All links have *hover* effects (brighter white), a *title* (which is displayed on hover) and an *aria-label* (to assist screen readers).
 
 Links to external pages open in a new tab (to avoid taking users away from the main site) and use the rel="noopener noreferrer" attribute (for increased security).
 
@@ -249,7 +249,7 @@ For example:
 
 ### Hero Section
 
-The Homepage opens with a hero image showing an action shot of a table tennis player. This is designed to immediately engage visitors and convey the energy of the sport.
+The Homepage opens with a *hero image* showing an action shot of a table tennis player. This is designed to immediately engage visitors and convey the energy of the sport.
 
 ![Hero section](readme-resources/images/hero.jpg)
 
@@ -265,7 +265,7 @@ The next section provides a friendly welcome to the website and background infor
 
 ### News Section
 
-This section displays active league news items in a rotating carousel. Users can cycle through them using navigation buttons, which are hidden when only one news item is available. When no active news items are available, a placeholder message is shown instead.
+This section displays active league news items in a rotating carousel. Users can cycle through them using *navigation buttons*, which are hidden when only one news item is available. When no active news items are available, a *placeholder message* is shown instead.
 
 ![News section](readme-resources/images/news.jpg)
 
@@ -277,7 +277,7 @@ This section provides an alternative pathway to the Clubs, League Tables, Fixtur
 
 ![Useful Links section](readme-resources/images/useful-links.jpg)
 
-Each card includes a key word and related image to grab the attention of the user. On hovering over the card, it expands slightly with a shadow effect to indicate to the user that it is clickable.
+Each card includes a key word and related image to grab the attention of the user. On hovering over the card, it *expands* slightly with a *shadow effect* to indicate to the user that it is clickable.
 
 ### FAQs Section
 
@@ -309,7 +309,7 @@ It includes:
 - A Google Map showing the positions of the club venues.
 - Information about each club listed in alphabetical order (by club name) and a filter based on checklist criteria.
 
-All of the information on this page is dynamically populated from data in the database. The data itself is submitted by authenticated website users through restricted pages that are only accessible to users who have **Club Admin Status** on their account. All user submitted information must be approved by the league administrator before it appears on the clubs page. This approach ensures that the information is accurate and contains no offensive content.
+All of the information on this page is *dynamically populated* from data in the database. The data itself is submitted by authenticated website users through restricted pages that are only accessible to users who have **Club Admin Status** on their account. All user submitted information must be approved by the league administrator before it appears on the clubs page. This approach ensures that the information is accurate and contains no offensive content.
 
 *NOTE: More details about the Club Admin Dashboard can be found [here](#club-admin-dashboard).*
 
@@ -401,7 +401,7 @@ The league administrator can view all submitted enquiries in the Django Admin Pa
 ![Enquiries as viewed in the Django Admin Panel](readme-resources/images/dj-admin-enquiry.jpg)
 
 
-## League Fixtures page
+## League Fixtures Page
 
 The League Fixtures page can be accessed from the League dropdown menu in the navbar. It displays all league fixtures (played and unplayed) for a given season (current season by default). The fixtures are grouped by week and sorted in chronological order.
 
@@ -433,7 +433,11 @@ Each fixture displays the name of the home and away teams, the fixture date, the
 
 ![Venue modal on Fixtures page](readme-resources/images/venue-modal.jpg)
 
-Clicking a team name navigates to its Team Summary page, which displays player details and performance statistics.
+When the modal first loads, a spinner displays for a brief moment to indicate that the information is being retrieved. Fallback placeholders are shown if no approved venue information is available or if the venue record is not found in the database.
+
+![Venue modal spinner and placeholder fallbacks](readme-resources/images/venue-modal-fallbacks.jpg)
+
+Clicking a team name (in the Fixtures page) navigates to its [Team Summary](#team-summary-page) page, which displays player details and performance statistics.
 
 The links are styled consistently with the rest of the site, including similar hover effects and tooltips.
 
@@ -452,11 +456,11 @@ The League Results page can be accessed from the League dropdown menu in the nav
 
 ### Filtering Results
 
-The filtering functionality is similar to the Fixtures page.
+The filtering functionality is similar to the [League Fixtures](#league-fixtures-page) page.
 
 ### Additional Result Information
 
-Just like on the Fixtures page, clicking on a team name redirects to the Team Summary page.
+Just like on the Fixtures page, clicking on a team name redirects to the [Team Summary](#team-summary-page) page.
 
 Although the date of the fixture is still displayed, the time of the fixture has been replaced by the fixture result and the Venue button has been replaced by a Scores link. Clicking the scores link navigates to the [Result Breakdown](#result-breakdown-page) page.
 
@@ -491,21 +495,21 @@ The League Tables page can be accessed from the League dropdown menu in the navb
 
 ![League Tables page](readme-resources/images/league-tables.jpg)
 
-Teams are ranked by points (high to low). In the event of a tie, the following secondary criteria is progressively applied until an order is resolved:
+Teams are ranked by points (high to low). In the event of a tie, the following secondary criteria are progressively applied until an order is resolved:
 - Number of team matches won
 - Number of team sets won (individual singles and doubles matches)
 - Number of individual games won (within singles and doubles matches)
 
 The league tables for different seasons can be viewed using the filter panel.
 
-Clicking on a team name navigates to the Team Summary page for that team.
+Clicking on a team name navigates to the [Team Summary](#team-summary-page) page for that team.
 
 The following fallback messages may be shown:
 - "Season not found" - when the league administrator has not marked any season as *current*.
 - "No tables to display" - if there are no divisions assigned to the season.
 - "No table to display" under the division name - if there are no teams assigned to the division yet.
 
-If no matches have been played yet, the table shows a table including team names with initial data as in the image below.
+If no matches have been played yet, the table includes team names with zero values as in the image below.
 
 ![League Tables before matches have been played page](readme-resources/images/league-table-no-matches.jpg)
 
@@ -523,24 +527,15 @@ All player statistics are specific to their performance for the specified team; 
 
 Reserve players are indicated with the word 'RESERVE' in brackets after their name.
 
-Team results are listed in chronological order by week. Clicking on the opponent navigates to their Team Summary page. Clicking on the venue opens a modal with venue information (as already seen on the Fixtures page). Clicking on the score navigates to the Result Breakdown page for that match.
+Team results are listed in chronological order by week. Clicking on the opponent navigates to their [Team Summary](#team-summary-page) page. Clicking on the venue opens a modal with venue information (as already seen on the [League Fixtures](#league-fixtures-page) page). Clicking on the score navigates to the [Result Breakdown](#result-breakdown-page) page for that match.
 
-Upcoming fixtures are listed in chronological order by date. Clicking on the opponent navigates to the Team Summary page for that team and clicking on the venue opens the modal containing venue information.
+Upcoming fixtures are listed in chronological order by date. Clicking on the opponent navigates to the [Team Summary](#team-summary-page) page for that team and clicking on the venue opens the modal containing venue information.
 
 Clicking the 'Go Back' button near the top or bottom of the page takes the user back to their previous page.
 
 If the team has no fixtures, results or players yet, the page will display as in the image below.
 
 ![Team Summary page before fixtures, results and players](readme-resources/images/team-summary-no-data.jpg)
-
-
-## Error Pages
-
-This website implements three custom error pages for HTTP status codes 403, 404 and 500.
-
-![Custom Error Pages](readme-resources/images/error-pages.jpg)
-
-The pages are styled in a similar way to other pages on the website and include the navbar, footer and a link back to the Homepage. This reassures the user that they are still on the website. Two of the pages also include another link to the contact page so that users can quickly navigate to their next location without any confusion.
 
 ## User Authentication Pages
 
@@ -623,7 +618,7 @@ Since venues can be shared by multiple clubs:
 - A warning is displayed when a user tries to update venue information for shared venues.
 - Users are allowed to delete unapproved venue information but not to delete the venue itself if it is shared with other clubs.
 
-If a user tries to delete a venue that is linked to a team in the league, the venue will not be deleted, the user is redirected to the Club Admin page and a warning message displays "Venue could not be deleted because it is linked to protected league data".
+Venues which are linked to a team in historic league data are protected. A notification box is displayed above the form stating "The venue cannot be deleted because it is assigned as a home venue for at least one team in the league." and the second radio button is disabled. If a user tries to delete a team-linked venue by somehow activating the disabled checkbox option, the venue will not be deleted, the user is redirected to the Club Admin page and a warning message displays "Venue could not be deleted because it is linked to protected league data".
 
 ### Preview Club and Venue Information
 
@@ -636,6 +631,14 @@ If all information is approved, it will display exactly what is currently shown 
 If any information is not yet approved, a message appears above the preview to clarify that this is how the information will appear on the clubs page when it has been approved.
 
 The link to the Club Reviews page is disabled in the preview. The anchor element has been replaced with a paragraph element to avoid confusing screen readers.
+
+## Error Pages
+
+This website implements three custom error pages for HTTP status codes 403, 404 and 500.
+
+![Custom Error Pages](readme-resources/images/error-pages.jpg)
+
+The pages are styled in a similar way to other pages on the website and include the navbar, footer and a link back to the Homepage. This reassures the user that they are still on the website. Two of the pages also include another link to the contact page so that users can quickly navigate to their next location without any confusion.
 
 # Database Data and Design
 
@@ -701,7 +704,7 @@ In addition to the standard Django packages, the following Python packages were 
 - **requests**: for making HTTP requests to Google Geocoding API on server side
 - **whitenoise**: for serving static files directly from Django in production
 
-The following package was used in development but not included in the requirements.txt:
+The following package was used in development for formatting template files but is not used in production so is not included in the requirements.txt:
 - **djhtml**: for formatting django templates
 
 Most of the code was written in a local copy of **Visual Studio Code**.
@@ -789,7 +792,7 @@ A number of bugs were encountered during testing. Some of these are described be
 Clubs without any approved information were appearing on the homepage
 
 **Cause:**
-The line for appending to club_dicts was under-indented and therefore out of the if block.
+The line for appending to club_dicts was under-indented and therefore outside of the if block.
 
 ```python
 if club.approved_club_infos:
@@ -808,7 +811,7 @@ Indented the line for appending to clubs_dict to ensure it is contained in the i
 Image files were not being correctly uploaded via the form on the Club Info page.
 
 **Cause:**
-The form was missing `enctype` attribute and the files were not being passed to the form in the update_club_info view.
+The form was missing the `enctype` attribute and the files were not being passed to the form in the update_club_info view.
 
 ```python
 # Problem line in update_club_info.html template
@@ -819,7 +822,7 @@ form = UpdateClubInfoForm(request.POST)
 ```
 
 **Fix:**
-Added `enctype="multipart/form-data"` to form element in the template and passed files to the form in the view.
+Added `enctype="multipart/form-data"` to the form element in the template and passed files to the form in the view.
 
 ```python
 # Correction in template
